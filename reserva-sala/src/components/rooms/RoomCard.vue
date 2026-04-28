@@ -44,6 +44,8 @@
         <span class="font-weight-medium">{{ formattedDays }}</span>
       </div>
 
+      <RoomAmenities :amenities="room.amenities || []" class="mb-4" />
+
       <v-divider class="mb-5 opacity-50" />
 
       <div class="d-flex align-center">
@@ -68,6 +70,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import RoomAmenities from '@/components/common/RoomAmenities.vue'
 
 interface DetailedRoom {
   id: string
@@ -77,6 +80,7 @@ interface DetailedRoom {
   rating?: number
   location?: string
   features?: string[]
+  amenities?: string[]
   image: string
   availability?: {
     days: number[]
