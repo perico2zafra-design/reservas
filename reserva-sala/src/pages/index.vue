@@ -7,7 +7,7 @@
       </div>
       <v-spacer />
       <v-btn
-        v-if="authStore.isSuperAdmin"
+        v-if="authStore.isAdmin"
         color="primary"
         prepend-icon="mdi-plus-circle"
         rounded="xl"
@@ -24,7 +24,7 @@
       <v-col v-for="block in blocks" :key="block.id" cols="12" sm="6" lg="4">
         <v-card rounded="xl" class="border-0 hover-lift glass-card overflow-hidden block-card elevation-2">
           <v-img :src="block.image" height="240" cover class="align-start">
-            <div class="pa-4 d-flex justify-end w-100 bg-gradient-top" v-if="authStore.isSuperAdmin">
+            <div class="pa-4 d-flex justify-end w-100 bg-gradient-top" v-if="authStore.isAdmin">
               <v-btn
                 icon="mdi-pencil"
                 size="small"
