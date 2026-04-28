@@ -16,6 +16,22 @@ const router = createRouter({
       component: () => import('@/pages/login.vue'),
     },
     {
+      path: '/register',
+      name: 'register',
+      component: () => import('@/pages/register.vue'),
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: () => import('@/pages/forgot-password.vue'),
+    },
+    {
+      path: '/reset-password',
+      name: 'reset-password',
+      component: () => import('@/pages/reset-password.vue'),
+    },
+
+    {
       path: '/',
       name: 'home',
       component: () => import('@/pages/index.vue'),
@@ -36,17 +52,25 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  authStore.initialize()
+  
+  if (!authStore.token) {
+    authStore.initialize()
+  }
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+  const publicPages = ['login', 'register', 'forgot-password', 'reset-password']
+  const authRequired = !publicPages.includes(to.name as string)
+  const loggedIn = authStore.isAuthenticated
+
+  if (authRequired && !loggedIn) {
     next('/login')
-  } else if (to.name === 'login' && authStore.isAuthenticated) {
+  } else if (loggedIn && publicPages.includes(to.name as string)) {
     next('/')
   } else {
     next()
   }
 })
+
 
 export default router
