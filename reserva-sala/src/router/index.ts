@@ -49,6 +49,12 @@ const router = createRouter({
       component: () => import('@/pages/room-details.vue'),
       meta: { requiresAuth: true }
     },
+    {
+      path: '/admin',
+      name: 'admin-dashboard',
+      component: () => import('@/pages/admin-dashboard.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
   ],
 })
 

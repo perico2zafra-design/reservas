@@ -89,7 +89,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '@/stores/auth'
 
@@ -97,10 +97,16 @@
   const router = useRouter()
   const drawer = ref(true)
 
-  const menuItems = [
-    { title: 'Bloques', icon: 'mdi-view-dashboard-outline', to: '/' },
-    { title: 'Ajustes', icon: 'mdi-cog-outline', to: '/settings' },
-  ]
+  const menuItems = computed(() => {
+    const items = [
+      { title: 'Bloques', icon: 'mdi-view-dashboard-outline', to: '/' },
+    ]
+    if (authStore.isAdmin) {
+      items.push({ title: 'Panel Admin', icon: 'mdi-shield-check-outline', to: '/admin' })
+    }
+    items.push({ title: 'Ajustes', icon: 'mdi-cog-outline', to: '/settings' })
+    return items
+  })
 
   const handleLogout = () => {
     authStore.logout()
