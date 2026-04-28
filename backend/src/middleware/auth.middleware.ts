@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import { supabase } from '../lib/supabase.js';
 
 interface AuthRequest extends Request {
   user?: any;
 }
 
-export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -13,17 +13,22 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
     return res.status(401).json({ message: 'No token provided' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET || 'secret', (err: any, user: any) => {
-    if (err) {
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
       return res.status(403).json({ message: 'Invalid or expired token' });
     }
+
     req.user = user;
     next();
-  });
+  } catch (err) {
+    return res.status(500).json({ message: 'Error authenticating token' });
+  }
 };
 
 export const authorizeAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (req.user && req.user.role === 'ADMIN') {
+  if (req.user && req.user.user_metadata?.role === 'ADMIN') {
     next();
   } else {
     res.status(403).json({ message: 'Admin access required' });

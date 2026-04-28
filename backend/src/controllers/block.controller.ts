@@ -1,11 +1,14 @@
 import { Request, Response } from 'express';
-import { prisma } from '../lib/prisma.js';
+import { Request, Response } from 'express';
+import { supabase } from '../lib/supabase.js';
 
 export const getAllBlocks = async (req: Request, res: Response) => {
   try {
-    const blocks = await prisma.block.findMany({
-      include: { rooms: true }
-    });
+    const { data: blocks, error } = await supabase
+      .from('Block')
+      .select('*, Room(*)');
+    
+    if (error) throw error;
     res.json(blocks);
   } catch (error) {
     console.error('Error fetching blocks:', error);
@@ -16,9 +19,13 @@ export const getAllBlocks = async (req: Request, res: Response) => {
 export const createBlock = async (req: Request, res: Response) => {
   const { name, location, description, image } = req.body;
   try {
-    const block = await prisma.block.create({
-      data: { name, location, description, image },
-    });
+    const { data: block, error } = await supabase
+      .from('Block')
+      .insert([{ name, location, description, image }])
+      .select()
+      .single();
+
+    if (error) throw error;
     res.status(201).json(block);
   } catch (error) {
     console.error('Error creating block:', error);

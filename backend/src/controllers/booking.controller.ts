@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
-import { prisma } from '../lib/prisma.js';
+import { Request, Response } from 'express';
+import { supabase } from '../lib/supabase.js';
 
 export const getAllBookings = async (req: Request, res: Response) => {
   try {
-    const bookings = await prisma.booking.findMany({
-      include: { room: true },
-      orderBy: { startTime: 'asc' }
-    });
+    const { data: bookings, error } = await supabase
+      .from('Booking')
+      .select('*, Room(*)');
+    
+    if (error) throw error;
     res.json(bookings);
   } catch (error) {
     console.error('Error fetching bookings:', error);
@@ -15,16 +17,20 @@ export const getAllBookings = async (req: Request, res: Response) => {
 };
 
 export const createBooking = async (req: Request, res: Response) => {
-  const { roomId, userName, startTime, endTime } = req.body;
+  const { roomId, userId, startTime, endTime } = req.body;
   try {
-    const booking = await prisma.booking.create({
-      data: {
+    const { data: booking, error } = await supabase
+      .from('Booking')
+      .insert([{
         roomId: parseInt(roomId),
-        userName,
-        startTime: new Date(startTime),
-        endTime: new Date(endTime),
-      },
-    });
+        userId, // Esto ahora es un UUID de Supabase Auth
+        startTime: new Date(startTime).toISOString(),
+        endTime: new Date(endTime).toISOString(),
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
     res.status(201).json(booking);
   } catch (error) {
     console.error('Error creating booking:', error);
@@ -35,9 +41,12 @@ export const createBooking = async (req: Request, res: Response) => {
 export const deleteBooking = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    await prisma.booking.delete({
-      where: { id: parseInt(id) }
-    });
+    const { error } = await supabase
+      .from('Booking')
+      .delete()
+      .eq('id', parseInt(id));
+
+    if (error) throw error;
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting booking:', error);

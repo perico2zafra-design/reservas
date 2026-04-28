@@ -1,9 +1,14 @@
 import { Request, Response } from 'express';
-import { prisma } from '../lib/prisma.js';
+import { Request, Response } from 'express';
+import { supabase } from '../lib/supabase.js';
 
 export const getAllRooms = async (req: Request, res: Response) => {
   try {
-    const rooms = await prisma.room.findMany();
+    const { data: rooms, error } = await supabase
+      .from('Room')
+      .select('*');
+    
+    if (error) throw error;
     res.json(rooms);
   } catch (error) {
     console.error('Error fetching rooms:', error);
@@ -12,10 +17,11 @@ export const getAllRooms = async (req: Request, res: Response) => {
 };
 
 export const createRoom = async (req: Request, res: Response) => {
-  const { name, capacity, description, image, openTime, closeTime, workDays } = req.body;
+  const { name, capacity, description, image, openTime, closeTime, workDays, blockId } = req.body;
   try {
-    const room = await prisma.room.create({
-      data: {
+    const { data: room, error } = await supabase
+      .from('Room')
+      .insert([{
         name,
         capacity: parseInt(capacity),
         description,
@@ -23,8 +29,12 @@ export const createRoom = async (req: Request, res: Response) => {
         openTime,
         closeTime,
         workDays: Array.isArray(workDays) ? workDays.join(',') : workDays,
-      },
-    });
+        blockId: parseInt(blockId)
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
     res.status(201).json(room);
   } catch (error) {
     console.error('Error creating room:', error);
@@ -36,18 +46,24 @@ export const updateRoom = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { name, capacity, description, image, openTime, closeTime, workDays } = req.body;
   try {
-    const room = await prisma.room.update({
-      where: { id: parseInt(id) },
-      data: {
-        name,
-        capacity: capacity ? parseInt(capacity) : undefined,
-        description,
-        image,
-        openTime,
-        closeTime,
-        workDays: Array.isArray(workDays) ? workDays.join(',') : workDays,
-      },
-    });
+    const updateData: any = {
+      name,
+      description,
+      image,
+      openTime,
+      closeTime,
+      workDays: Array.isArray(workDays) ? workDays.join(',') : workDays,
+    };
+    if (capacity) updateData.capacity = parseInt(capacity);
+
+    const { data: room, error } = await supabase
+      .from('Room')
+      .update(updateData)
+      .eq('id', parseInt(id))
+      .select()
+      .single();
+
+    if (error) throw error;
     res.json(room);
   } catch (error) {
     console.error('Error updating room:', error);
@@ -58,9 +74,12 @@ export const updateRoom = async (req: Request, res: Response) => {
 export const deleteRoom = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    await prisma.room.delete({
-      where: { id: parseInt(id) }
-    });
+    const { error } = await supabase
+      .from('Room')
+      .delete()
+      .eq('id', parseInt(id));
+
+    if (error) throw error;
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting room:', error);
