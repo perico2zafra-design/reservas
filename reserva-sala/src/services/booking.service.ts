@@ -1,0 +1,51 @@
+import api from './api';
+import type { Booking, CreateBookingDTO, Room, CreateRoomDTO } from '../types/api';
+
+export const bookingService = {
+  // Block endpoints
+  async getBlocks(): Promise<any[]> {
+    const response = await api.get('/blocks');
+    return response.data;
+  },
+
+  async createBlock(blockData: any): Promise<any> {
+    const response = await api.post('/blocks', blockData);
+    return response.data;
+  },
+
+  // Room endpoints
+  async getRooms(blockId?: number): Promise<Room[]> {
+    const url = blockId ? `/rooms?blockId=${blockId}` : '/rooms';
+    const response = await api.get<Room[]>(url);
+    return response.data;
+  },
+
+  async createRoom(roomData: CreateRoomDTO): Promise<Room> {
+    const response = await api.post<Room>('/rooms', roomData);
+    return response.data;
+  },
+
+  async updateRoom(id: number, roomData: Partial<CreateRoomDTO>): Promise<Room> {
+    const response = await api.put<Room>(`/rooms/${id}`, roomData);
+    return response.data;
+  },
+
+  async deleteRoom(id: number): Promise<void> {
+    await api.delete(`/rooms/${id}`);
+  },
+
+  // Booking endpoints
+  async getBookings(): Promise<Booking[]> {
+    const response = await api.get<Booking[]>('/bookings');
+    return response.data;
+  },
+
+  async createBooking(bookingData: CreateBookingDTO): Promise<Booking> {
+    const response = await api.post<Booking>('/bookings', bookingData);
+    return response.data;
+  },
+
+  async cancelBooking(id: number): Promise<void> {
+    await api.delete(`/bookings/${id}`);
+  }
+};

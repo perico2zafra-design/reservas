@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Block {
+  id          Int      @id @default(autoincrement())
+  name        String
+  location    String
+  description String?
+  image       String?
+  rooms       Room[]
+  createdAt   DateTime @default(now())
+}
+
+model Room {
+  id          Int       @id @default(autoincrement())
+  name        String
+  capacity    Int
+  description String?
+  image       String?
+  openTime    String    @default("09:00")
+  closeTime   String    @default("18:00")
+  workDays    String    @default("1,2,3,4,5") // Monday to Friday
+  blockId     Int
+  block       Block     @relation(fields: [blockId], references: [id])
+  bookings    Booking[]
+  createdAt   DateTime  @default(now())
+}
+
+model User {
+  id               Int       @id @default(autoincrement())
+  email            String    @unique
+  password         String
+  name             String
+  role             String    @default("USER") // USER, ADMIN
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  bookings         Booking[]
+  createdAt        DateTime  @default(now())
+}
+
+model Booking {
+  id        Int      @id @default(autoincrement())
+  roomId    Int
+  room      Room     @relation(fields: [roomId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  startTime DateTime
+  endTime   DateTime
+  createdAt DateTime @default(now())
+}
+
