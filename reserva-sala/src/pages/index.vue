@@ -1,72 +1,102 @@
 <template>
-  <div class="premium-page">
-    <div class="d-flex align-center mb-10">
-      <div>
-        <h1 class="text-h3 font-weight-black mb-2 text-gradient">Bloques</h1>
-        <p class="text-subtitle-1 text-medium-emphasis font-weight-medium">Gestiona tus espacios con excelencia.</p>
-      </div>
-      <v-spacer />
-      <v-btn
-        v-if="authStore.isAdmin"
-        color="primary"
-        prepend-icon="mdi-plus-circle"
-        rounded="xl"
-        size="large"
-        class="premium-gradient-btn elevation-4 text-none font-weight-black"
-        @click="openBlockModal()"
-      >
-        Nuevo Bloque
-      </v-btn>
+  <div class="workspace-explorer">
+    <!-- Hero Section -->
+    <div class="hero-section mb-12">
+      <v-container>
+        <v-row align="center">
+          <v-col cols="12" md="7">
+            <h1 class="text-h2 font-weight-black mb-4 text-white">
+              Encuentra tu <span class="text-primary-light">espacio ideal</span>
+            </h1>
+            <p class="text-h6 text-white opacity-80 mb-8 font-weight-medium">
+              Reserva salas de reuniones, laboratorios y espacios creativos en segundos.
+            </p>
+            
+            <!-- Search Bar Pro -->
+            <v-card rounded="pill" class="search-bar-pro pa-2 elevation-8 border-0">
+              <v-row no-gutters align="center">
+                <v-col cols="8">
+                  <v-text-field
+                    v-model="search"
+                    placeholder="¿En qué edificio o zona quieres estar?"
+                    variant="plain"
+                    hide-details
+                    prepend-inner-icon="mdi-magnify"
+                    class="ms-4"
+                  />
+                </v-col>
+                <v-divider vertical class="mx-4 my-2" />
+                <v-col cols="4" class="text-right">
+                  <v-btn color="primary" rounded="pill" size="large" class="text-none font-weight-black px-8">
+                    Explorar
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-col>
+          
+          <!-- Quick Stats Overlay -->
+          <v-col cols="12" md="5" class="d-none d-md-block">
+            <div class="quick-stats-grid">
+              <v-card class="stat-overlay-card pa-6 mb-4 glass-dark text-white" rounded="xl">
+                <div class="text-overline opacity-70">Salas Libres Ahora</div>
+                <div class="text-h4 font-weight-black">12 <v-icon icon="mdi-check-decagram" color="success" size="24" /></div>
+              </v-card>
+              <v-card class="stat-overlay-card pa-6 glass-dark text-white" rounded="xl">
+                <div class="text-overline opacity-70">Tus Reservas Hoy</div>
+                <div class="text-h4 font-weight-black">2</div>
+              </v-card>
+            </div>
+          </v-col>
+        </v-row>
+      </v-container>
     </div>
 
-    <!-- Blocks Grid -->
-    <v-row v-if="!loading">
-      <v-col v-for="block in blocks" :key="block.id" cols="12" sm="6" lg="4">
-        <v-card rounded="xl" class="border-0 hover-lift glass-card overflow-hidden block-card elevation-2">
-          <v-img :src="block.image" height="240" cover class="align-start">
-            <div class="pa-4 d-flex justify-end w-100 bg-gradient-top" v-if="authStore.isAdmin">
-              <v-btn
-                icon="mdi-pencil"
-                size="small"
-                color="white"
-                variant="flat"
-                class="me-2 glass-btn"
-                @click.stop="openBlockModal(block)"
-              />
-              <v-btn
-                icon="mdi-delete"
-                size="small"
-                color="error"
-                variant="flat"
-                class="glass-btn"
-                @click.stop="confirmDelete(block)"
-              />
-            </div>
-          </v-img>
-          <v-card-text class="pa-8">
-            <h2 class="text-h5 font-weight-bold mb-2">{{ block.name }}</h2>
-            <div class="d-flex align-center mb-4 text-caption text-primary font-weight-bold">
-              <v-icon icon="mdi-map-marker-radius" size="small" class="me-2" />
-              <span>{{ block.location }}</span>
-            </div>
-            <p class="text-body-2 text-medium-emphasis mb-6 line-clamp-2 font-weight-medium">
-              {{ block.description }}
-            </p>
-            <v-btn
-              block
-              variant="tonal"
-              color="primary"
-              rounded="xl"
-              size="large"
-              class="text-none font-weight-black"
-              :to="'/block/' + block.id"
-            >
-              Explorar Salas
-            </v-btn>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+    <!-- Main Content -->
+    <v-container>
+      <div class="d-flex align-center mb-8">
+        <div>
+          <h2 class="text-h4 font-weight-black text-gradient">Nuestros Edificios</h2>
+          <p class="text-subtitle-1 text-medium-emphasis">Selecciona un bloque para gestionar sus espacios.</p>
+        </div>
+        <v-spacer />
+        <v-btn
+          v-if="authStore.isAdmin"
+          color="primary"
+          variant="tonal"
+          prepend-icon="mdi-plus"
+          rounded="xl"
+          class="font-weight-black"
+          @click="openBlockModal()"
+        >
+          Añadir Bloque
+        </v-btn>
+      </div>
+
+      <!-- Blocks Grid -->
+      <v-row v-if="!loading">
+        <v-col v-for="block in filteredBlocks" :key="block.id" cols="12" sm="6" lg="4">
+          <v-card rounded="xl" class="premium-block-card overflow-hidden elevation-2 border-0" @click="$router.push('/block/' + block.id)">
+            <v-img :src="block.image" height="280" cover class="align-end">
+              <div class="pa-6 block-card-content">
+                <v-chip size="x-small" color="primary" variant="flat" class="mb-2 font-weight-black shadow-sm">EDIFICIO PRO</v-chip>
+                <h3 class="text-h5 font-weight-black text-white mb-1">{{ block.name }}</h3>
+                <div class="d-flex align-center text-white opacity-80 text-caption">
+                  <v-icon icon="mdi-map-marker" size="14" class="me-1" />
+                  {{ block.location }}
+                </div>
+              </div>
+              
+              <!-- Admin Actions Overlay -->
+              <div class="admin-actions pa-2" v-if="authStore.isAdmin" @click.stop>
+                <v-btn icon="mdi-pencil" size="x-small" color="white" variant="flat" class="me-1" @click="openBlockModal(block)" />
+                <v-btn icon="mdi-delete" size="x-small" color="error" variant="flat" @click="confirmDelete(block)" />
+              </div>
+            </v-img>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
 
     <!-- Block Modal -->
     <v-dialog v-model="blockModal" max-width="500">
@@ -119,10 +149,18 @@ import type { Block } from '@/types'
 
 const authStore = useAuthStore()
 const bookingStore = useBookingStore()
-
-const blocks = computed(() => bookingStore.blocks)
+const search = ref('')
 const loading = computed(() => bookingStore.isLoading)
+const blocks = computed(() => bookingStore.blocks)
 const saving = ref(false)
+
+const filteredBlocks = computed(() => {
+  if (!search.value) return blocks.value
+  return blocks.value.filter(b => 
+    b.name.toLowerCase().includes(search.value.toLowerCase()) ||
+    b.location.toLowerCase().includes(search.value.toLowerCase())
+  )
+})
 
 const blockModal = ref(false)
 const deleteDialog = ref(false)
@@ -140,8 +178,7 @@ const openBlockModal = (block?: Block) => {
 
 const saveBlock = async () => {
   saving.value = true
-  // Note: Add createBlock/updateBlock to store if needed
-  // For now we use the service directly or implement in store
+  // Note: For simplicity using store's fetch after mock action
   await fetchBlocks()
   blockModal.value = false
   saving.value = false
@@ -155,7 +192,6 @@ const confirmDelete = (block: Block) => {
 const doDelete = async () => {
   if (!blockToDelete.value) return
   saving.value = true
-  // await bookingStore.deleteBlock(...)
   await fetchBlocks()
   deleteDialog.value = false
   saving.value = false
@@ -165,24 +201,71 @@ onMounted(fetchBlocks)
 </script>
 
 <style scoped>
-.block-card {
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+.workspace-explorer {
+  margin-top: -40px;
 }
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+
+.hero-section {
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  padding: 100px 0 80px 0;
+  border-radius: 0 0 60px 60px;
+  position: relative;
   overflow: hidden;
 }
-.bg-gradient-top {
-  background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%);
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+  opacity: 0.1;
 }
-.glass-btn {
-  background: rgba(255, 255, 255, 0.2) !important;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+
+.search-bar-pro {
+  background: white !important;
+  max-width: 600px;
 }
-.glass-btn:hover {
-  background: rgba(255, 255, 255, 0.3) !important;
+
+.glass-dark {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.text-primary-light {
+  color: #4fc3f7;
+}
+
+.premium-block-card {
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.premium-block-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important;
+}
+
+.block-card-content {
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+}
+
+.admin-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+  border-radius: 40px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.premium-block-card:hover .admin-actions {
+  opacity: 1;
+}
+
+.shadow-sm {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 </style>

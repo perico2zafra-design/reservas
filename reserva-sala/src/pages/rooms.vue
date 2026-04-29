@@ -1,65 +1,114 @@
 <template>
-  <div>
-    <v-btn
-      variant="text"
-      prepend-icon="mdi-arrow-left"
-      class="mb-4 text-none"
-      to="/"
-    >
-      Volver a Bloques
-    </v-btn>
-
-    <div class="d-flex align-center mb-6">
+  <div class="rooms-explorer">
+    <div class="d-flex align-center mb-8">
+      <v-btn
+        variant="tonal"
+        icon="mdi-arrow-left"
+        to="/"
+        class="me-4 elevation-1"
+        color="primary"
+      />
       <div>
-        <h1 class="text-h4 font-weight-bold mb-1">Salas del Bloque</h1>
-        <p class="text-subtitle-1 text-medium-emphasis">Gestiona las salas y sus horarios.</p>
+        <h1 class="text-h4 font-weight-black text-gradient">Salas Disponibles</h1>
+        <p class="text-subtitle-1 text-medium-emphasis">Explora y reserva el espacio que necesitas.</p>
       </div>
       <v-spacer />
-      <v-btn
-        v-if="authStore.isAdmin"
-        color="secondary"
-        variant="tonal"
-        prepend-icon="mdi-account-group"
-        rounded="lg"
-        class="me-2"
-        @click="openMembersModal()"
-      >
-        Miembros
-      </v-btn>
-      <v-btn
-        v-if="authStore.isAdmin"
-        color="primary"
-        prepend-icon="mdi-plus"
-        rounded="lg"
-        @click="openRoomModal()"
-      >
-        Nueva Sala
-      </v-btn>
+      <div class="d-flex gap-2">
+        <v-btn
+          v-if="authStore.isAdmin"
+          color="secondary"
+          variant="tonal"
+          prepend-icon="mdi-account-group"
+          rounded="xl"
+          class="text-none font-weight-black"
+          @click="openMembersModal()"
+        >
+          Miembros
+        </v-btn>
+        <v-btn
+          v-if="authStore.isAdmin"
+          color="primary"
+          prepend-icon="mdi-plus"
+          rounded="xl"
+          class="text-none font-weight-black elevation-4"
+          @click="openRoomModal()"
+        >
+          Nueva Sala
+        </v-btn>
+      </div>
     </div>
 
-    <v-row v-if="!loading">
-      <v-col v-for="room in rooms" :key="room.id" cols="12" sm="6" lg="4">
-        <RoomCard :room="room" @book="$router.push('/room/' + room.id)">
-          <template v-slot:append v-if="authStore.isAdmin">
-            <div class="pa-4 d-flex justify-end position-absolute top-0 right-0">
-              <v-btn
-                icon="mdi-pencil"
-                size="small"
-                color="white"
-                class="me-2"
-                @click.stop="openRoomModal(room)"
-              />
-              <v-btn
-                icon="mdi-delete"
-                size="small"
-                color="error"
-                @click.stop="confirmDelete(room)"
-              />
+    <!-- Filter Bar -->
+    <v-card rounded="xl" class="glass-card pa-4 mb-8 border-0 elevation-2">
+      <v-row align="center" no-gutters>
+        <v-col cols="12" md="4" class="px-2">
+          <v-text-field
+            v-model="roomSearch"
+            prepend-inner-icon="mdi-magnify"
+            label="Buscar por nombre..."
+            variant="solo-filled"
+            flat
+            hide-details
+            rounded="lg"
+            density="comfortable"
+          />
+        </v-col>
+        <v-col cols="12" md="3" class="px-2">
+          <v-select
+            v-model="capacityFilter"
+            :items="['Todas', '2-5 personas', '6-10 personas', '10+ personas']"
+            label="Capacidad"
+            variant="solo-filled"
+            flat
+            hide-details
+            rounded="lg"
+            density="comfortable"
+            prepend-inner-icon="mdi-account-group-outline"
+          />
+        </v-col>
+        <v-spacer />
+        <v-col cols="auto" class="px-2">
+          <v-btn-toggle v-model="viewMode" rounded="lg" mandatory density="comfortable" color="primary">
+            <v-btn value="grid" icon="mdi-view-grid-outline" />
+            <v-btn value="list" icon="mdi-view-list" />
+          </v-btn-toggle>
+        </v-col>
+      </v-row>
+    </v-card>
+
+    <!-- Rooms List -->
+    <v-fade-transition mode="out-in">
+      <v-row v-if="!loading && viewMode === 'grid'">
+        <v-col v-for="room in filteredRooms" :key="room.id" cols="12" sm="6" lg="4">
+          <RoomCard :room="room" @book="$router.push('/room/' + room.id)">
+            <template v-slot:append v-if="authStore.isAdmin">
+              <div class="pa-2 d-flex glass-actions rounded-pill">
+                <v-btn icon="mdi-pencil" size="x-small" color="white" variant="text" @click.stop="openRoomModal(room)" />
+                <v-btn icon="mdi-delete" size="x-small" color="error" variant="text" @click.stop="confirmDelete(room)" />
+              </div>
+            </template>
+          </RoomCard>
+        </v-col>
+      </v-row>
+      
+      <div v-else-if="!loading && viewMode === 'list'" class="list-container">
+        <v-card v-for="room in filteredRooms" :key="room.id" rounded="xl" class="mb-4 glass-card pa-4 border-0 hover-lift d-flex align-center cursor-pointer" @click="$router.push('/room/' + room.id)">
+          <v-avatar size="100" rounded="lg" class="me-6">
+            <v-img :src="room.image" cover />
+          </v-avatar>
+          <div class="flex-grow-1">
+            <h3 class="text-h6 font-weight-black mb-1">{{ room.name }}</h3>
+            <div class="d-flex align-center text-caption text-medium-emphasis">
+              <v-icon icon="mdi-account-group" size="14" class="me-1" /> {{ room.capacity }} personas
+              <v-divider vertical class="mx-3" />
+              <v-icon icon="mdi-clock-outline" size="14" class="me-1" /> {{ room.openTime }} - {{ room.closeTime }}
             </div>
-          </template>
-        </RoomCard>
-      </v-col>
-    </v-row>
+          </div>
+          <v-spacer />
+          <v-btn color="primary" rounded="xl" class="text-none font-weight-black px-6">Reservar</v-btn>
+        </v-card>
+      </div>
+    </v-fade-transition>
 
     <!-- Room Modal -->
     <v-dialog v-model="roomModal" max-width="500">
@@ -205,10 +254,30 @@ const loading = computed(() => bookingStore.isLoading)
 const saving = ref(false)
 const roomModal = ref(false)
 const deleteDialog = ref(false)
+const roomSearch = ref('')
+const capacityFilter = ref('Todas')
+const viewMode = ref('grid')
+
 const editedRoom = ref<any>({ 
   openTime: '09:00', 
   closeTime: '18:00',
   workDays: [1, 2, 3, 4, 5] 
+})
+
+const filteredRooms = computed(() => {
+  let result = bookingStore.rooms
+  
+  if (roomSearch.value) {
+    result = result.filter(r => r.name.toLowerCase().includes(roomSearch.value.toLowerCase()))
+  }
+  
+  if (capacityFilter.value !== 'Todas') {
+    if (capacityFilter.value === '2-5 personas') result = result.filter(r => r.capacity >= 2 && r.capacity <= 5)
+    else if (capacityFilter.value === '6-10 personas') result = result.filter(r => r.capacity >= 6 && r.capacity <= 10)
+    else if (capacityFilter.value === '10+ personas') result = result.filter(r => r.capacity > 10)
+  }
+  
+  return result
 })
 const roomToDelete = ref<Room | null>(null)
 const dayLabels = ['D', 'L', 'M', 'X', 'J', 'V', 'S']
