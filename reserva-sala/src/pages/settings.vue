@@ -1,146 +1,126 @@
 <template>
-  <div class="profile-page pa-4">
-    <!-- Header Premium -->
-    <div class="text-center mb-10 pt-6">
-      <div class="avatar-container d-inline-block position-relative mb-4">
-        <v-avatar size="120" class="elevation-10 border-4 border-white shadow-xl">
-          <v-img :src="profileForm.avatar_url || 'https://i.pravatar.cc/300?u=' + authStore.user?.id" cover />
-        </v-avatar>
-        <v-btn
-          icon="mdi-camera"
-          color="primary"
-          size="small"
-          class="position-absolute bottom-0 right-0 elevation-4"
-          @click="triggerImageUpload"
-        />
-      </div>
-      <h1 class="text-h4 font-weight-black text-slate-900">{{ profileForm.first_name }} {{ profileForm.last_name }}</h1>
-      <p class="text-subtitle-2 text-slate-400">Vecino de Residencial Campus</p>
-    </div>
+  <v-container class="py-10">
+    <v-row justify="center">
+      <v-col cols="12" md="8" lg="6">
+        <!-- Profile Header -->
+        <div class="text-center mb-10">
+          <InitialAvatar 
+            :name="authStore.user?.name" 
+            :url="authStore.user?.avatar_url" 
+            size="120" 
+            variant="large"
+            class="mb-4"
+          />
+          <h1 class="text-h4 font-weight-black text-slate-900">{{ authStore.user?.name }}</h1>
+          <p class="text-slate-500">{{ authStore.user?.email }}</p>
+          <v-chip size="small" :color="getStatusColor(authStore.user?.status || '')" class="mt-2 font-weight-black">
+            CUENTA {{ authStore.user?.status }}
+          </v-chip>
+        </div>
 
-    <!-- Secciones de Ajustes -->
-    <v-card rounded="24" class="pa-6 border-0 elevation-xl mb-6">
-      <div class="text-overline font-weight-black text-primary mb-4">DATOS PERSONALES</div>
-      <v-row>
-        <v-col cols="12" sm="6">
-          <v-text-field v-model="profileForm.first_name" label="Nombre" variant="filled" rounded="lg" hide-details class="mb-4" />
-        </v-col>
-        <v-col cols="12" sm="6">
-          <v-text-field v-model="profileForm.last_name" label="Apellidos" variant="filled" rounded="lg" hide-details class="mb-4" />
-        </v-col>
-        <v-col cols="12">
-          <v-text-field v-model="profileForm.email" label="Email" variant="filled" rounded="lg" hide-details disabled class="mb-4" />
-        </v-col>
-        <v-col cols="12">
-          <v-text-field v-model="profileForm.phone" label="Teléfono de Contacto" variant="filled" rounded="lg" hide-details />
-        </v-col>
-      </v-row>
-    </v-card>
+        <!-- Settings Form -->
+        <v-card rounded="32" class="pa-8 border-0 elevation-xl">
+          <h2 class="text-h6 font-weight-black mb-6">Información Personal</h2>
+          
+          <v-form @submit.prevent="saveProfile">
+            <v-row>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="form.first_name"
+                  label="Nombre"
+                  variant="outlined"
+                  rounded="xl"
+                />
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="form.last_name"
+                  label="Apellidos"
+                  variant="outlined"
+                  rounded="xl"
+                />
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="form.avatar_url"
+                  label="URL del Avatar"
+                  variant="outlined"
+                  rounded="xl"
+                  prepend-inner-icon="mdi-link"
+                />
+              </v-col>
+              
+              <v-divider class="my-4 mx-3 opacity-10" />
+              <v-col cols="12">
+                <h3 class="text-subtitle-1 font-weight-bold mb-4">Ubicación en la Comunidad</h3>
+              </v-col>
+              
+              <v-col cols="12" sm="4">
+                <v-text-field v-model="form.portal" label="Portal" variant="outlined" rounded="xl" />
+              </v-col>
+              <v-col cols="12" sm="4">
+                <v-text-field v-model="form.floor" label="Piso" variant="outlined" rounded="xl" />
+              </v-col>
+              <v-col cols="12" sm="4">
+                <v-text-field v-model="form.letter" label="Letra" variant="outlined" rounded="xl" />
+              </v-col>
+            </v-row>
 
-    <v-card rounded="24" class="pa-6 border-0 elevation-xl mb-10">
-      <div class="text-overline font-weight-black text-primary mb-4">TU VIVIENDA</div>
-      <v-row>
-        <v-col cols="4">
-          <v-text-field v-model="profileForm.portal" label="Portal" variant="filled" rounded="lg" hide-details />
-        </v-col>
-        <v-col cols="4">
-          <v-text-field v-model="profileForm.floor" label="Piso" variant="filled" rounded="lg" hide-details />
-        </v-col>
-        <v-col cols="4">
-          <v-text-field v-model="profileForm.letter" label="Letra" variant="filled" rounded="lg" hide-details />
-        </v-col>
-      </v-row>
-    </v-card>
-
-    <!-- Botón Flotante de Guardar -->
-    <div class="d-flex ga-4 mb-12">
-      <v-btn
-        block
-        color="primary"
-        size="x-large"
-        rounded="xl"
-        class="font-weight-black premium-btn"
-        :loading="saving"
-        @click="handleSave"
-      >
-        Guardar Cambios
-      </v-btn>
-    </div>
-
-    <v-snackbar v-model="snackbar" color="success" rounded="pill">
+            <v-btn
+              type="submit"
+              block
+              color="primary"
+              size="x-large"
+              rounded="xl"
+              class="mt-6 font-weight-black"
+              :loading="loading"
+            >
+              Guardar Cambios
+            </v-btn>
+          </v-form>
+        </v-card>
+      </v-col>
+    </v-row>
+    
+    <!-- Success Snackbar -->
+    <v-snackbar v-model="success" color="success" rounded="pill" elevation="24">
       Perfil actualizado correctamente
     </v-snackbar>
-  </div>
+  </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, reactive } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import api from '@/services/api'
+import { userService } from '@/services/user.service'
+import { getStatusColor } from '@/utils/formatters'
+import InitialAvatar from '@/components/common/InitialAvatar.vue'
+import type { User } from '@/types'
 
 const authStore = useAuthStore()
-const saving = ref(false)
-const snackbar = ref(false)
+const loading = ref(false)
+const success = ref(false)
 
-const profileForm = ref({
-  first_name: '',
-  last_name: '',
-  email: '',
-  phone: '',
-  portal: '',
-  floor: '',
-  letter: '',
-  avatar_url: ''
+// Inicializar formulario con datos del store
+const form = reactive({
+  first_name: authStore.user?.first_name || '',
+  last_name: authStore.user?.last_name || '',
+  avatar_url: authStore.user?.avatar_url || '',
+  portal: authStore.user?.portal || '',
+  floor: authStore.user?.floor || '',
+  letter: authStore.user?.letter || ''
 })
 
-const fetchProfile = async () => {
+const saveProfile = async () => {
+  loading.value = true
   try {
-    const res = await api.get('/auth/me')
-    profileForm.value = { ...res.data }
+    const updatedUser = await userService.updateProfile(form)
+    authStore.user = { ...authStore.user, ...updatedUser }
+    success.value = true
   } catch (err) {
-    console.error('Error fetching profile:', err)
-  }
-}
-
-const handleSave = async () => {
-  saving.value = true
-  try {
-    await api.patch('/users/me', profileForm.value)
-    snackbar.value = true
-    // Actualizar datos en el store global
-    authStore.user = { ...authStore.user, ...profileForm.value, name: `${profileForm.value.first_name} ${profileForm.value.last_name}` }
-  } catch (err) {
-    console.error('Error updating profile:', err)
+    console.error(err)
   } finally {
-    saving.value = false
+    loading.value = false
   }
 }
-
-const triggerImageUpload = () => {
-  // Simulación de subida: en un entorno real usaríamos un input file
-  const url = prompt('Introduce la URL de tu nueva imagen de perfil:')
-  if (url) profileForm.value.avatar_url = url
-}
-
-onMounted(fetchProfile)
 </script>
-
-<style scoped>
-.avatar-container {
-  border-radius: 50%;
-}
-
-.border-4 {
-  border-width: 4px !important;
-  border-style: solid !important;
-}
-
-.shadow-xl {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
-}
-
-.v-field--variant-filled {
-  background: #f1f5f9 !important;
-  border-radius: 16px !important;
-}
-</style>

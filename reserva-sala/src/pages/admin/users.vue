@@ -34,45 +34,14 @@
 
     <!-- Lista de Vecinos -->
     <v-fade-transition group>
-      <v-card 
+      <UserListItem 
         v-for="user in filteredUsers" 
-        :key="user.id" 
-        rounded="24" 
-        class="mb-4 pa-4 border-0 elevation-xl premium-user-card"
-      >
-        <div class="d-flex align-center">
-          <v-avatar size="48" color="slate-100" class="me-4 elevation-2">
-            <span class="text-h6 font-weight-black text-primary">{{ user.first_name?.charAt(0) }}</span>
-          </v-avatar>
-          <div class="flex-grow-1">
-            <div class="d-flex align-center">
-              <span class="font-weight-black text-slate-900 me-2">{{ user.first_name }} {{ user.last_name }}</span>
-              <v-chip v-if="user.role === 'ADMIN'" size="x-small" color="primary" variant="flat">ADMIN</v-chip>
-            </div>
-            <div class="text-caption text-slate-500">Portal {{ user.portal }}, {{ user.floor }}º{{ user.letter }}</div>
-          </div>
-          
-          <!-- Acciones Contextuales -->
-          <v-menu location="bottom end">
-            <template v-slot:activator="{ props }">
-              <v-btn icon="mdi-dots-vertical" variant="text" color="slate-400" v-bind="props" />
-            </template>
-            <v-list rounded="xl" class="elevation-xl pa-2">
-              <v-list-item v-if="user.status === 'PENDING'" prepend-icon="mdi-check-decagram" title="Admitir" color="success" @click="updateStatus(user.id, 'APPROVED')" />
-              <v-list-item v-if="user.status === 'APPROVED'" prepend-icon="mdi-block-helper" title="Bloquear" color="warning" @click="openBlockDialog(user)" />
-              <v-list-item v-if="user.status === 'BLOCKED'" prepend-icon="mdi-account-check" title="Desbloquear" color="success" @click="updateStatus(user.id, 'APPROVED')" />
-              <v-divider class="my-2 opacity-10" />
-              <v-list-item prepend-icon="mdi-delete-outline" title="Eliminar" color="error" @click="confirmDelete(user)" />
-            </v-list>
-          </v-menu>
-        </div>
-
-        <!-- Info de Bloqueo si aplica -->
-        <div v-if="user.status === 'BLOCKED' && user.blocked_until" class="mt-3 pa-2 bg-amber-lighten-5 rounded-lg text-caption text-amber-darken-4 d-flex align-center">
-          <v-icon icon="mdi-clock-outline" size="14" class="me-2" />
-          Bloqueado hasta: {{ new Date(user.blocked_until).toLocaleDateString() }}
-        </div>
-      </v-card>
+        :key="user.id"
+        :user="user"
+        @update-status="updateStatus"
+        @open-block="openBlockDialog"
+        @confirm-delete="confirmDelete"
+      />
     </v-fade-transition>
 
     <!-- Diálogo de Bloqueo Temporal -->
@@ -101,6 +70,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import api from '@/services/api'
+import UserListItem from '@/components/admin/UserListItem.vue'
 
 const users = ref<any[]>([])
 const activeStatus = ref('PENDING')
@@ -126,7 +96,7 @@ const filteredUsers = computed(() => {
     const matchesSearch = !search.value || 
       `${u.first_name} ${u.last_name}`.toLowerCase().includes(search.value.toLowerCase()) ||
       u.email.toLowerCase().includes(search.value.toLowerCase()) ||
-      u.portal.includes(search.value)
+      u.portal?.includes(search.value)
     return matchesStatus && matchesSearch
   })
 })
@@ -162,39 +132,18 @@ const applyBlock = () => {
   blockDialog.value = false
 }
 
+const confirmDelete = async (user: any) => {
+  if (confirm(`¿Estás seguro de que quieres eliminar a ${user.first_name}? Esta acción no se puede deshacer.`)) {
+    await api.delete(`/users/${user.id}`)
+    fetchUsers()
+  }
+}
+
 onMounted(fetchUsers)
 </script>
 
 <style scoped>
-.custom-tabs {
-  display: flex;
-  background: #f1f5f9;
-  padding: 4px;
-  border-radius: 16px;
-  ga: 4px;
-}
-
-.tab-item {
-  flex: 1;
-  padding: 10px;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #64748b;
-  transition: all 0.3s ease;
-}
-
-.tab-item.active {
-  background: white;
-  color: #0f172a;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.premium-user-card {
-  transition: transform 0.2s ease;
-}
-
-.premium-user-card:active {
-  transform: scale(0.98);
-}
+.custom-tabs { display: flex; background: #f1f5f9; padding: 4px; border-radius: 16px; ga: 4px; }
+.tab-item { flex: 1; padding: 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; color: #64748b; transition: all 0.3s ease; }
+.tab-item.active { background: white; color: #0f172a; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
 </style>

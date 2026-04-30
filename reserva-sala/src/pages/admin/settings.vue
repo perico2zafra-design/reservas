@@ -1,125 +1,129 @@
 <template>
-  <div class="premium-page">
-    <div class="mb-10">
-      <h1 class="text-h3 font-weight-black text-gradient mb-2">Configuración Base</h1>
-      <p class="text-subtitle-1 text-medium-emphasis">Gestiona la información principal de la urbanización y la web.</p>
-    </div>
-
+  <v-container class="py-10">
     <v-row>
-      <v-col cols="12" md="8">
-        <v-card rounded="xl" class="glass-card pa-8 border-0 elevation-4">
-          <v-form @submit.prevent="handleSave" v-model="valid">
-            <h2 class="text-h5 font-weight-bold mb-6">Información General</h2>
+      <v-col cols="12" md="8" class="mx-auto">
+        <div class="d-flex align-center mb-8">
+          <v-avatar color="primary" size="56" class="me-4 elevation-4">
+            <v-icon icon="mdi-cog-outline" color="white" size="32" />
+          </v-avatar>
+          <div>
+            <h1 class="text-h4 font-weight-black text-slate-900">Configuración del Portal</h1>
+            <p class="text-slate-500">Ajustes generales de la Mancomunidad</p>
+          </div>
+        </div>
+
+        <v-card rounded="32" class="pa-8 border-0 elevation-xl mb-8">
+          <h2 class="text-h6 font-weight-black mb-6">Información General</h2>
+          <v-form @submit.prevent="saveSettings">
+            <v-text-field
+              v-model="form.name"
+              label="Nombre de la Mancomunidad"
+              variant="outlined"
+              rounded="xl"
+              class="mb-4"
+              prepend-inner-icon="mdi-office-building"
+            />
             
             <v-text-field
-              v-model="settings.name"
-              label="Nombre de la Web / Aplicación"
+              v-model="form.address"
+              label="Dirección Física"
               variant="outlined"
-              rounded="lg"
+              rounded="xl"
               class="mb-4"
-              :rules="[v => !!v || 'Campo requerido']"
-            />
-
-            <v-text-field
-              v-model="settings.address"
-              label="Dirección de la Urbanización"
               prepend-inner-icon="mdi-map-marker"
-              variant="outlined"
-              rounded="lg"
-              class="mb-4"
-              :rules="[v => !!v || 'Campo requerido']"
             />
 
             <v-textarea
-              v-model="settings.urbanization_details"
-              label="Detalles / Descripción de la Urbanización"
+              v-model="form.urbanization_details"
+              label="Detalles de la Urbanización (Acta de Junta)"
               variant="outlined"
-              rounded="lg"
+              rounded="32"
               rows="4"
-              class="mb-8"
+              class="mb-6"
+              prepend-inner-icon="mdi-text-box-check-outline"
+              hint="Esta información aparecerá en la página principal"
+              persistent-hint
             />
 
-            <v-divider class="mb-8" />
-
-            <div class="d-flex justify-end">
-              <v-btn
-                color="primary"
-                size="large"
-                rounded="xl"
-                type="submit"
-                :loading="saving"
-                class="px-8 font-weight-black elevation-8 premium-gradient-btn"
-              >
-                Guardar Cambios
-              </v-btn>
-            </div>
+            <v-btn
+              type="submit"
+              block
+              color="primary"
+              size="x-large"
+              rounded="xl"
+              class="font-weight-black"
+              :loading="loading"
+            >
+              Guardar Cambios Globales
+            </v-btn>
           </v-form>
         </v-card>
-      </v-col>
 
-      <v-col cols="12" md="4">
-        <v-card rounded="xl" class="glass-card pa-6 border-0 elevation-4 bg-primary-darken-1 text-white">
-          <v-icon icon="mdi-shield-crown-outline" size="48" class="mb-4" />
-          <h3 class="text-h6 font-weight-bold mb-2">Acceso Super Admin</h3>
-          <p class="text-body-2 opacity-80 mb-6">
-            Solo los Super Administradores pueden modificar esta información global. Estos datos se mostrarán en la página de inicio y en los correos electrónicos.
-          </p>
-          <v-divider class="mb-6 opacity-20" />
-          <div class="text-caption">
-            Última actualización: {{ settings.updated_at ? new Date(settings.updated_at).toLocaleString() : 'N/A' }}
+        <!-- Preview Card -->
+        <v-alert
+          type="info"
+          variant="tonal"
+          rounded="xl"
+          icon="mdi-eye-outline"
+          class="mb-8"
+        >
+          <div class="text-subtitle-2 font-weight-bold mb-1">Vista Previa</div>
+          <div class="text-caption">Así es como los vecinos verán la información en el panel principal.</div>
+        </v-alert>
+
+        <v-card rounded="32" class="pa-8 bg-slate-900 text-white elevation-24">
+          <div class="text-overline opacity-40 mb-2">Previsualización del Panel</div>
+          <div class="text-h5 font-weight-black mb-4">{{ form.name || 'Cargando...' }}</div>
+          <div class="d-flex align-center opacity-60 text-caption mb-6">
+            <v-icon icon="mdi-map-marker" size="14" class="me-2" />
+            {{ form.address }}
           </div>
+          <p class="text-body-2 opacity-80">{{ form.urbanization_details }}</p>
         </v-card>
       </v-col>
     </v-row>
 
-    <v-snackbar v-model="showSuccess" color="success" timeout="3000" rounded="pill">
+    <v-snackbar v-model="success" color="success" rounded="pill">
       Configuración guardada correctamente
     </v-snackbar>
-  </div>
+  </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import api from '@/services/api'
+import { ref, reactive, onMounted } from 'vue'
+import { siteService } from '@/services/site.service'
 
-const settings = ref({
+const loading = ref(false)
+const success = ref(false)
+
+const form = reactive({
   name: '',
   address: '',
-  urbanization_details: '',
-  updated_at: null
+  urbanization_details: ''
 })
-const valid = ref(false)
-const loading = ref(false)
-const saving = ref(false)
-const showSuccess = ref(false)
 
 const fetchSettings = async () => {
+  try {
+    const data = await siteService.getSettings()
+    form.name = data.name
+    form.address = data.address
+    form.urbanization_details = data.urbanization_details
+  } catch (err) {
+    console.error('Error al cargar ajustes:', err)
+  }
+}
+
+const saveSettings = async () => {
   loading.value = true
   try {
-    const res = await api.get('/settings')
-    settings.value = res.data
+    await siteService.updateSettings(form)
+    success.value = true
   } catch (err) {
-    console.error('Error fetching settings:', err)
+    console.error('Error al guardar ajustes:', err)
   } finally {
     loading.value = false
   }
 }
 
-const handleSave = async () => {
-  if (!valid.value) return
-  saving.value = true
-  try {
-    const res = await api.put('/settings', settings.value)
-    settings.value = res.data
-    showSuccess.value = true
-  } catch (err) {
-    console.error('Error saving settings:', err)
-  } finally {
-    saving.value = false
-  }
-}
-
-onMounted(() => {
-  fetchSettings()
-})
+onMounted(fetchSettings)
 </script>

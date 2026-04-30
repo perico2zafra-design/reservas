@@ -1,10 +1,9 @@
 import { defineStore } from 'pinia';
-import { bookingService } from '../services/booking.service';
-import type { Room, Booking, CreateBookingDTO, CreateRoomDTO } from '../types/api';
+import { bookingService } from '@/services/booking.service';
+import type { Room, Booking } from '@/types';
 
 export const useBookingStore = defineStore('booking', {
   state: () => ({
-    blocks: [] as any[],
     rooms: [] as Room[],
     bookings: [] as Booking[],
     isLoading: false,

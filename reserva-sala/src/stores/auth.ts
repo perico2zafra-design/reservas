@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { User, LoginData, RegisterData } from '@/types/auth';
+import type { User, LoginData, RegisterData } from '@/types';
 import { authService } from '@/services/auth.service';
 import api from '@/services/api';
 
@@ -21,7 +21,6 @@ export const useAuthStore = defineStore('auth', {
     isAuthenticated: (state) => !!state.token,
     isAdmin: (state) => state.user?.role === 'ADMIN' || state.user?.role === 'SUPERADMIN',
     isSuperAdmin: (state) => state.user?.role === 'SUPERADMIN',
-    isBlockAdmin: (state) => state.user?.role === 'ADMIN' || state.user?.role === 'SUPERADMIN',
   },
   actions: {
     async login(data: LoginData) {
