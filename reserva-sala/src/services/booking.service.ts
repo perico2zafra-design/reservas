@@ -40,12 +40,19 @@ export const bookingService = {
     return response.data;
   },
 
-  async createBooking(bookingData: CreateBookingDTO): Promise<Booking> {
-    const response = await api.post<Booking>('/bookings', bookingData);
+  // Payment & Deposit endpoints
+  async createPaymentIntent(data: any): Promise<{ clientSecret: string, depositAmount: number }> {
+    const response = await api.post('/bookings/payment-intent', data);
     return response.data;
   },
 
-  async cancelBooking(id: number): Promise<void> {
-    await api.delete(`/bookings/${id}`);
+  async confirmBookingWithPayment(bookingData: any): Promise<Booking> {
+    const response = await api.post<Booking>('/bookings/confirm', bookingData);
+    return response.data;
+  },
+
+  async manageDeposit(id: number, action: 'REFUND' | 'CAPTURE'): Promise<any> {
+    const response = await api.patch(`/bookings/${id}/deposit`, { action });
+    return response.data;
   }
 };

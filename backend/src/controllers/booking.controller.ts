@@ -1,31 +1,70 @@
 import { Request, Response } from 'express';
-import { Request, Response } from 'express';
 import { supabase } from '../lib/supabase.js';
+import Stripe from 'stripe';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder');
 
 export const getAllBookings = async (req: Request, res: Response) => {
   try {
     const { data: bookings, error } = await supabase
-      .from('Booking')
-      .select('*, Room(*)');
+      .from('bookings')
+      .select('*, rooms(*), user:user_id(email, first_name, last_name)')
+      .order('created_at', { ascending: false });
     
     if (error) throw error;
     res.json(bookings);
   } catch (error) {
-    console.error('Error fetching bookings:', error);
-    res.status(500).json({ error: 'Error fetching bookings' });
+    res.status(500).json({ error: 'Error al obtener reservas' });
   }
 };
 
-export const createBooking = async (req: Request, res: Response) => {
-  const { roomId, userId, startTime, endTime } = req.body;
+// Crear intención de pago para la fianza de 50€
+export const createBookingPaymentIntent = async (req: Request, res: Response) => {
   try {
+    const { roomId, bookingDate, startTime, endTime } = req.body;
+    
+    // 1. Crear el Payment Intent en Stripe
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: 5000, // 50.00€ en céntimos
+      currency: 'eur',
+      metadata: { 
+        roomId, 
+        userId: (req as any).user.id,
+        bookingDate 
+      }
+    });
+
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+      depositAmount: 50
+    });
+  } catch (error) {
+    console.error('Stripe Error:', error);
+    res.status(500).json({ error: 'Error al crear la fianza' });
+  }
+};
+
+// Confirmar reserva tras el pago
+export const confirmBooking = async (req: Request, res: Response) => {
+  try {
+    const { roomId, bookingDate, startTime, endTime, paymentIntentId } = req.body;
+    const userId = (req as any).user.id;
+
     const { data: booking, error } = await supabase
-      .from('Booking')
+      .from('bookings')
       .insert([{
-        roomId: parseInt(roomId),
-        userId, // Esto ahora es un UUID de Supabase Auth
-        startTime: new Date(startTime).toISOString(),
-        endTime: new Date(endTime).toISOString(),
+        room_id: roomId,
+        user_id: userId,
+        booking_date: bookingDate,
+        start_time: startTime,
+        end_time: endTime,
+        status: 'CONFIRMED',
+        deposit_status: 'PAID',
+        stripe_payment_intent_id: paymentIntentId,
+        deposit_amount: 50
       }])
       .select()
       .single();
@@ -33,8 +72,51 @@ export const createBooking = async (req: Request, res: Response) => {
     if (error) throw error;
     res.status(201).json(booking);
   } catch (error) {
-    console.error('Error creating booking:', error);
-    res.status(500).json({ error: 'Error creating booking' });
+    res.status(500).json({ error: 'Error al confirmar la reserva' });
+  }
+};
+
+// Gestión de fianza por el Admin (Devolver o Cobrar)
+export const manageDeposit = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { action } = req.body; // 'REFUND' o 'CAPTURE'
+    
+    const { data: booking, error: fetchError } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !booking) return res.status(404).json({ error: 'Reserva no encontrada' });
+
+    if (action === 'REFUND') {
+      // Reembolsar en Stripe
+      await stripe.refunds.create({
+        payment_intent: booking.stripe_payment_intent_id,
+      });
+
+      const { error: updateError } = await supabase
+        .from('bookings')
+        .update({ deposit_status: 'REFUNDED' })
+        .eq('id', id);
+
+      if (updateError) throw updateError;
+      res.json({ message: 'Fianza devuelta correctamente' });
+    } else if (action === 'CAPTURE') {
+      // En este flujo simplificado, el dinero ya está pagado. 
+      // CAPTURE aquí significa simplemente que el admin marca que se queda el dinero por daños.
+      const { error: updateError } = await supabase
+        .from('bookings')
+        .update({ deposit_status: 'CAPTURED' })
+        .eq('id', id);
+
+      if (updateError) throw updateError;
+      res.json({ message: 'Fianza ejecutada (cobrada) por daños' });
+    }
+  } catch (error) {
+    console.error('Deposit Management Error:', error);
+    res.status(500).json({ error: 'Error al gestionar la fianza' });
   }
 };
 
@@ -42,63 +124,13 @@ export const deleteBooking = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const { error } = await supabase
-      .from('Booking')
+      .from('bookings')
       .delete()
-      .eq('id', parseInt(id));
+      .eq('id', id);
 
     if (error) throw error;
     res.status(204).send();
   } catch (error) {
-    console.error('Error deleting booking:', error);
-    res.status(500).json({ error: 'Error deleting booking' });
-  }
-};
-
-export const getBookingHistory = async (req: Request, res: Response) => {
-  try {
-    const { data: bookings, error } = await supabase
-      .from('Booking')
-      .select('*, Room(name, blockId)');
-    
-    if (error) throw error;
-    res.json(bookings);
-  } catch (error) {
-    console.error('Error fetching history:', error);
-    res.status(500).json({ error: 'Error fetching history' });
-  }
-};
-
-export const getBookingStats = async (req: Request, res: Response) => {
-  try {
-    const { data: bookings, error } = await supabase
-      .from('Booking')
-      .select('*, user:userId(email, user_metadata)');
-    
-    if (error) throw error;
-
-    // Calcular horas por usuario
-    const stats: any = {};
-    bookings?.forEach(b => {
-      const start = new Date(b.startTime);
-      const end = new Date(b.endTime);
-      const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-      
-      const userEmail = b.user?.email || 'Desconocido';
-      if (!stats[userEmail]) {
-        stats[userEmail] = {
-          name: b.user?.user_metadata?.name || 'Usuario',
-          email: userEmail,
-          totalHours: 0,
-          totalBookings: 0
-        };
-      }
-      stats[userEmail].totalHours += hours;
-      stats[userEmail].totalBookings += 1;
-    });
-
-    res.json(Object.values(stats));
-  } catch (error) {
-    console.error('Error fetching stats:', error);
-    res.status(500).json({ error: 'Error fetching stats' });
+    res.status(500).json({ error: 'Error al eliminar reserva' });
   }
 };

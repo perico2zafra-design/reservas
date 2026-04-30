@@ -1,13 +1,19 @@
 import { Router } from 'express';
-import { getAllBookings, createBooking, deleteBooking, getBookingHistory, getBookingStats } from '../controllers/booking.controller.js';
-import { authenticateToken } from '../middleware/auth.middleware.js';
+import { 
+  getAllBookings, 
+  createBookingPaymentIntent, 
+  confirmBooking, 
+  manageDeposit,
+  deleteBooking 
+} from '../controllers/booking.controller.js';
+import { authenticateToken, authorizeAdmin } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
 router.get('/', authenticateToken, getAllBookings);
-router.get('/history', authenticateToken, getBookingHistory);
-router.get('/stats', authenticateToken, getBookingStats);
-router.post('/', authenticateToken, createBooking);
+router.post('/payment-intent', authenticateToken, createBookingPaymentIntent);
+router.post('/confirm', authenticateToken, confirmBooking);
+router.patch('/:id/deposit', authenticateToken, authorizeAdmin, manageDeposit);
 router.delete('/:id', authenticateToken, deleteBooking);
 
 export default router;

@@ -105,6 +105,7 @@
       items.push({ title: 'Dashboard', icon: 'mdi-chart-box-outline', to: '/admin' })
       items.push({ title: 'Usuarios', icon: 'mdi-account-group-outline', to: '/admin/users' })
       items.push({ title: 'Salas', icon: 'mdi-office-building-cog', to: '/admin/rooms' })
+      items.push({ title: 'Reservas', icon: 'mdi-calendar-check', to: '/admin/bookings' })
     }
     if (authStore.isSuperAdmin) {
       items.push({ title: 'Configuración Base', icon: 'mdi-tune-vertical', to: '/admin/settings' })

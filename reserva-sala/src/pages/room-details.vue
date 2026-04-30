@@ -34,17 +34,26 @@
             v-model:selection="selectedRange"
           />
 
-          <div class="mt-10 d-flex justify-center">
+          <div class="mt-10 d-flex justify-center flex-column align-center">
+            <div v-if="selectedRange.start" class="mb-4 text-center">
+              <v-chip color="secondary" variant="flat" size="large" class="font-weight-black">
+                {{ selectedRange.start }} - {{ selectedRange.end }}
+              </v-chip>
+              <div class="text-caption mt-2 text-medium-emphasis">
+                Se requiere una fianza reembolsable de <strong>50,00 €</strong>
+              </div>
+            </div>
+            
             <v-btn
               color="primary"
               size="x-large"
               rounded="xl"
               class="text-none font-weight-black px-12 premium-gradient-btn"
               :disabled="!selectedRange.start || !selectedRange.end"
-              :loading="saving"
-              @click="confirmBooking"
+              :loading="paymentLoading"
+              @click="initiateBooking"
             >
-              Confirmar Reserva
+              Confirmar y Pagar Fianza
             </v-btn>
           </div>
         </v-card>
@@ -60,15 +69,19 @@
             >
               <template v-slot:prepend>
                 <v-avatar color="primary-lighten-4" class="me-4">
-                  <span class="text-primary font-weight-bold">{{ booking.userId?.charAt(0) || 'U' }}</span>
+                  <span class="text-primary font-weight-bold">{{ booking.user?.first_name?.charAt(0) || 'U' }}</span>
                 </v-avatar>
               </template>
-              <v-list-item-title class="font-weight-bold">{{ booking.userId }}</v-list-item-title>
+              <v-list-item-title class="font-weight-bold">
+                {{ booking.user?.first_name }} {{ booking.user?.last_name }}
+              </v-list-item-title>
               <v-list-item-subtitle>
-                {{ formatTime(booking.startTime) }} - {{ formatTime(booking.endTime) }}
+                {{ booking.start_time.substring(0, 5) }} - {{ booking.end_time.substring(0, 5) }}
               </v-list-item-subtitle>
               <template v-slot:append>
-                <v-chip size="x-small" color="success" class="font-weight-black">CONFIRMADA</v-chip>
+                <v-chip size="x-small" :color="booking.status === 'CONFIRMED' ? 'success' : 'warning'" class="font-weight-black">
+                  {{ booking.status }}
+                </v-chip>
               </template>
             </v-list-item>
             <div v-if="roomBookings.length === 0" class="text-center pa-8 text-medium-emphasis">
@@ -95,19 +108,41 @@
 
             <v-divider class="mb-8" />
             
-            <h3 class="text-overline font-weight-black mb-4">Equipamiento Incluido</h3>
-            <RoomAmenities :amenities="currentRoom.amenities || ['wifi', 'ac', 'coffee']" class="mb-8" />
-            
-            <v-card color="primary-lighten-5" flat rounded="xl" class="pa-4 border-dashed">
-              <div class="d-flex align-center text-primary">
-                <v-icon icon="mdi-shield-check" class="me-3" />
-                <div class="text-caption font-weight-bold">Acceso mediante código QR generado tras la reserva.</div>
+            <h3 class="text-overline font-weight-black mb-4">Depósito de Fianza</h3>
+            <v-card color="amber-lighten-5" flat rounded="xl" class="pa-4 border-dashed border-amber">
+              <div class="d-flex align-center text-amber-darken-4">
+                <v-icon icon="mdi-cash-lock" class="me-3" />
+                <div class="text-caption font-weight-bold">
+                  Se cobrarán 50€ de fianza que serán devueltos tras la reserva si no hay daños.
+                </div>
               </div>
             </v-card>
           </div>
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Payment Modal -->
+    <v-dialog v-model="paymentModal" max-width="500" persistent>
+      <v-card rounded="xl" class="pa-6">
+        <div class="d-flex align-center mb-6">
+          <h2 class="text-h5 font-weight-bold">Pago de Fianza</h2>
+          <v-spacer />
+          <v-btn icon="mdi-close" variant="text" @click="paymentModal = false" />
+        </div>
+        
+        <CheckoutForm 
+          v-if="clientSecret" 
+          :client-secret="clientSecret"
+          @success="handlePaymentSuccess"
+          @error="handlePaymentError"
+        />
+      </v-card>
+    </v-dialog>
+
+    <v-snackbar v-model="showSuccess" color="success" timeout="5000">
+      Reserva confirmada. La fianza ha sido retenida correctamente.
+    </v-snackbar>
   </div>
 </template>
 
@@ -116,19 +151,23 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useBookingStore } from '@/stores/booking'
+import { bookingService } from '@/services/booking.service'
 import BookingTimeline from '@/components/booking/BookingTimeline.vue'
-import RoomAmenities from '@/components/common/RoomAmenities.vue'
+import CheckoutForm from '@/components/CheckoutForm.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
 const bookingStore = useBookingStore()
 const roomId = route.params.id as string
 
-const saving = ref(false)
+const paymentLoading = ref(false)
+const paymentModal = ref(false)
+const clientSecret = ref('')
 const selectedRange = ref({ start: null, end: null })
+const showSuccess = ref(false)
 
 const roomBookings = computed(() => 
-  bookingStore.bookings.filter(b => b.roomId === parseInt(roomId))
+  bookingStore.bookings.filter(b => b.room_id === parseInt(roomId))
 )
 
 const currentRoom = computed(() => 
@@ -137,34 +176,52 @@ const currentRoom = computed(() =>
 
 const formattedBookings = computed(() => {
   return roomBookings.value.map(b => ({
-    start: b.startTime.split('T')[1].substring(0, 5),
-    end: b.endTime.split('T')[1].substring(0, 5)
+    start: b.start_time.substring(0, 5),
+    end: b.end_time.substring(0, 5)
   }))
 })
 
-const formatTime = (isoString: string) => {
-  return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-}
-
-const confirmBooking = async () => {
-  if (!selectedRange.value.start || !selectedRange.value.end) return
-  
-  saving.value = true
+const initiateBooking = async () => {
+  paymentLoading.value = true
   try {
     const today = new Date().toISOString().split('T')[0]
-    await bookingStore.createBooking({
+    const res = await bookingService.createPaymentIntent({
       roomId: parseInt(roomId),
-      userId: authStore.user?.email || 'anon',
-      startTime: `${today}T${selectedRange.value.start}:00Z`,
-      endTime: `${today}T${selectedRange.value.end}:00Z`
+      bookingDate: today,
+      startTime: selectedRange.value.start,
+      endTime: selectedRange.value.end
     })
-    selectedRange.value = { start: null, end: null }
-    await bookingStore.fetchBookings()
+    clientSecret.value = res.clientSecret
+    paymentModal.value = true
   } catch (err) {
-    console.error('Error creating booking:', err)
+    console.error('Error initiating payment:', err)
   } finally {
-    saving.value = false
+    paymentLoading.value = false
   }
+}
+
+const handlePaymentSuccess = async (paymentIntentId: string) => {
+  try {
+    const today = new Date().toISOString().split('T')[0]
+    await bookingService.confirmBookingWithPayment({
+      roomId: parseInt(roomId),
+      bookingDate: today,
+      startTime: selectedRange.value.start,
+      endTime: selectedRange.value.end,
+      paymentIntentId
+    })
+    
+    paymentModal.value = false
+    showSuccess.value = true
+    selectedRange.value = { start: null, end: null }
+    bookingStore.fetchBookings()
+  } catch (err) {
+    console.error('Error confirming booking:', err)
+  }
+}
+
+const handlePaymentError = (msg: string) => {
+  console.error('Payment Error:', msg)
 }
 
 onMounted(() => {
@@ -174,20 +231,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.room-details-pro {
-  margin-top: -20px;
-}
-.line-height-1-6 {
-  line-height: 1.6;
+.border-amber {
+  border-color: rgba(var(--v-theme-warning), 0.3) !important;
 }
 .border-dashed {
-  border: 1px dashed rgba(var(--v-theme-primary), 0.3) !important;
-}
-.sticky-top {
-  position: sticky;
-  top: 100px;
-}
-.premium-info-card {
-  background: white !important;
+  border-style: dashed !important;
 }
 </style>

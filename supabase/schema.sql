@@ -71,7 +71,7 @@ CREATE TABLE room_exceptions (
     UNIQUE(room_id, exception_date)
 );
 
--- Reservas
+-- Reservas con sistema de fianza
 CREATE TABLE bookings (
     id SERIAL PRIMARY KEY,
     room_id INTEGER REFERENCES rooms(id) ON DELETE CASCADE,
@@ -79,7 +79,10 @@ CREATE TABLE bookings (
     booking_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
-    status TEXT DEFAULT 'CONFIRMED' CHECK (status IN ('CONFIRMED', 'CANCELLED')),
+    status TEXT DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'CONFIRMED', 'CANCELLED')),
+    deposit_status TEXT DEFAULT 'PENDING' CHECK (deposit_status IN ('PENDING', 'PAID', 'REFUNDED', 'CAPTURED')),
+    stripe_payment_intent_id TEXT,
+    deposit_amount DECIMAL DEFAULT 50.00,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
