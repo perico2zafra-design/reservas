@@ -9,15 +9,31 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder'
 
 export const getAllBookings = async (req: Request, res: Response) => {
   try {
-    const { data: bookings, error } = await supabase
+    // 1. Obtener reservas y salas (esta relación sí existe)
+    const { data: bookings, error: bError } = await supabase
       .from('bookings')
-      .select('*, rooms(*), user:user_id(email, first_name, last_name)')
+      .select('*, room:rooms!room_id(*)')
       .order('created_at', { ascending: false });
     
-    if (error) throw error;
-    res.json(bookings);
+    if (bError) throw bError;
+
+    // 2. Obtener todos los perfiles para asociarlos manualmente
+    const { data: profiles, error: pError } = await supabase
+      .from('profiles')
+      .select('*');
+
+    if (pError) throw pError;
+
+    // 3. Combinar los datos en el servidor
+    const enrichedBookings = bookings.map(booking => ({
+      ...booking,
+      user: profiles.find(p => p.id === booking.user_id) || { first_name: 'Vecino', last_name: 'Desconocido' }
+    }));
+
+    res.json(enrichedBookings);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener reservas' });
+    console.error('Error detallado en getAllBookings:', error);
+    res.status(500).json({ error: 'Error al obtener reservas', details: error });
   }
 };
 
