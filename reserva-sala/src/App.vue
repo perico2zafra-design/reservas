@@ -102,9 +102,14 @@
       { title: 'Bloques', icon: 'mdi-view-dashboard-outline', to: '/' },
     ]
     if (authStore.isAdmin) {
-      items.push({ title: 'Panel Admin', icon: 'mdi-shield-check-outline', to: '/admin' })
+      items.push({ title: 'Dashboard', icon: 'mdi-chart-box-outline', to: '/admin' })
+      items.push({ title: 'Usuarios', icon: 'mdi-account-group-outline', to: '/admin/users' })
+      items.push({ title: 'Salas', icon: 'mdi-office-building-cog', to: '/admin/rooms' })
     }
-    items.push({ title: 'Ajustes', icon: 'mdi-cog-outline', to: '/settings' })
+    if (authStore.isSuperAdmin) {
+      items.push({ title: 'Configuración Base', icon: 'mdi-tune-vertical', to: '/admin/settings' })
+    }
+    items.push({ title: 'Mi Perfil', icon: 'mdi-account-outline', to: '/settings' })
     return items
   })
 

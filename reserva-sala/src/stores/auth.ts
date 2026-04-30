@@ -19,9 +19,9 @@ export const useAuthStore = defineStore('auth', {
   }),
   getters: {
     isAuthenticated: (state) => !!state.token,
-    isAdmin: (state) => state.user?.role === 'ADMIN' || state.user?.role === 'SUPER_ADMIN',
-    isSuperAdmin: (state) => state.user?.role === 'SUPER_ADMIN',
-    isBlockAdmin: (state) => state.user?.role === 'ADMIN' || state.user?.role === 'SUPER_ADMIN',
+    isAdmin: (state) => state.user?.role === 'ADMIN' || state.user?.role === 'SUPERADMIN',
+    isSuperAdmin: (state) => state.user?.role === 'SUPERADMIN',
+    isBlockAdmin: (state) => state.user?.role === 'ADMIN' || state.user?.role === 'SUPERADMIN',
   },
   actions: {
     async login(data: LoginData) {

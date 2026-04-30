@@ -55,6 +55,24 @@ const router = createRouter({
       component: () => import('@/pages/admin-dashboard.vue'),
       meta: { requiresAuth: true, requiresAdmin: true }
     },
+    {
+      path: '/admin/users',
+      name: 'admin-users',
+      component: () => import('@/pages/admin/users.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/rooms',
+      name: 'admin-rooms',
+      component: () => import('@/pages/admin/rooms.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/settings',
+      name: 'admin-settings',
+      component: () => import('@/pages/admin/settings.vue'),
+      meta: { requiresAuth: true, requiresSuperAdmin: true }
+    },
   ],
 })
 
@@ -72,6 +90,10 @@ router.beforeEach(async (to, from, next) => {
   if (authRequired && !loggedIn) {
     next('/login')
   } else if (loggedIn && publicPages.includes(to.name as string)) {
+    next('/')
+  } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    next('/')
+  } else if (to.meta.requiresSuperAdmin && !authStore.isSuperAdmin) {
     next('/')
   } else {
     next()

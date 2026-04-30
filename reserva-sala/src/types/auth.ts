@@ -1,10 +1,11 @@
-export type UserRole = 'USER' | 'ADMIN' | 'BLOCK_ADMIN' | 'SUPER_ADMIN';
+export type UserRole = 'USER' | 'ADMIN' | 'SUPERADMIN';
 
 export interface User {
-  id: number;
+  id: string;
   email: string;
   name: string;
   role: UserRole;
+  status?: 'PENDING' | 'APPROVED' | 'REJECTED';
 }
 
 export interface AuthResponse {
@@ -14,11 +15,17 @@ export interface AuthResponse {
 
 export interface LoginData {
   email: string;
-  password?: string; // Optional if we support passwordless, but required for now
+  password?: string;
 }
 
 export interface RegisterData {
   email: string;
   password?: string;
-  name: string;
+  firstName: string;
+  lastName: string;
+  address: string;
+  portal: string;
+  floor: string;
+  letter: string;
+  phone?: string;
 }

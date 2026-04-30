@@ -28,9 +28,19 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
 };
 
 export const authorizeAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (req.user && req.user.user_metadata?.role === 'ADMIN') {
+  const role = req.user && req.user.user_metadata?.role;
+  if (role === 'ADMIN' || role === 'SUPERADMIN') {
     next();
   } else {
     res.status(403).json({ message: 'Admin access required' });
+  }
+};
+
+export const authorizeSuperAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+  const role = req.user && req.user.user_metadata?.role;
+  if (role === 'SUPERADMIN') {
+    next();
+  } else {
+    res.status(403).json({ message: 'SuperAdmin access required' });
   }
 };

@@ -31,17 +31,77 @@
             </div>
 
             <v-form @submit.prevent="handleRegister" v-model="valid">
+              <v-row>
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="firstName"
+                    label="Nombre"
+                    prepend-inner-icon="mdi-account-outline"
+                    variant="outlined"
+                    rounded="lg"
+                    density="comfortable"
+                    :rules="[v => !!v || 'Nombre es requerido']"
+                    required
+                  />
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="lastName"
+                    label="Apellidos"
+                    prepend-inner-icon="mdi-account-outline"
+                    variant="outlined"
+                    rounded="lg"
+                    density="comfortable"
+                    :rules="[v => !!v || 'Apellidos son requeridos']"
+                    required
+                  />
+                </v-col>
+              </v-row>
+
               <v-text-field
-                v-model="name"
-                label="Full Name"
-                prepend-inner-icon="mdi-account-outline"
+                v-model="address"
+                label="Dirección"
+                prepend-inner-icon="mdi-map-marker-outline"
                 variant="outlined"
                 rounded="lg"
                 class="mb-4"
                 density="comfortable"
-                :rules="[v => !!v || 'Name is required']"
+                :rules="[v => !!v || 'Dirección es requerida']"
                 required
               />
+
+              <v-row>
+                <v-col cols="4">
+                  <v-text-field
+                    v-model="portal"
+                    label="Portal"
+                    variant="outlined"
+                    rounded="lg"
+                    density="comfortable"
+                    :rules="[v => !!v || 'Requerido']"
+                  />
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    v-model="floor"
+                    label="Piso"
+                    variant="outlined"
+                    rounded="lg"
+                    density="comfortable"
+                    :rules="[v => !!v || 'Requerido']"
+                  />
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    v-model="letter"
+                    label="Letra"
+                    variant="outlined"
+                    rounded="lg"
+                    density="comfortable"
+                    :rules="[v => !!v || 'Requerido']"
+                  />
+                </v-col>
+              </v-row>
 
               <v-text-field
                 v-model="email"
@@ -106,9 +166,15 @@ import { useAuthStore } from '@/stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
-const name = ref('')
+const firstName = ref('')
+const lastName = ref('')
 const email = ref('')
 const password = ref('')
+const address = ref('')
+const portal = ref('')
+const floor = ref('')
+const letter = ref('')
+const phone = ref('')
 const valid = ref(false)
 const showError = ref(false)
 const errorMessage = ref('')
@@ -118,11 +184,17 @@ const handleRegister = async () => {
   
   try {
     await authStore.register({ 
-      name: name.value, 
+      firstName: firstName.value,
+      lastName: lastName.value,
       email: email.value, 
-      password: password.value 
+      password: password.value,
+      address: address.value,
+      portal: portal.value,
+      floor: floor.value,
+      letter: letter.value,
+      phone: phone.value
     })
-    router.push('/')
+    router.push('/login?registered=true')
   } catch (error: any) {
     errorMessage.value = error.response?.data?.message || 'Registration failed'
     showError.value = true
