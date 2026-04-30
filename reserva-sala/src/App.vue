@@ -1,27 +1,32 @@
 <template>
   <v-app>
     <!-- Premium App Bar (Mobile & Desktop) -->
-    <v-app-bar flat class="glass-app-bar px-2" elevation="0">
-      <div class="pa-2 d-flex align-center">
-        <v-avatar color="primary" size="32" class="me-3 elevation-4">
-          <v-icon icon="mdi-home-city" size="18" color="white" />
-        </v-avatar>
-        <span class="text-subtitle-1 font-weight-black text-slate-900">Campus</span>
+    <v-app-bar flat class="glass-app-bar px-4" height="70">
+      <div class="d-flex align-center cursor-pointer" @click="$router.push('/')">
+        <div class="logo-box me-3">
+          <v-icon icon="mdi-home-modern" color="white" size="20" />
+        </div>
+        <span class="text-h6 font-weight-black letter-spacing-tight text-slate-900">CAMPUS</span>
       </div>
       
       <v-spacer />
       
-      <v-btn icon="mdi-bell-outline" variant="text" size="small" class="me-2" />
-      <v-menu location="bottom end">
+      <v-btn icon="mdi-bell-outline" variant="text" size="small" class="me-3 opacity-60" />
+      <v-menu location="bottom end" transition="scale-transition">
         <template v-slot:activator="{ props }">
-          <v-avatar size="32" class="cursor-pointer border-2 border-primary" v-bind="props">
-            <v-img :src="'https://i.pravatar.cc/150?u=' + authStore.user?.id" />
-          </v-avatar>
+          <div v-bind="props" class="avatar-wrapper cursor-pointer">
+            <v-avatar v-if="authStore.user?.avatar_url" size="40" class="elevation-2 border-2 border-primary">
+              <v-img :src="authStore.user.avatar_url" cover />
+            </v-avatar>
+            <v-avatar v-else size="40" class="elevation-2 premium-gradient-avatar border-2 border-white">
+              <span class="text-caption font-weight-black text-white">{{ userInitials }}</span>
+            </v-avatar>
+          </div>
         </template>
-        <v-list rounded="xl" class="mt-2 glass-list elevation-xl">
-          <v-list-item prepend-icon="mdi-account-outline" title="Perfil" to="/settings" />
-          <v-divider class="my-2 opacity-10" />
-          <v-list-item prepend-icon="mdi-logout" title="Cerrar Sesión" color="error" @click="handleLogout" />
+        <v-list rounded="xl" class="mt-3 pa-2 shadow-2xl glass-list" width="220">
+          <v-list-item prepend-icon="mdi-account-circle-outline" title="Mi Perfil" to="/settings" rounded="lg" />
+          <v-divider class="my-2 opacity-5" />
+          <v-list-item prepend-icon="mdi-logout" title="Cerrar Sesión" color="error" rounded="lg" @click="handleLogout" />
         </v-list>
       </v-menu>
     </v-app-bar>
@@ -102,6 +107,16 @@
   const authStore = useAuthStore()
   const router = useRouter()
   const drawer = ref(true)
+
+
+  const userInitials = computed(() => {
+    if (!authStore.user?.name) return 'U'
+    const parts = authStore.user.name.split(' ')
+    if (parts.length > 1) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    }
+    return parts[0][0].toUpperCase()
+  })
 
   const menuItems = computed(() => {
     const items = [

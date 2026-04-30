@@ -74,7 +74,37 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Colores Slate (Tailwind-like) */
-.bg-slate-50 { background-color: #f8fafc !important; }
-.text-slate-900 { color: #0f172a !important; }
+/* Avatares y Logo */
+.premium-gradient-avatar {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+}
+
+.logo-box {
+  background: var(--accent-gradient);
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-wrapper {
+  padding: 2px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.avatar-wrapper:hover {
+  background: rgba(var(--v-theme-primary), 0.1);
+  transform: scale(1.05);
+}
+
+.letter-spacing-tight {
+  letter-spacing: -0.05em !important;
+}
+
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+}
 

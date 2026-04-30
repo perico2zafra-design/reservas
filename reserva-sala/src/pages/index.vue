@@ -17,28 +17,33 @@
     </v-overlay>
 
     <!-- App Header (Hero) -->
-    <div class="app-hero pt-8 pb-12 px-6">
-      <div class="d-flex align-center mb-6">
+    <div class="app-hero pt-10 pb-16 px-6">
+      <div class="d-flex align-center mb-10">
         <div>
-          <div class="text-overline text-blue-200 font-weight-black mb-1">MI URBANIZACIÓN</div>
-          <h1 class="text-h4 font-weight-black text-white">Residencial Campus</h1>
+          <div class="text-overline text-blue-200 font-weight-black mb-1 opacity-70">MI URBANIZACIÓN</div>
+          <h1 class="text-h3 font-weight-black text-white letter-spacing-tight">Residencial Campus</h1>
         </div>
         <v-spacer />
-        <v-avatar size="48" class="elevation-4 border-2 border-blue-400">
-          <v-img :src="'https://i.pravatar.cc/150?u=' + authStore.user?.id" />
-        </v-avatar>
+        <div class="hero-avatar-wrapper">
+          <v-avatar v-if="authStore.user?.avatar_url" size="64" class="elevation-10 border-3 border-blue-400">
+            <v-img :src="authStore.user.avatar_url" cover />
+          </v-avatar>
+          <v-avatar v-else size="64" class="elevation-10 premium-gradient-avatar border-3 border-white">
+            <span class="text-h6 font-weight-black text-white">{{ userInitials }}</span>
+          </v-avatar>
+        </div>
       </div>
 
       <!-- Quick Info Cards (Horizontal Scroll on Mobile) -->
       <div class="d-flex ga-4 overflow-x-auto no-scrollbar pb-2">
-        <v-card rounded="xl" class="glass-card-light pa-4 min-width-160 flex-shrink-0" elevation="0">
-          <div class="text-caption text-blue-100 opacity-70">Tu Vivienda</div>
-          <div class="text-h6 font-weight-black text-white">P:{{ authStore.user?.portal }} · {{ authStore.user?.letter }}</div>
+        <v-card rounded="24" class="glass-card-light pa-5 min-width-180 flex-shrink-0" elevation="0">
+          <div class="text-caption text-blue-100 opacity-60 mb-1">Tu Vivienda</div>
+          <div class="text-h6 font-weight-black text-white">Portal {{ authStore.user?.portal || '-' }} · {{ authStore.user?.letter || '-' }}</div>
         </v-card>
-        <v-card rounded="xl" class="glass-card-light pa-4 min-width-160 flex-shrink-0" elevation="0">
-          <div class="text-caption text-blue-100 opacity-70">Estado</div>
+        <v-card rounded="24" class="glass-card-light pa-5 min-width-180 flex-shrink-0" elevation="0">
+          <div class="text-caption text-blue-100 opacity-60 mb-1">Estado de Acceso</div>
           <div class="d-flex align-center">
-            <v-icon icon="mdi-check-decagram" color="green-accent-2" size="18" class="me-1" />
+            <v-icon icon="mdi-check-decagram" color="green-accent-2" size="20" class="me-2" />
             <span class="text-subtitle-1 font-weight-black text-white">Verificado</span>
           </div>
         </v-card>
@@ -80,20 +85,20 @@
         </div>
         
         <v-row>
-          <v-col v-for="room in rooms" :key="room.id" cols="12" sm="6">
+          <v-col v-for="room in rooms" :key="room.id" cols="12" sm="6" lg="4">
             <v-card rounded="24" class="room-app-card elevation-xl overflow-hidden border-0" @click="$router.push('/room/' + room.id)">
-              <v-img :src="room.image" height="240" cover class="align-end">
-                <div class="pa-6 room-card-gradient text-white">
+              <v-img :src="room.image" height="260" cover class="align-end bg-slate-200">
+                <div class="pa-6 room-card-gradient">
                   <div class="d-flex align-center mb-1">
-                    <h3 class="text-h5 font-weight-black">{{ room.name }}</h3>
+                    <h3 class="text-h5 font-weight-black text-white">{{ room.name }}</h3>
                     <v-spacer />
-                    <v-chip size="x-small" color="white" variant="flat" class="text-primary font-weight-black">
-                      {{ room.deposit_amount }}€
+                    <v-chip size="x-small" color="white" variant="flat" class="text-primary font-weight-black px-3">
+                      {{ room.deposit_amount }}€ FIANZA
                     </v-chip>
                   </div>
-                  <div class="text-caption opacity-80 d-flex align-center">
+                  <div class="text-caption text-white opacity-80 d-flex align-center">
                     <v-icon icon="mdi-account-group" size="14" class="me-1" />
-                    Aforo máx: {{ room.capacity }}
+                    Aforo máximo: {{ room.capacity }} personas
                   </div>
                 </div>
               </v-img>
@@ -130,6 +135,15 @@ import { useBookingStore } from '@/stores/booking'
 
 const authStore = useAuthStore()
 const bookingStore = useBookingStore()
+
+const userInitials = computed(() => {
+  if (!authStore.user?.name) return 'U'
+  const parts = authStore.user.name.split(' ')
+  if (parts.length > 1) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  }
+  return parts[0][0].toUpperCase()
+})
 
 const rooms = computed(() => bookingStore.rooms)
 const isPending = computed(() => authStore.user?.status === 'PENDING')
