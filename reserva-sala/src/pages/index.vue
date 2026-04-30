@@ -117,23 +117,20 @@
       </v-card>
 
       <!-- Facilities Section -->
-      <div class="section-container">
-        <div class="d-flex align-center justify-space-between mb-6 px-2">
-          <div>
-            <h2 class="text-h5 font-weight-black text-slate-900 mb-1">
+      <div class="section-container mt-6">
+        <div class="d-flex align-center justify-space-between mb-2 px-2">
+          <div class="d-flex align-center">
+            <div class="section-accent me-2"></div>
+            <h2 class="text-h5 text-sm-h4 font-weight-black text-slate-900 section-title">
               Instalaciones
             </h2>
-            <p class="text-caption text-slate-400 font-weight-medium">
-              Espacios comunes listos para tus eventos
-            </p>
           </div>
           <v-btn
-            variant="tonal"
-            color="primary"
+            variant="flat"
+            class="filter-btn-elite"
             rounded="xl"
-            size="small"
-            class="font-weight-black px-4"
-            prepend-icon="mdi-filter-variant"
+            prepend-icon="mdi-tune-variant"
+            :size="$vuetify.display.mobile ? 'small' : 'default'"
           >
             Filtrar
           </v-btn>
@@ -261,9 +258,49 @@ onMounted(async () => {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
+.section-accent {
+  width: 4px;
+  height: 32px;
+  background: linear-gradient(to bottom, #fbbf24, #d97706);
+  border-radius: 4px;
+}
+
+.section-title {
+  letter-spacing: -1px;
+}
+
+.filter-btn-elite {
+  background: #0f172a !important;
+  color: white !important;
+  font-weight: 800 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 1px !important;
+  padding: 0 20px !important;
+  height: 44px !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.3s ease !important;
+}
+
+.filter-btn-elite:hover {
+  background: #1e293b !important;
+  border-color: rgba(251, 191, 36, 0.3) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.filter-btn-elite :deep(.v-icon) {
+  color: #fbbf24 !important;
+}
+
 @media (max-width: 600px) {
   .text-h3 {
     font-size: 1.75rem !important;
+  }
+  .text-h4 {
+    font-size: 1.5rem !important;
+  }
+  .section-accent {
+    height: 24px;
   }
   .resident-panel-card {
     padding: 16px !important;
