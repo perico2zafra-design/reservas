@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { supabase } from '../lib/supabase.js';
+import jwt from 'jsonwebtoken';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -69,17 +70,20 @@ export const login = async (req: Request, res: Response) => {
       return res.status(403).json({ message: 'Perfil no encontrado' });
     }
 
-    if (profile.status !== 'APPROVED') {
-      return res.status(403).json({ message: 'Tu cuenta está pendiente de aprobación o ha sido rechazada.' });
-    }
+    const token = jwt.sign(
+      { id: data.user.id, email: data.user.email, role: profile.role, status: profile.status },
+      process.env.JWT_SECRET || 'secret',
+      { expiresIn: '24h' }
+    );
 
     res.json({
-      token: data.session?.access_token,
+      token,
       user: {
         id: data.user?.id,
         email: data.user?.email,
         name: `${profile.first_name} ${profile.last_name}`,
-        role: profile.role || 'USER'
+        role: profile.role,
+        status: profile.status
       }
     });
   } catch (error) {

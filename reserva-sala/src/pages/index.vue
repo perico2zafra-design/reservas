@@ -1,5 +1,35 @@
 <template>
   <div class="workspace-explorer">
+    <!-- Overlay de Pendiente de Aprobación -->
+    <v-overlay
+      v-model="isPending"
+      persistent
+      class="align-center justify-center text-center px-4"
+      scrim="#1a237e"
+      opacity="0.95"
+    >
+      <v-card rounded="xl" class="pa-10 elevation-0 bg-transparent text-white" max-width="500">
+        <v-icon icon="mdi-account-clock-outline" size="100" class="mb-6 animate-pulse" color="primary-light" />
+        <h2 class="text-h3 font-weight-black mb-4">Acceso Pendiente</h2>
+        <p class="text-h6 opacity-80 mb-10">
+          Hola <strong>{{ authStore.user?.name }}</strong>. Tu solicitud de acceso a la Mancomunidad Residencial Campus está siendo revisada por el administrador.
+        </p>
+        <v-divider class="mb-8 opacity-20" />
+        <p class="text-body-1 italic opacity-60 mb-8">
+          Recibirás acceso a las reservas de salas una vez validada tu vivienda.
+        </p>
+        <v-btn
+          variant="tonal"
+          color="white"
+          rounded="xl"
+          prepend-icon="mdi-logout"
+          @click="authStore.logout(); $router.push('/login')"
+        >
+          Cerrar Sesión
+        </v-btn>
+      </v-card>
+    </v-overlay>
+
     <!-- Hero Section -->
     <div class="hero-section mb-12">
       <v-container>
@@ -154,6 +184,8 @@ const loading = computed(() => bookingStore.isLoading)
 const blocks = computed(() => bookingStore.blocks)
 const saving = ref(false)
 
+const isPending = computed(() => authStore.user?.status === 'PENDING')
+
 const filteredBlocks = computed(() => {
   if (!search.value) return blocks.value
   return blocks.value.filter(b => 
@@ -267,5 +299,13 @@ onMounted(fetchBlocks)
 
 .shadow-sm {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 </style>
