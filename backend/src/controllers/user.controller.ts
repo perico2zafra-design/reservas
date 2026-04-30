@@ -37,11 +37,57 @@ export const updateUserStatus = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    // Esto elimina tanto en auth.users como en profiles por el ON DELETE CASCADE
     const { error } = await supabase.auth.admin.deleteUser(id);
     if (error) throw error;
     res.json({ message: 'Usuario eliminado correctamente' });
   } catch (error) {
     res.status(500).json({ message: 'Error al eliminar usuario', error });
+  }
+};
+
+export const manualCreateUser = async (req: Request, res: Response) => {
+  try {
+    const { 
+      email, 
+      password, 
+      firstName, 
+      lastName, 
+      address, 
+      portal, 
+      floor, 
+      letter,
+      role 
+    } = req.body;
+
+    // 1. Create in Auth (automatically creates profile via trigger)
+    const { data, error: authError } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      user_metadata: { 
+        first_name: firstName, 
+        last_name: lastName, 
+        address, 
+        portal, 
+        floor, 
+        letter,
+        role: role || 'USER' 
+      },
+      email_confirm: true
+    });
+
+    if (authError) throw authError;
+
+    // 2. Approve the profile immediately
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .update({ status: 'APPROVED' })
+      .eq('id', data.user.id);
+
+    if (profileError) throw profileError;
+
+    res.status(201).json({ message: 'Usuario creado y admitido correctamente', user: data.user });
+  } catch (error) {
+    console.error('Error in manualCreateUser:', error);
+    res.status(500).json({ message: 'Error al crear usuario manualmente', error });
   }
 };
