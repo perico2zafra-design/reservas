@@ -28,10 +28,11 @@ const textClass = computed(() => props.variant === 'large' ? 'text-h4 font-weigh
 <style scoped>
 .premium-avatar {
   background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+  box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.5) !important;
 }
 .premium-avatar-large {
   background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
-  box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4) !important;
+  box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.6) !important;
 }
 .premium-avatar span, .premium-avatar-large span {
   color: white !important;

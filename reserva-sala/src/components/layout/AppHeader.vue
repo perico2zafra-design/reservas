@@ -45,8 +45,9 @@ defineEmits(['toggle-drawer', 'logout'])
 
 <style scoped>
 .app-bar-glass {
-  background: rgba(248, 250, 252, 0.7) !important;
-  backdrop-filter: blur(10px);
+  background: rgba(248, 250, 252, 0.8) !important;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.1) !important;
 }
 .profile-trigger {
   padding: 4px 4px 4px 12px;

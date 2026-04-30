@@ -20,13 +20,16 @@
       <v-list-item 
         v-for="item in menuItems" 
         :key="item.to"
-        :prepend-icon="item.icon" 
-        :title="item.title" 
         :to="item.to" 
         rounded="20" 
         class="mb-2 py-4 nav-item-premium" 
         active-class="nav-active" 
-      />
+      >
+        <template v-slot:prepend>
+          <v-icon :icon="item.icon" :color="item.color" class="me-4" />
+        </template>
+        <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
+      </v-list-item>
     </v-list>
 
     <!-- Admin Section -->
@@ -36,13 +39,16 @@
         <v-list-item 
           v-for="item in adminItems" 
           :key="item.to"
-          :prepend-icon="item.icon" 
-          :title="item.title" 
           :to="item.to" 
           rounded="20" 
           class="mb-2 py-4 nav-item-premium" 
           active-class="nav-active" 
-        />
+        >
+          <template v-slot:prepend>
+            <v-icon :icon="item.icon" :color="item.color" class="me-4" />
+          </template>
+          <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
+        </v-list-item>
       </v-list>
     </div>
 
@@ -71,15 +77,15 @@ watch(() => props.drawer, (val) => internalDrawer.value = val)
 watch(internalDrawer, (val) => emit('update:drawer', val))
 
 const menuItems = [
-  { title: 'Inicio', icon: 'mdi-home-variant-outline', to: '/' },
-  { title: 'Mis Reservas', icon: 'mdi-calendar-clock-outline', to: '/my-bookings' }
+  { title: 'Inicio', icon: 'mdi-home-variant-outline', to: '/', color: 'primary' },
+  { title: 'Mis Reservas', icon: 'mdi-calendar-clock-outline', to: '/my-bookings', color: 'amber-darken-2' }
 ]
 
 const adminItems = [
-  { title: 'Vecinos', icon: 'mdi-account-group-outline', to: '/admin/users' },
-  { title: 'Instalaciones', icon: 'mdi-store-cog-outline', to: '/admin/rooms' },
-  { title: 'Control Fianzas', icon: 'mdi-shield-check-outline', to: '/admin/bookings' },
-  { title: 'Ajustes Portal', icon: 'mdi-cog-box', to: '/admin/settings' }
+  { title: 'Vecinos', icon: 'mdi-account-group-outline', to: '/admin/users', color: 'indigo' },
+  { title: 'Instalaciones', icon: 'mdi-store-cog-outline', to: '/admin/rooms', color: 'pink-darken-1' },
+  { title: 'Control Fianzas', icon: 'mdi-shield-check-outline', to: '/admin/bookings', color: 'cyan-darken-2' },
+  { title: 'Ajustes Portal', icon: 'mdi-cog-box', to: '/admin/settings', color: 'deep-purple' }
 ]
 </script>
 
