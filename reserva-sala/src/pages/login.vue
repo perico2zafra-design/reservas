@@ -1,87 +1,95 @@
 <template>
-  <v-container fluid class="fill-height pa-0 login-bg">
+  <v-container fluid class="fill-height pa-0 login-wrapper">
     <v-row no-gutters class="fill-height">
-      <!-- Left Side: Branding/Image (Hidden on mobile) -->
+      <!-- Left Side: Luxury Hero Section -->
       <v-col
         cols="12"
         md="7"
         lg="8"
-        class="d-none d-md-flex align-center justify-center relative bg-primary-darken-1"
+        class="d-none d-md-flex align-center justify-center hero-image-container"
       >
-        <div class="pa-12 text-white relative z-10">
-          <v-icon icon="mdi-office-building-marker" size="80" class="mb-6" />
-          <h1 class="text-h2 font-weight-bold mb-4">Optimize Your Workspace</h1>
-          <p class="text-h5 text-medium-emphasis">Efficient room booking and resource management for modern teams.</p>
+        <img src="@/assets/login-hero.png" alt="Luxury Meeting Room" class="hero-image" />
+        <div class="hero-overlay d-flex flex-column justify-end pa-16">
+          <div class="hero-content pb-10">
+            <span class="text-overline text-white mb-2 d-block letter-spacing-lg">Residencial Campus</span>
+            <h1 class="text-h1 text-playfair text-white font-weight-bold mb-6">Tu Hogar, <br/> Tu Espacio</h1>
+            <p class="text-h5 text-white opacity-80 max-width-600 font-weight-light">
+              Gestione las zonas comunes de su comunidad con total comodidad y elegancia.
+            </p>
+          </div>
         </div>
-        <div class="overlay" />
       </v-col>
 
-      <!-- Right Side: Login Form -->
+      <!-- Right Side: Refined Login Form -->
       <v-col
         cols="12"
         md="5"
         lg="4"
-        class="d-flex align-center justify-center bg-background relative"
+        class="d-flex align-center justify-center bg-white"
       >
-        <div class="pa-4 w-100 d-flex justify-center">
-          <v-card flat width="440" class="pa-10 glass-card rounded-xl elevation-4 hover-lift">
-            <div class="text-center mb-10">
-              <v-icon icon="mdi-office-building-marker" color="primary" size="56" class="mb-4 d-md-none" />
-              <h2 class="text-h3 font-weight-black mb-2 text-gradient">Welcome</h2>
-              <p class="text-subtitle-1 text-medium-emphasis font-weight-medium">Access your workspace booking</p>
+        <div class="pa-10 w-100 max-width-500">
+          <div class="brand-header mb-10 d-flex align-center">
+            <v-icon icon="mdi-shield-crown-outline" color="amber-darken-1" size="32" class="mr-3" />
+            <span class="text-h6 font-weight-bold letter-spacing-lg text-uppercase">Residencial Campus</span>
+          </div>
+
+          <div class="mb-10">
+            <h2 class="text-h3 text-playfair font-weight-bold mb-2">Iniciar Sesión</h2>
+            <p class="text-body-1 text-muted">Acceda a su cuenta para gestionar sus reservas.</p>
+          </div>
+
+          <v-form @submit.prevent="handleLogin" v-model="valid">
+            <v-text-field
+              v-model="email"
+              label="Correo Electrónico"
+              placeholder="nombre@empresa.com"
+              variant="underlined"
+              class="mb-6 input-refined"
+              color="primary"
+              density="comfortable"
+              :rules="[v => !!v || 'Obligatorio', v => /.+@.+\..+/.test(v) || 'Inválido']"
+              required
+            />
+
+            <v-text-field
+              v-model="password"
+              label="Contraseña"
+              type="password"
+              variant="underlined"
+              class="mb-8 input-refined"
+              color="primary"
+              density="comfortable"
+              :rules="[v => !!v || 'Obligatorio']"
+              required
+            />
+
+            <v-btn
+              block
+              color="primary"
+              size="x-large"
+              flat
+              type="submit"
+              :loading="authStore.loading"
+              class="premium-btn mb-6"
+              height="60"
+            >
+              Iniciar Sesión
+            </v-btn>
+
+            <div class="d-flex justify-space-between align-center mt-4">
+              <router-link to="/forgot-password" class="text-caption text-muted text-decoration-none hover-primary">
+                ¿Olvidó su contraseña?
+              </router-link>
+              
+              <router-link to="/register" class="text-caption font-weight-bold text-primary text-decoration-none">
+                Registrarse
+              </router-link>
             </div>
-
-            <v-form @submit.prevent="handleLogin" v-model="valid">
-              <v-text-field
-                v-model="email"
-                label="Email Address"
-                prepend-inner-icon="mdi-email-outline"
-                variant="outlined"
-                rounded="lg"
-                class="mb-4"
-                density="comfortable"
-                :rules="[v => !!v || 'Email is required', v => /.+@.+\..+/.test(v) || 'E-mail must be valid']"
-                required
-              />
-
-              <v-text-field
-                v-model="password"
-                label="Password"
-                prepend-inner-icon="mdi-lock-outline"
-                type="password"
-                variant="outlined"
-                rounded="lg"
-                class="mb-6"
-                density="comfortable"
-                required
-              />
-
-              <v-btn
-                block
-                color="primary"
-                size="x-large"
-                rounded="xl"
-                type="submit"
-                :loading="authStore.loading"
-                class="text-none font-weight-black premium-gradient-btn elevation-8"
-              >
-                Sign In
-              </v-btn>
-
-              <div class="mt-4 text-center">
-                <router-link to="/forgot-password" class="text-body-2 font-weight-medium text-primary text-decoration-none">
-                  Forgot your password?
-                </router-link>
-              </div>
-
-              <div class="mt-8 text-center">
-                <span class="text-body-2 text-medium-emphasis">Don't have an account? </span>
-                <router-link to="/register" class="text-body-2 font-weight-black text-primary text-decoration-none">
-                  Create Account
-                </router-link>
-              </div>
-            </v-form>
-          </v-card>
+          </v-form>
+          
+          <div class="mt-16 pt-8 border-top text-center">
+            <p class="text-caption text-muted">© 2026 Residencial Campus Elite. Todos los derechos reservados.</p>
+          </div>
         </div>
       </v-col>
     </v-row>
@@ -99,8 +107,6 @@ const authStore = useAuthStore()
 const email = ref('')
 const password = ref('')
 const valid = ref(false)
-const showSnackbar = ref(false)
-const errorMessage = ref('')
 
 const handleLogin = async () => {
   if (!valid.value) return
@@ -109,40 +115,74 @@ const handleLogin = async () => {
     await authStore.login({ email: email.value, password: password.value })
     router.push('/')
   } catch (error: any) {
-    errorMessage.value = error.response?.data?.message || 'Login failed'
-    showSnackbar.value = true
+    console.error('Login failed:', error)
   }
 }
 </script>
 
-
 <style scoped>
-.login-bg {
-  background-color: rgb(var(--v-theme-background));
+.login-wrapper {
+  background-color: #fff;
+  overflow: hidden;
 }
 
-.relative {
+.hero-image-container {
   position: relative;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.z-10 {
-  z-index: 10;
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: slowZoom 20s infinite alternate ease-in-out;
 }
 
-.overlay {
+.hero-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.8) 0%, rgba(var(--v-theme-primary-darken-1), 0.9) 100%);
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.2) 60%, transparent 100%);
+  z-index: 2;
 }
 
-.cursor-pointer {
-  cursor: pointer;
+.hero-content {
+  z-index: 3;
+  max-width: 800px;
 }
 
-.gap-2 {
-  gap: 8px;
+.max-width-500 {
+  max-width: 500px;
+}
+
+.max-width-600 {
+  max-width: 600px;
+}
+
+.opacity-80 {
+  opacity: 0.8;
+}
+
+.border-top {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.hover-primary:hover {
+  color: var(--primary) !important;
+}
+
+@keyframes slowZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .login-wrapper {
+    background: #fff;
+  }
 }
 </style>

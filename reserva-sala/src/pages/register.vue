@@ -1,153 +1,201 @@
 <template>
-  <v-container fluid class="fill-height pa-0 register-bg">
+  <v-container fluid class="fill-height pa-0 login-wrapper">
     <v-row no-gutters class="fill-height">
-      <!-- Left Side: Branding (Hidden on mobile) -->
+      <!-- Left Side: Luxury Hero Section -->
       <v-col
         cols="12"
         md="7"
         lg="8"
-        class="d-none d-md-flex align-center justify-center relative bg-primary-darken-1"
+        class="d-none d-md-flex align-center justify-center hero-image-container"
       >
-        <div class="pa-12 text-white relative z-10">
-          <v-icon icon="mdi-account-plus-outline" size="80" class="mb-6" />
-          <h1 class="text-h2 font-weight-bold mb-4">Join Our Community</h1>
-          <p class="text-h5 text-medium-emphasis">Start managing your workspace more efficiently today.</p>
+        <img
+          src="@/assets/login-hero.png"
+          alt="Luxury Meeting Room"
+          class="hero-image"
+        />
+        <div class="hero-overlay d-flex flex-column justify-end pa-16">
+          <div class="hero-content pb-10">
+            <span
+              class="text-overline text-white mb-2 d-block letter-spacing-lg"
+              >Residencial Campus</span
+            >
+            <h1 class="text-h1 text-playfair text-white font-weight-bold mb-6">
+              Tu Hogar, <br />
+              Tu Espacio
+            </h1>
+            <p
+              class="text-h5 text-white opacity-80 max-width-600 font-weight-light"
+            >
+              Únase a la plataforma de gestión de espacios más exclusiva de su
+              comunidad.
+            </p>
+          </div>
         </div>
-        <div class="overlay" />
       </v-col>
 
-      <!-- Right Side: Register Form -->
+      <!-- Right Side: Refined Register Form -->
       <v-col
         cols="12"
         md="5"
         lg="4"
-        class="d-flex align-center justify-center bg-background relative"
+        class="d-flex align-center justify-center bg-white"
       >
-        <div class="pa-4 w-100 d-flex justify-center">
-          <v-card flat width="440" class="pa-10 glass-card rounded-xl elevation-4">
-            <div class="text-center mb-10">
-              <h2 class="text-h3 font-weight-black mb-2 text-gradient">Create Account</h2>
-              <p class="text-subtitle-1 text-medium-emphasis">Fill in your details to get started</p>
-            </div>
+        <div
+          class="pa-10 w-100 max-width-500 fill-height d-flex flex-column justify-center"
+        >
+          <div class="brand-header mb-4 d-flex align-center">
+            <v-icon
+              icon="mdi-shield-crown-outline"
+              color="amber-darken-1"
+              size="32"
+              class="mr-3"
+            />
+            <span
+              class="text-h6 font-weight-bold letter-spacing-lg text-uppercase"
+              >Residencial Campus</span
+            >
+          </div>
 
-            <v-form @submit.prevent="handleRegister" v-model="valid">
-              <v-row>
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="firstName"
-                    label="Nombre"
-                    prepend-inner-icon="mdi-account-outline"
-                    variant="outlined"
-                    rounded="lg"
-                    density="comfortable"
-                    :rules="[v => !!v || 'Nombre es requerido']"
-                    required
-                  />
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                    v-model="lastName"
-                    label="Apellidos"
-                    prepend-inner-icon="mdi-account-outline"
-                    variant="outlined"
-                    rounded="lg"
-                    density="comfortable"
-                    :rules="[v => !!v || 'Apellidos son requeridos']"
-                    required
-                  />
-                </v-col>
-              </v-row>
+          <div class="mb-6">
+            <h2 class="text-h3 text-playfair font-weight-bold mb-2">
+              Registrarse
+            </h2>
+            <p class="text-body-1 text-muted">
+              Cree su cuenta para comenzar a reservar.
+            </p>
+          </div>
 
-              <v-text-field
-                v-model="address"
-                label="Dirección"
-                prepend-inner-icon="mdi-map-marker-outline"
-                variant="outlined"
-                rounded="lg"
-                class="mb-4"
-                density="comfortable"
-                :rules="[v => !!v || 'Dirección es requerida']"
-                required
-              />
+          <v-form @submit.prevent="handleRegister" v-model="valid">
+            <v-row dense>
+              <v-col cols="6">
+                <v-text-field
+                  v-model="firstName"
+                  label="Nombre"
+                  variant="underlined"
+                  class="mb-3 input-refined"
+                  color="primary"
+                  density="comfortable"
+                  :rules="[(v) => !!v || 'Obligatorio']"
+                  required
+                />
+              </v-col>
+              <v-col cols="6">
+                <v-text-field
+                  v-model="lastName"
+                  label="Apellidos"
+                  variant="underlined"
+                  class="mb-3 input-refined"
+                  color="primary"
+                  density="comfortable"
+                  :rules="[(v) => !!v || 'Obligatorio']"
+                  required
+                />
+              </v-col>
+            </v-row>
 
-              <v-row>
-                <v-col cols="4">
-                  <v-text-field
-                    v-model="portal"
-                    label="Portal"
-                    variant="outlined"
-                    rounded="lg"
-                    density="comfortable"
-                    :rules="[v => !!v || 'Requerido']"
-                  />
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field
-                    v-model="floor"
-                    label="Piso"
-                    variant="outlined"
-                    rounded="lg"
-                    density="comfortable"
-                    :rules="[v => !!v || 'Requerido']"
-                  />
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field
-                    v-model="letter"
-                    label="Letra"
-                    variant="outlined"
-                    rounded="lg"
-                    density="comfortable"
-                    :rules="[v => !!v || 'Requerido']"
-                  />
-                </v-col>
-              </v-row>
+            <v-text-field
+              v-model="address"
+              label="Dirección"
+              variant="underlined"
+              class="mb-3 input-refined"
+              color="primary"
+              density="comfortable"
+              :rules="[(v) => !!v || 'Obligatorio']"
+              required
+            />
 
-              <v-text-field
-                v-model="email"
-                label="Email Address"
-                prepend-inner-icon="mdi-email-outline"
-                variant="outlined"
-                rounded="lg"
-                class="mb-4"
-                density="comfortable"
-                :rules="[v => !!v || 'Email is required', v => /.+@.+\..+/.test(v) || 'E-mail must be valid']"
-                required
-              />
+            <v-row dense>
+              <v-col cols="4">
+                <v-text-field
+                  v-model="portal"
+                  label="Portal"
+                  variant="underlined"
+                  class="mb-3 input-refined"
+                  color="primary"
+                  density="comfortable"
+                />
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  v-model="floor"
+                  label="Piso"
+                  variant="underlined"
+                  class="mb-3 input-refined"
+                  color="primary"
+                  density="comfortable"
+                />
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  v-model="letter"
+                  label="Letra"
+                  variant="underlined"
+                  class="mb-3 input-refined"
+                  color="primary"
+                  density="comfortable"
+                />
+              </v-col>
+            </v-row>
 
-              <v-text-field
-                v-model="password"
-                label="Password"
-                prepend-inner-icon="mdi-lock-outline"
-                type="password"
-                variant="outlined"
-                rounded="lg"
-                class="mb-6"
-                density="comfortable"
-                :rules="[v => !!v || 'Password is required', v => v.length >= 6 || 'Min 6 characters']"
-                required
-              />
+            <v-text-field
+              v-model="email"
+              label="Correo Electrónico"
+              placeholder="nombre@empresa.com"
+              variant="underlined"
+              class="mb-3 input-refined"
+              color="primary"
+              density="comfortable"
+              :rules="[
+                (v) => !!v || 'Obligatorio',
+                (v) => /.+@.+\..+/.test(v) || 'Inválido',
+              ]"
+              required
+            />
 
-              <v-btn
-                block
-                color="primary"
-                size="x-large"
-                rounded="xl"
-                type="submit"
-                :loading="authStore.loading"
-                class="text-none font-weight-black premium-gradient-btn elevation-8"
+            <v-text-field
+              v-model="password"
+              label="Contraseña"
+              type="password"
+              variant="underlined"
+              class="mb-8 input-refined"
+              color="primary"
+              density="comfortable"
+              :rules="[
+                (v) => !!v || 'Obligatorio',
+                (v) => v.length >= 6 || 'Min 6 carac.',
+              ]"
+              required
+            />
+
+            <v-btn
+              block
+              color="primary"
+              size="x-large"
+              flat
+              type="submit"
+              :loading="authStore.loading"
+              class="premium-btn mb-6"
+              height="60"
+            >
+              Registrarse
+            </v-btn>
+
+            <div class="text-center mt-4">
+              <span class="text-caption text-muted">¿Ya tiene cuenta? </span>
+              <router-link
+                to="/login"
+                class="text-caption font-weight-bold text-primary text-decoration-none"
               >
-                Sign Up
-              </v-btn>
+                Iniciar Sesión
+              </router-link>
+            </div>
+          </v-form>
 
-              <div class="mt-8 text-center">
-                <span class="text-body-2 text-medium-emphasis">Already have an account? </span>
-                <router-link to="/login" class="text-body-2 font-weight-black text-primary text-decoration-none">
-                  Sign In
-                </router-link>
-              </div>
-            </v-form>
-          </v-card>
+          <div class="mt-10 pt-6 border-top text-center">
+            <p class="text-caption text-muted">
+              © 2026 Residencial Campus Elite. Todos los derechos reservados.
+            </p>
+          </div>
         </div>
       </v-col>
     </v-row>
@@ -159,74 +207,121 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 
-const router = useRouter()
-const authStore = useAuthStore()
+const router = useRouter();
+const authStore = useAuthStore();
 
-const firstName = ref('')
-const lastName = ref('')
-const email = ref('')
-const password = ref('')
-const address = ref('')
-const portal = ref('')
-const floor = ref('')
-const letter = ref('')
-const phone = ref('')
-const valid = ref(false)
-const showError = ref(false)
-const errorMessage = ref('')
+const firstName = ref("");
+const lastName = ref("");
+const email = ref("");
+const password = ref("");
+const address = ref("");
+const portal = ref("");
+const floor = ref("");
+const letter = ref("");
+const phone = ref("");
+const valid = ref(false);
+const showError = ref(false);
+const errorMessage = ref("");
 
 const handleRegister = async () => {
-  if (!valid.value) return
-  
+  if (!valid.value) return;
+
   try {
-    await authStore.register({ 
+    await authStore.register({
       firstName: firstName.value,
       lastName: lastName.value,
-      email: email.value, 
+      email: email.value,
       password: password.value,
       address: address.value,
       portal: portal.value,
       floor: floor.value,
       letter: letter.value,
-      phone: phone.value
-    })
-    router.push('/login?registered=true')
+      phone: phone.value,
+    });
+    router.push("/login?registered=true");
   } catch (error: any) {
-    errorMessage.value = error.response?.data?.message || 'Registration failed'
-    showError.value = true
+    errorMessage.value =
+      error.response?.data?.message || "Error en el registro";
+    showError.value = true;
   }
-}
+};
 </script>
 
 <style scoped>
-.register-bg {
-  background-color: rgb(var(--v-theme-background));
+.login-wrapper {
+  background-color: #fff;
+  overflow: hidden;
 }
 
-.relative {
+.hero-image-container {
   position: relative;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.z-10 {
-  z-index: 10;
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: slowZoom 20s infinite alternate ease-in-out;
 }
 
-.overlay {
+.hero-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.8) 0%, rgba(var(--v-theme-primary-darken-1), 0.9) 100%);
+  background: linear-gradient(
+    to top,
+    rgba(15, 23, 42, 0.9) 0%,
+    rgba(15, 23, 42, 0.2) 60%,
+    transparent 100%
+  );
+  z-index: 2;
 }
 
-.text-gradient {
-  background: linear-gradient(to right, rgb(var(--v-theme-primary)), rgb(var(--v-theme-secondary)));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.hero-content {
+  z-index: 3;
+  max-width: 800px;
+}
+
+.max-width-500 {
+  max-width: 500px;
+}
+
+.max-width-600 {
+  max-width: 600px;
+}
+
+.opacity-80 {
+  opacity: 0.8;
+}
+
+.border-top {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
+@keyframes slowZoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@media (max-width: 960px) {
+  .login-wrapper {
+    background: #fff;
+  }
 }
 </style>

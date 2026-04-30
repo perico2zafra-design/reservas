@@ -3,58 +3,64 @@
     v-model="internalDrawer"
     app
     floating
-    width="300"
-    class="sidebar-glass pa-6"
+    width="280"
+    class="sidebar-premium pa-4"
   >
+    <div class="mesh-container">
+      <div class="mesh-glow"></div>
+    </div>
     <!-- Logo Section -->
-    <div class="d-flex align-center mb-10 px-2 pt-4 cursor-pointer" @click="$router.push('/')">
-      <div class="logo-box-main me-3">
-        <v-icon icon="mdi-office-building" color="white" size="20" />
+    <div class="d-flex align-center mb-6 px-2 pt-2 cursor-pointer" @click="$router.push('/')">
+      <div class="brand-logo-container me-3">
+        <v-icon icon="mdi-shield-crown-outline" color="amber-darken-1" size="24" />
       </div>
-      <span class="app-logo-text">CAMPUS</span>
+      <div class="d-flex flex-column">
+        <span class="brand-text-top">RESIDENCIAL</span>
+        <span class="brand-text-bottom">CAMPUS</span>
+      </div>
     </div>
 
     <!-- User Menu -->
-    <div class="text-overline font-weight-black opacity-30 px-4 mb-4">MENÚ</div>
+    <div class="nav-section-title">MENÚ</div>
     <v-list nav class="pa-0">
       <v-list-item 
         v-for="item in menuItems" 
         :key="item.to"
         :to="item.to" 
-        rounded="20" 
-        class="mb-2 py-4 nav-item-premium" 
+        rounded="16" 
+        class="mb-1 py-2 nav-item-premium" 
         active-class="nav-active" 
       >
         <template v-slot:prepend>
           <v-icon :icon="item.icon" :color="item.color" class="me-4" />
         </template>
-        <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
+        <v-list-item-title class="font-weight-medium">{{ item.title }}</v-list-item-title>
       </v-list-item>
     </v-list>
 
     <!-- Admin Section -->
-    <div v-if="isAdmin" class="mt-10">
-      <div class="text-overline font-weight-black opacity-30 px-4 mb-4">GESTIÓN ADM.</div>
+    <div v-if="isAdmin" class="mt-6">
+      <div class="nav-section-title">GESTIÓN ADM.</div>
       <v-list nav class="pa-0">
         <v-list-item 
           v-for="item in adminItems" 
           :key="item.to"
           :to="item.to" 
-          rounded="20" 
-          class="mb-2 py-4 nav-item-premium" 
+          rounded="16" 
+          class="mb-2 py-3 nav-item-premium" 
           active-class="nav-active" 
         >
           <template v-slot:prepend>
             <v-icon :icon="item.icon" :color="item.color" class="me-4" />
           </template>
-          <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
+          <v-list-item-title class="font-weight-medium">{{ item.title }}</v-list-item-title>
         </v-list-item>
       </v-list>
     </div>
 
     <template v-slot:append>
-      <div class="pa-4">
-        <v-btn block color="error" variant="tonal" rounded="xl" prepend-icon="mdi-logout" class="font-weight-black" @click="$emit('logout')">
+      <div class="pa-6">
+        <v-btn block color="error" variant="flat" rounded="xl" prepend-icon="mdi-logout" class="font-weight-bold logout-btn-premium" height="50" @click="$emit('logout')">
           Cerrar Sesión
         </v-btn>
       </div>
@@ -90,38 +96,101 @@ const adminItems = [
 </script>
 
 <style scoped>
-.sidebar-glass {
-  background: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+.sidebar-premium {
+  background: #0f172a !important; /* Dark Slate Blue */
+  border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
-.logo-box-main {
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-  width: 40px; height: 40px; border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+
+.mesh-container {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.1;
 }
-.app-logo-text {
-  font-size: 1.5rem; font-weight: 900; letter-spacing: -1.5px;
-  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+
+.mesh-glow {
+  position: absolute;
+  top: -20%; left: -20%;
+  width: 140%; height: 140%;
+  background: radial-gradient(circle at center, #6366f1 0%, transparent 70%);
+  filter: blur(80px);
 }
+
+.brand-logo-container {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.brand-text-top {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1;
+}
+
+.brand-text-bottom {
+  font-size: 1.4rem;
+  font-weight: 300;
+  letter-spacing: 1px;
+  color: #ffffff;
+  font-family: 'Playfair Display', serif;
+  line-height: 1.2;
+}
+
+.nav-section-title {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 0 16px;
+  margin-bottom: 12px;
+}
+
 .nav-item-premium { 
-  color: #64748b !important; 
-  transition: all 0.3s ease !important;
+  color: rgba(255, 255, 255, 0.6) !important; 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   margin-bottom: 8px !important;
   font-weight: 600 !important;
 }
+
 .nav-item-premium:hover {
-  background: rgba(99, 102, 241, 0.05) !important;
-  color: #6366f1 !important;
-}
-.nav-active {
-  background: #6366f1 !important;
+  background: rgba(255, 255, 255, 0.05) !important;
   color: white !important;
-  box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.3) !important;
+  transform: translateX(4px);
 }
+
+.nav-active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(124, 58, 237, 0.9) 100%) !important;
+  color: white !important;
+  box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4), 
+              inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
 .nav-active :deep(.v-icon) {
   color: white !important;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+}
+
+.logout-btn-premium {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  transition: all 0.3s ease;
+}
+
+.logout-btn-premium:hover {
+  background: #ef4444 !important;
+  color: white !important;
+  box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.4) !important;
 }
 </style>
