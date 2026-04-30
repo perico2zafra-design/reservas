@@ -1,130 +1,106 @@
 <template>
-  <div class="community-app">
-    <!-- Overlay de Pendiente de Aprobación (Estilo App Nativa) -->
-    <v-overlay v-model="isPending" persistent class="align-center justify-center text-center px-6" scrim="#0f172a" opacity="0.98">
-      <div class="pa-8">
-        <v-avatar size="120" color="primary" class="mb-8 elevation-xl shadow-blue">
-          <v-icon icon="mdi-shield-lock" size="60" color="white" />
-        </v-avatar>
-        <h2 class="text-h4 font-weight-black text-white mb-2">Verificando...</h2>
-        <p class="text-body-1 text-slate-400 mb-10">
-          Hola {{ authStore.user?.name.split(' ')[0] }}, estamos confirmando tu vivienda en el Residencial Campus.
-        </p>
-        <v-btn block color="white" rounded="xl" size="x-large" class="text-primary font-weight-black" @click="authStore.logout(); $router.push('/login')">
-          Cerrar Sesión
-        </v-btn>
-      </div>
-    </v-overlay>
-
-    <!-- App Header (Hero) -->
-    <div class="app-hero pt-10 pb-16 px-6">
-      <div class="d-flex align-center mb-10">
-        <div>
-          <div class="text-overline text-blue-200 font-weight-black mb-1 opacity-70">MI URBANIZACIÓN</div>
-          <h1 class="text-h3 font-weight-black text-white letter-spacing-tight">Residencial Campus</h1>
-        </div>
-        <v-spacer />
-        <div class="hero-avatar-wrapper">
-          <v-avatar v-if="authStore.user?.avatar_url" size="64" class="elevation-10 border-3 border-blue-400">
-            <v-img :src="authStore.user.avatar_url" cover />
-          </v-avatar>
-          <v-avatar v-else size="64" class="elevation-10 premium-gradient-avatar border-3 border-white">
-            <span class="text-h6 font-weight-black text-white">{{ userInitials }}</span>
-          </v-avatar>
-        </div>
-      </div>
-
-      <!-- Quick Info Cards (Horizontal Scroll on Mobile) -->
-      <div class="d-flex ga-4 overflow-x-auto no-scrollbar pb-2">
-        <v-card rounded="24" class="glass-card-light pa-5 min-width-180 flex-shrink-0" elevation="0">
-          <div class="text-caption text-blue-100 opacity-60 mb-1">Tu Vivienda</div>
-          <div class="text-h6 font-weight-black text-white">Portal {{ authStore.user?.portal || '-' }} · {{ authStore.user?.letter || '-' }}</div>
-        </v-card>
-        <v-card rounded="24" class="glass-card-light pa-5 min-width-180 flex-shrink-0" elevation="0">
-          <div class="text-caption text-blue-100 opacity-60 mb-1">Estado de Acceso</div>
-          <div class="d-flex align-center">
-            <v-icon icon="mdi-check-decagram" color="green-accent-2" size="20" class="me-2" />
-            <span class="text-subtitle-1 font-weight-black text-white">Verificado</span>
-          </div>
-        </v-card>
-      </div>
-    </div>
-
-    <!-- Dashboard Content -->
-    <div class="app-content px-6 pb-12">
-      <!-- Próxima Reserva Card -->
-      <section class="mb-10 mt-n6">
-        <h2 class="text-subtitle-2 font-weight-black text-slate-500 mb-4 px-1">TU PRÓXIMA CITA</h2>
-        <v-card v-if="nextBooking" rounded="xl" class="premium-card pa-6 border-0 elevation-xl" @click="$router.push('/my-bookings')">
-          <div class="d-flex align-center">
-            <v-avatar size="56" rounded="lg" class="me-4 elevation-2">
-              <v-img :src="getRoom(nextBooking.room_id)?.image" cover />
-            </v-avatar>
-            <div>
-              <div class="text-h6 font-weight-black text-slate-900">{{ getRoom(nextBooking.room_id)?.name }}</div>
-              <div class="text-body-2 text-primary font-weight-bold">
-                {{ formatBookingDate(nextBooking.booking_date) }} · {{ nextBooking.start_time.substring(0,5) }}
-              </div>
-            </div>
-            <v-spacer />
-            <v-icon icon="mdi-chevron-right" color="slate-300" />
-          </div>
-        </v-card>
-        <v-card v-else rounded="xl" class="border-2 border-dashed border-slate-200 pa-8 text-center bg-transparent" elevation="0">
-          <div class="text-slate-400 font-weight-bold mb-1">Sin reservas activas</div>
-          <div class="text-caption text-slate-400">Reserva una sala para empezar</div>
-        </v-card>
-      </section>
-
-      <!-- Instalaciones Grid -->
-      <section>
-        <div class="d-flex align-center mb-4 px-1">
-          <h2 class="text-subtitle-2 font-weight-black text-slate-500">INSTALACIONES</h2>
-          <v-spacer />
-          <v-btn variant="text" color="primary" size="small" class="font-weight-black">Ver Todo</v-btn>
-        </div>
+  <div class="community-pro-app">
+    <!-- Hero Section: Floating Mesh Card -->
+    <v-container class="pt-10 pb-16">
+      <v-card rounded="32" class="hero-mesh-card pa-8 pa-md-12 elevation-24 border-0 overflow-hidden position-relative">
+        <!-- Abstract Glows -->
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
         
+        <v-row align="center" class="position-relative z-10">
+          <v-col cols="12" md="8">
+            <div class="d-flex align-center mb-6">
+              <div class="logo-icon-box me-4">
+                <v-icon icon="mdi-office-building" color="white" />
+              </div>
+              <span class="text-overline font-weight-black text-white opacity-60 letter-spacing-widest">RESIDENCIAL CAMPUS</span>
+            </div>
+            <h1 class="text-h2 font-weight-black text-white mb-6 leading-tight">
+              Tu comunidad, <br>
+              <span class="text-gradient-light">más conectada.</span>
+            </h1>
+            <p class="text-h6 text-white opacity-70 mb-10 max-width-500 font-weight-medium">
+              Gestiona tus espacios comunes de forma inteligente y disfruta de una convivencia premium.
+            </p>
+            
+            <div class="d-flex ga-4 flex-wrap">
+              <v-card rounded="20" class="glass-info pa-4 min-width-160" elevation="0">
+                <div class="text-caption text-white opacity-50 mb-1">VIVIENDA</div>
+                <div class="text-subtitle-1 font-weight-black text-white">Portal {{ authStore.user?.portal || '7' }} · {{ authStore.user?.letter || 'B' }}</div>
+              </v-card>
+              <v-card rounded="20" class="glass-info pa-4 min-width-160" elevation="0">
+                <div class="text-caption text-white opacity-50 mb-1">ESTADO</div>
+                <div class="d-flex align-center">
+                  <v-icon icon="mdi-shield-check" color="green-accent-2" size="18" class="me-2" />
+                  <span class="text-subtitle-1 font-weight-black text-white">Validado</span>
+                </div>
+              </v-card>
+            </div>
+          </v-col>
+          
+          <v-col cols="12" md="4" class="text-center d-none d-md-block">
+            <div class="hero-avatar-main">
+              <v-avatar v-if="authStore.user?.avatar_url" size="180" class="elevation-24 border-4 border-white">
+                <v-img :src="authStore.user.avatar_url" cover />
+              </v-avatar>
+              <v-avatar v-else size="180" class="elevation-24 premium-avatar-large border-4 border-white">
+                <span class="text-h2 font-weight-black">{{ userInitials }}</span>
+              </v-avatar>
+            </div>
+          </v-col>
+        </v-row>
+      </v-card>
+
+      <!-- Main Actions / Content -->
+      <div class="mt-16">
+        <div class="d-flex align-center mb-8 px-2">
+          <h2 class="text-h4 font-weight-black text-slate-900">Instalaciones Disponibles</h2>
+          <v-spacer />
+          <v-btn variant="text" color="primary" class="font-weight-black">Ver todas</v-btn>
+        </div>
+
         <v-row>
           <v-col v-for="room in rooms" :key="room.id" cols="12" sm="6" lg="4">
-            <v-card rounded="24" class="room-app-card elevation-xl overflow-hidden border-0" @click="$router.push('/room/' + room.id)">
-              <v-img :src="room.image" height="260" cover class="align-end bg-slate-200">
-                <div class="pa-6 room-card-gradient">
-                  <div class="d-flex align-center mb-1">
-                    <h3 class="text-h5 font-weight-black text-white">{{ room.name }}</h3>
-                    <v-spacer />
-                    <v-chip size="x-small" color="white" variant="flat" class="text-primary font-weight-black px-3">
-                      {{ room.deposit_amount }}€ FIANZA
-                    </v-chip>
-                  </div>
+            <v-card 
+              rounded="32" 
+              class="room-card-premium elevation-12 border-0 overflow-hidden" 
+              @click="$router.push('/room/' + room.id)"
+            >
+              <v-img :src="room.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200'" height="280" cover class="align-end bg-slate-200">
+                <div class="pa-6 room-overlay">
+                  <v-chip color="white" variant="flat" size="x-small" class="mb-2 font-weight-black text-primary">
+                    {{ room.deposit_amount }}€ FIANZA
+                  </v-chip>
+                  <h3 class="text-h5 font-weight-black text-white mb-1">{{ room.name }}</h3>
                   <div class="text-caption text-white opacity-80 d-flex align-center">
-                    <v-icon icon="mdi-account-group" size="14" class="me-1" />
-                    Aforo máximo: {{ room.capacity }} personas
+                    <v-icon icon="mdi-account-group" size="14" class="me-2" />
+                    Aforo: {{ room.capacity }} personas
                   </div>
                 </div>
               </v-img>
             </v-card>
           </v-col>
         </v-row>
-      </section>
+      </div>
 
-      <!-- Comunicados App Style -->
-      <section class="mt-10">
-        <h2 class="text-subtitle-2 font-weight-black text-slate-500 mb-4 px-1">AVISOS COMUNITARIOS</h2>
-        <v-card rounded="xl" class="bg-indigo-lighten-5 border-0 elevation-0 pa-5">
-          <div class="d-flex align-start">
-            <v-avatar color="indigo-lighten-4" size="36" class="me-4 mt-1">
-              <v-icon icon="mdi-bullhorn" color="indigo" size="20" />
+      <!-- Community Feed / Alerts -->
+      <section class="mt-16">
+        <v-card rounded="32" class="pa-8 bg-white elevation-4 border-0">
+          <div class="d-flex align-center mb-6">
+            <v-avatar color="amber-lighten-4" size="48" class="me-4">
+              <v-icon icon="mdi-bullhorn" color="amber-darken-3" />
             </v-avatar>
             <div>
-              <div class="text-subtitle-2 font-weight-black text-indigo-darken-4 mb-1">Recordatorio de Limpieza</div>
-              <p class="text-caption text-indigo-darken-2 opacity-80 leading-tight">
-                Recuerda que para la devolución íntegra de la fianza, el Salón Social debe quedar en el mismo estado de limpieza que se encontró.
-              </p>
+              <h3 class="text-h6 font-weight-black">Aviso de Administración</h3>
+              <div class="text-caption opacity-60">Publicado hace 2 horas</div>
             </div>
           </div>
+          <p class="text-body-1 text-slate-600 leading-relaxed">
+            Recordamos a todos los vecinos que el uso del Salón Social durante el fin de semana requiere reserva previa con al menos 48h de antelación. Por favor, asegúrese de revisar el estado de la limpieza al finalizar para el reembolso íntegro de su fianza.
+          </p>
         </v-card>
       </section>
-    </div>
+    </v-container>
   </div>
 </template>
 
@@ -139,27 +115,11 @@ const bookingStore = useBookingStore()
 const userInitials = computed(() => {
   if (!authStore.user?.name) return 'U'
   const parts = authStore.user.name.split(' ')
-  if (parts.length > 1) {
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-  }
-  return parts[0][0].toUpperCase()
+  return parts.map(p => p[0]).slice(0,2).join('').toUpperCase()
 })
 
 const rooms = computed(() => bookingStore.rooms)
 const isPending = computed(() => authStore.user?.status === 'PENDING')
-
-const nextBooking = computed(() => {
-  const future = bookingStore.bookings
-    .filter(b => b.user_id === authStore.user?.id && new Date(b.booking_date) >= new Date())
-    .sort((a, b) => new Date(a.booking_date).getTime() - new Date(b.booking_date).getTime())
-  return future[0] || null
-})
-
-const getRoom = (id: number) => rooms.value.find(r => r.id === id)
-
-const formatBookingDate = (dateStr: string) => {
-  return new Date(dateStr).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
-}
 
 onMounted(async () => {
   await Promise.all([
@@ -169,62 +129,63 @@ onMounted(async () => {
 })
 </script>
 
-<script lang="ts">
-export default {
-  name: 'CommunityHome'
-}
-</script>
-
 <style scoped>
-.app-hero {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border-radius: 0 0 40px 40px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+.hero-mesh-card {
+  background: #0f172a !important;
 }
 
-.glass-card-light {
+.glow-1 {
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 60%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, transparent 70%);
+  filter: blur(60px);
+}
+
+.glow-2 {
+  position: absolute;
+  bottom: -20%;
+  right: -10%;
+  width: 60%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, transparent 70%);
+  filter: blur(60px);
+}
+
+.text-gradient-light {
+  background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.glass-info {
   background: rgba(255, 255, 255, 0.1) !important;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-.room-app-card {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-}
-
-.room-app-card:active {
-  transform: scale(0.96);
-}
-
-.room-card-gradient {
-  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+.room-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
   width: 100%;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+.premium-avatar-large {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+  color: white !important;
 }
 
-.min-width-160 {
-  min-width: 160px;
+.leading-tight { line-height: 1.1 !important; }
+.z-10 { position: relative; z-index: 10; }
+.max-width-500 { max-width: 500px; }
+.letter-spacing-widest { letter-spacing: 0.2em !important; }
+
+.room-card-premium {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.shadow-blue {
-  box-shadow: 0 0 40px rgba(59, 130, 246, 0.4) !important;
-}
-
-.border-2 {
-  border-width: 2px !important;
-  border-style: solid !important;
-}
-
-.border-blue-400 { border-color: #60a5fa !important; }
-.border-slate-200 { border-color: #e2e8f0 !important; }
-
-.leading-tight { line-height: 1.25 !important; }
-
-.v-avatar.border-2 {
-  padding: 2px;
+.room-card-premium:hover {
+  transform: translateY(-10px) scale(1.02);
 }
 </style>

@@ -1,110 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 :root {
-  --premium-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --primary-glow: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.15), transparent);
+  --secondary-glow: radial-gradient(circle at 100% 0%, rgba(168, 85, 247, 0.1), transparent);
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', sans-serif !important;
   background-color: #f8fafc;
   color: #1e293b;
-  -webkit-tap-highlight-color: transparent;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Animación de entrada suave para todas las páginas */
-.v-main {
-  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+.app-shell {
+  background-attachment: fixed;
+  background-image: var(--primary-glow), var(--secondary-glow);
 }
 
+/* Glassmorphism Classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Typography Utilities */
+.text-gradient {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.letter-spacing-widest { letter-spacing: 0.1em !important; }
+.letter-spacing-tight { letter-spacing: -0.05em !important; }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Tarjetas Premium con efecto de elevación */
-.premium-card {
-  background: white !important;
-  border: 1px solid rgba(0, 0, 0, 0.05) !important;
-  box-shadow: var(--card-shadow) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+.fade-enter-active {
+  animation: fadeIn 0.5s ease-out;
 }
-
-.premium-card:active {
-  transform: scale(0.98);
-}
-
-/* Estilo de los botones */
-.v-btn {
-  letter-spacing: -0.01em !important;
-  text-transform: none !important;
-}
-
-.premium-btn {
-  background: var(--accent-gradient) !important;
-  color: white !important;
-  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3) !important;
-}
-
-/* App Bar y Navegación inferior */
-.glass-app-bar {
-  background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-}
-
-.premium-bottom-nav {
-  background: rgba(255, 255, 255, 0.9) !important;
-  backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
-  height: 75px !important;
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.premium-bottom-nav .v-btn {
-  font-weight: 700 !important;
-  font-size: 0.7rem !important;
-}
-
-.glass-list {
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(10px);
-  border-radius: 20px !important;
-  border: 1px solid rgba(0, 0, 0, 0.05) !important;
-}
-
-/* Avatares y Logo */
-.premium-gradient-avatar {
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
-}
-
-.logo-box {
-  background: var(--accent-gradient);
-  padding: 8px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.avatar-wrapper {
-  padding: 2px;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-}
-
-.avatar-wrapper:hover {
-  background: rgba(var(--v-theme-primary), 0.1);
-  transform: scale(1.05);
-}
-
-.letter-spacing-tight {
-  letter-spacing: -0.05em !important;
-}
-
-.shadow-2xl {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
-}
-
