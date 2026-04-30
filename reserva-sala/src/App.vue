@@ -1,121 +1,91 @@
 <template>
   <v-app>
-    <!-- Show navigation only if authenticated and not on login page -->
-    <template v-if="authStore.isAuthenticated && $route.name !== 'login'">
-      <v-navigation-drawer
-        v-model="drawer"
-        app
-        class="glass-card border-0"
-        width="280"
-        elevation="0"
-      >
-        <div class="pa-8 d-flex align-center">
-          <div class="premium-icon-box me-3">
-            <v-icon color="white" icon="mdi-home-city" size="24" />
-          </div>
-          <span class="text-h6 font-weight-black text-gradient">Residencial Campus</span>
-        </div>
-
-        <v-list nav class="px-4">
-          <v-list-item
-            prepend-icon="mdi-view-dashboard-outline"
-            title="Inicio"
-            to="/"
-            rounded="xl"
-            class="mb-3 nav-item"
-            active-class="premium-nav-active"
-          />
-          <v-list-item
-            prepend-icon="mdi-calendar-clock"
-            title="Mis Reservas"
-            to="/my-bookings"
-            rounded="xl"
-            class="mb-3 nav-item"
-            active-class="premium-nav-active"
-          />
-        </v-list>
-
-        <v-divider class="mx-6 my-4 opacity-10" />
-        
-        <v-list nav class="px-4" v-if="authStore.isAdmin">
-          <div class="text-overline px-4 mb-2 opacity-60">Administración</div>
-          <v-list-item
-            prepend-icon="mdi-account-group-outline"
-            title="Vecinos y Admisión"
-            to="/admin/users"
-            rounded="xl"
-            class="mb-3 nav-item"
-            active-class="premium-nav-active"
-          />
-          <v-list-item
-            prepend-icon="mdi-office-building-cog"
-            title="Gestión de Salas"
-            to="/admin/rooms"
-            rounded="xl"
-            class="mb-3 nav-item"
-            active-class="premium-nav-active"
-          />
-          <v-list-item
-            prepend-icon="mdi-shield-check-outline"
-            title="Control de Fianzas"
-            to="/admin/bookings"
-            rounded="xl"
-            class="mb-3 nav-item"
-            active-class="premium-nav-active"
-          />
-        </v-list>
-
-        <template v-slot:append>
-          <div class="pa-6">
-            <v-btn
-              block
-              variant="tonal"
-              color="error"
-              prepend-icon="mdi-logout"
-              rounded="xl"
-              class="text-none font-weight-bold"
-              @click="handleLogout"
-            >
-              Cerrar Sesión
-            </v-btn>
-          </div>
+    <!-- Premium App Bar (Mobile & Desktop) -->
+    <v-app-bar flat class="glass-app-bar px-2" elevation="0">
+      <div class="pa-2 d-flex align-center">
+        <v-avatar color="primary" size="32" class="me-3 elevation-4">
+          <v-icon icon="mdi-home-city" size="18" color="white" />
+        </v-avatar>
+        <span class="text-subtitle-1 font-weight-black text-slate-900">Campus</span>
+      </div>
+      
+      <v-spacer />
+      
+      <v-btn icon="mdi-bell-outline" variant="text" size="small" class="me-2" />
+      <v-menu location="bottom end">
+        <template v-slot:activator="{ props }">
+          <v-avatar size="32" class="cursor-pointer border-2 border-primary" v-bind="props">
+            <v-img :src="'https://i.pravatar.cc/150?u=' + authStore.user?.id" />
+          </v-avatar>
         </template>
-      </v-navigation-drawer>
+        <v-list rounded="xl" class="mt-2 glass-list elevation-xl">
+          <v-list-item prepend-icon="mdi-account-outline" title="Perfil" to="/settings" />
+          <v-divider class="my-2 opacity-10" />
+          <v-list-item prepend-icon="mdi-logout" title="Cerrar Sesión" color="error" @click="handleLogout" />
+        </v-list>
+      </v-menu>
+    </v-app-bar>
 
-      <v-app-bar flat border-b class="glass-app-bar" elevation="0">
-        <v-app-bar-nav-icon @click="drawer = !drawer" class="ms-2" />
-        <v-spacer />
-        
-        <div class="d-flex align-center me-6">
-          <v-btn icon="mdi-bell-outline" variant="text" class="me-2" />
-          <div class="text-right me-4 d-none d-sm-block">
-            <div class="text-subtitle-2 font-weight-bold">{{ authStore.user?.name }}</div>
-            <div class="text-caption text-medium-emphasis">{{ authStore.user?.role }}</div>
-          </div>
-          <v-menu location="bottom end">
-            <template v-slot:activator="{ props }">
-              <v-avatar color="primary" size="40" class="cursor-pointer elevation-2" v-bind="props">
-                <span class="text-subtitle-2 text-white">{{ authStore.user?.name.charAt(0) }}</span>
-              </v-avatar>
-            </template>
-            <v-list rounded="xl" class="mt-2 glass-card border-0 shadow-lg">
-              <v-list-item prepend-icon="mdi-account-outline" title="Mi Perfil" />
-              <v-list-item prepend-icon="mdi-cog-outline" title="Ajustes" />
-              <v-divider class="my-2" />
-              <v-list-item prepend-icon="mdi-logout" title="Cerrar Sesión" color="error" @click="handleLogout" />
-            </v-list>
-          </v-menu>
-        </div>
-      </v-app-bar>
-    </template>
+    <!-- Desktop Navigation Drawer -->
+    <v-navigation-drawer
+      v-if="!$vuetify.display.mobile && authStore.isAuthenticated"
+      v-model="drawer"
+      app
+      class="border-0 bg-slate-50"
+      width="280"
+    >
+      <div class="pa-8 d-flex align-center">
+        <span class="text-h6 font-weight-black text-gradient">Residencial Campus</span>
+      </div>
 
-    <v-main :class="{'bg-premium-background': authStore.isAuthenticated}">
-      <v-container :fluid="authStore.isAuthenticated" class="pa-0 fill-height d-block">
+      <v-list nav class="px-4">
+        <v-list-item prepend-icon="mdi-view-dashboard" title="Inicio" to="/" rounded="xl" class="mb-2" />
+        <v-list-item prepend-icon="mdi-calendar-month" title="Reservas" to="/my-bookings" rounded="xl" />
+      </v-list>
+
+      <template v-if="authStore.isAdmin" v-slot:prepend>
+        <div class="text-overline px-8 mt-6 mb-2 opacity-50">ADMIN</div>
+        <v-list nav class="px-4">
+          <v-list-item prepend-icon="mdi-account-group" title="Vecinos" to="/admin/users" rounded="xl" />
+          <v-list-item prepend-icon="mdi-office-building-cog" title="Salas" to="/admin/rooms" rounded="xl" />
+        </v-list>
+      </template>
+    </v-navigation-drawer>
+
+    <!-- Mobile Bottom Navigation (Ultra Premium) -->
+    <v-bottom-navigation
+      v-if="$vuetify.display.mobile && authStore.isAuthenticated"
+      grow
+      color="primary"
+      elevation="10"
+      class="premium-bottom-nav"
+    >
+      <v-btn to="/" value="home">
+        <v-icon>mdi-home-variant</v-icon>
+        <span>Inicio</span>
+      </v-btn>
+
+      <v-btn to="/my-bookings" value="bookings">
+        <v-icon>mdi-calendar-clock</v-icon>
+        <span>Reservas</span>
+      </v-btn>
+
+      <v-btn v-if="authStore.isAdmin" to="/admin/users" value="admin">
+        <v-icon>mdi-shield-account</v-icon>
+        <span>Admin</span>
+      </v-btn>
+
+      <v-btn to="/settings" value="profile">
+        <v-icon>mdi-account-circle</v-icon>
+        <span>Tú</span>
+      </v-btn>
+    </v-bottom-navigation>
+
+    <v-main class="bg-slate-50 pb-16 pb-sm-0">
+      <v-container fluid class="pa-0">
         <router-view v-slot="{ Component }">
           <v-fade-transition mode="out-in">
-            <div :class="{'pa-4 pa-md-10': authStore.isAuthenticated && $route.name !== 'login'}">
-              <component :is="Component" />
-            </div>
+            <component :is="Component" />
           </v-fade-transition>
         </router-view>
       </v-container>
