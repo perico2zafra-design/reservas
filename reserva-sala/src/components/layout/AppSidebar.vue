@@ -100,10 +100,22 @@ const adminItems = [
   background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
-.nav-item-premium { color: #64748b !important; transition: all 0.3s ease !important; }
-.nav-active {
-  background: white !important;
+.nav-item-premium { 
+  color: #64748b !important; 
+  transition: all 0.3s ease !important;
+  margin-bottom: 8px !important;
+  font-weight: 600 !important;
+}
+.nav-item-premium:hover {
+  background: rgba(99, 102, 241, 0.05) !important;
   color: #6366f1 !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05) !important;
+}
+.nav-active {
+  background: #6366f1 !important;
+  color: white !important;
+  box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.3) !important;
+}
+.nav-active :deep(.v-icon) {
+  color: white !important;
 }
 </style>
