@@ -11,18 +11,54 @@
       >
         <div class="pa-8 d-flex align-center">
           <div class="premium-icon-box me-3">
-            <v-icon color="white" icon="mdi-office-building-marker" size="24" />
+            <v-icon color="white" icon="mdi-home-city" size="24" />
           </div>
-          <span class="text-h6 font-weight-black text-gradient">Reserva Sala</span>
+          <span class="text-h6 font-weight-black text-gradient">Residencial Campus</span>
         </div>
 
         <v-list nav class="px-4">
           <v-list-item
-            v-for="item in menuItems"
-            :key="item.title"
-            :to="item.to"
-            :prepend-icon="item.icon"
-            :title="item.title"
+            prepend-icon="mdi-view-dashboard-outline"
+            title="Inicio"
+            to="/"
+            rounded="xl"
+            class="mb-3 nav-item"
+            active-class="premium-nav-active"
+          />
+          <v-list-item
+            prepend-icon="mdi-calendar-clock"
+            title="Mis Reservas"
+            to="/my-bookings"
+            rounded="xl"
+            class="mb-3 nav-item"
+            active-class="premium-nav-active"
+          />
+        </v-list>
+
+        <v-divider class="mx-6 my-4 opacity-10" />
+        
+        <v-list nav class="px-4" v-if="authStore.isAdmin">
+          <div class="text-overline px-4 mb-2 opacity-60">Administración</div>
+          <v-list-item
+            prepend-icon="mdi-account-group-outline"
+            title="Vecinos y Admisión"
+            to="/admin/users"
+            rounded="xl"
+            class="mb-3 nav-item"
+            active-class="premium-nav-active"
+          />
+          <v-list-item
+            prepend-icon="mdi-office-building-cog"
+            title="Gestión de Salas"
+            to="/admin/rooms"
+            rounded="xl"
+            class="mb-3 nav-item"
+            active-class="premium-nav-active"
+          />
+          <v-list-item
+            prepend-icon="mdi-shield-check-outline"
+            title="Control de Fianzas"
+            to="/admin/bookings"
             rounded="xl"
             class="mb-3 nav-item"
             active-class="premium-nav-active"

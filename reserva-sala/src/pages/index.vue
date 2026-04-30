@@ -1,5 +1,5 @@
 <template>
-  <div class="workspace-explorer">
+  <div class="community-dashboard">
     <!-- Overlay de Pendiente de Aprobación -->
     <v-overlay
       v-model="isPending"
@@ -12,11 +12,11 @@
         <v-icon icon="mdi-account-clock-outline" size="100" class="mb-6 animate-pulse" color="primary-light" />
         <h2 class="text-h3 font-weight-black mb-4">Acceso Pendiente</h2>
         <p class="text-h6 opacity-80 mb-10">
-          Hola <strong>{{ authStore.user?.name }}</strong>. Tu solicitud de acceso a la Mancomunidad Residencial Campus está siendo revisada por el administrador.
+          Hola <strong>{{ authStore.user?.name }}</strong>. Tu solicitud de acceso al Residencial Campus está siendo revisada por el administrador.
         </p>
         <v-divider class="mb-8 opacity-20" />
         <p class="text-body-1 italic opacity-60 mb-8">
-          Recibirás acceso a las reservas de salas una vez validada tu vivienda.
+          Podrás realizar reservas una vez validada tu vivienda.
         </p>
         <v-btn
           variant="tonal"
@@ -30,53 +30,42 @@
       </v-card>
     </v-overlay>
 
-    <!-- Hero Section -->
-    <div class="hero-section mb-12">
+    <!-- Header / Hero Section -->
+    <div class="dashboard-header mb-12">
       <v-container>
         <v-row align="center">
-          <v-col cols="12" md="7">
+          <v-col cols="12" md="8">
+            <div class="d-flex align-center mb-4">
+              <v-chip color="primary-light" variant="flat" size="small" class="font-weight-black me-3">
+                COMUNIDAD ACTIVA
+              </v-chip>
+              <span class="text-white opacity-70 text-body-2 font-weight-bold">Badajoz, Extremadura</span>
+            </div>
             <h1 class="text-h2 font-weight-black mb-4 text-white">
-              Encuentra tu <span class="text-primary-light">espacio ideal</span>
+              Bienvenido al <br><span class="text-primary-light">Residencial Campus</span>
             </h1>
             <p class="text-h6 text-white opacity-80 mb-8 font-weight-medium">
-              Reserva salas de reuniones, laboratorios y espacios creativos en segundos.
+              Plaza Pepe Reyes 7-14. Gestiona tus reservas y disfruta de las instalaciones comunes.
             </p>
-            
-            <!-- Search Bar Pro -->
-            <v-card rounded="pill" class="search-bar-pro pa-2 elevation-8 border-0">
-              <v-row no-gutters align="center">
-                <v-col cols="8">
-                  <v-text-field
-                    v-model="search"
-                    placeholder="¿En qué edificio o zona quieres estar?"
-                    variant="plain"
-                    hide-details
-                    prepend-inner-icon="mdi-magnify"
-                    class="ms-4"
-                  />
-                </v-col>
-                <v-divider vertical class="mx-4 my-2" />
-                <v-col cols="4" class="text-right">
-                  <v-btn color="primary" rounded="pill" size="large" class="text-none font-weight-black px-8">
-                    Explorar
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-card>
           </v-col>
           
-          <!-- Quick Stats Overlay -->
-          <v-col cols="12" md="5" class="d-none d-md-block">
-            <div class="quick-stats-grid">
-              <v-card class="stat-overlay-card pa-6 mb-4 glass-dark text-white" rounded="xl">
-                <div class="text-overline opacity-70">Salas Libres Ahora</div>
-                <div class="text-h4 font-weight-black">12 <v-icon icon="mdi-check-decagram" color="success" size="24" /></div>
-              </v-card>
-              <v-card class="stat-overlay-card pa-6 glass-dark text-white" rounded="xl">
-                <div class="text-overline opacity-70">Tus Reservas Hoy</div>
-                <div class="text-h4 font-weight-black">2</div>
-              </v-card>
-            </div>
+          <v-col cols="12" md="4" class="d-none d-md-block">
+            <v-card class="glass-dark pa-6 text-white" rounded="xl">
+              <div class="d-flex align-center mb-4">
+                <v-avatar color="primary-light" size="48" class="me-4 shadow-lg">
+                  <v-icon icon="mdi-account" color="primary" />
+                </v-avatar>
+                <div>
+                  <div class="text-caption opacity-70">Tu Vivienda</div>
+                  <div class="text-subtitle-1 font-weight-bold">Portal {{ authStore.user?.portal || '7' }}, {{ authStore.user?.letter || 'B' }}</div>
+                </div>
+              </div>
+              <v-divider class="mb-4 opacity-20" />
+              <div class="d-flex justify-space-between align-center">
+                <span class="text-caption opacity-70">Estado:</span>
+                <v-chip size="x-small" color="success" variant="flat" class="font-weight-black">VERIFICADO</v-chip>
+              </div>
+            </v-card>
           </v-col>
         </v-row>
       </v-container>
@@ -84,79 +73,104 @@
 
     <!-- Main Content -->
     <v-container>
-      <div class="d-flex align-center mb-8">
-        <div>
-          <h2 class="text-h4 font-weight-black text-gradient">Salas Disponibles</h2>
-          <p class="text-subtitle-1 text-medium-emphasis">Selecciona una sala para realizar tu reserva y abonar la fianza.</p>
-        </div>
-        <v-spacer />
-      </div>
+      <v-row>
+        <!-- Left Column: Reservations & News -->
+        <v-col cols="12" md="8">
+          <section class="mb-12">
+            <div class="d-flex align-center mb-6">
+              <v-icon icon="mdi-calendar-clock" color="primary" class="me-3" />
+              <h2 class="text-h4 font-weight-black text-gradient">Tus Próximas Reservas</h2>
+            </div>
+            
+            <v-row v-if="myBookings.length > 0">
+              <v-col v-for="booking in myBookings" :key="booking.id" cols="12">
+                <v-card rounded="xl" class="pa-6 border-0 elevation-2 booking-card">
+                  <div class="d-flex align-center">
+                    <v-avatar size="60" rounded="lg" class="me-4">
+                      <v-img :src="getRoom(booking.room_id)?.image" cover />
+                    </v-avatar>
+                    <div>
+                      <div class="text-h6 font-weight-bold">{{ getRoom(booking.room_id)?.name }}</div>
+                      <div class="text-caption text-medium-emphasis">
+                        {{ new Date(booking.booking_date).toLocaleDateString() }} | {{ booking.start_time.substring(0,5) }} - {{ booking.end_time.substring(0,5) }}
+                      </div>
+                    </div>
+                    <v-spacer />
+                    <v-chip :color="getStatusColor(booking.deposit_status)" variant="tonal" size="small" class="font-weight-black">
+                      FIANZA: {{ booking.deposit_status }}
+                    </v-chip>
+                  </div>
+                </v-card>
+              </v-col>
+            </v-row>
+            
+            <v-card v-else variant="flat" color="grey-lighten-4" rounded="xl" class="pa-10 text-center">
+              <v-icon icon="mdi-calendar-blank" size="64" color="grey-lighten-1" class="mb-4" />
+              <div class="text-h6 font-weight-bold text-medium-emphasis">No tienes reservas activas</div>
+              <p class="text-body-2 text-medium-emphasis">Elige una sala a la derecha para empezar.</p>
+            </v-card>
+          </section>
 
-      <!-- Rooms Grid -->
-      <v-row v-if="!loading">
-        <v-col v-for="room in rooms" :key="room.id" cols="12" sm="6" lg="4">
-          <v-card 
-            rounded="xl" 
-            class="premium-block-card overflow-hidden elevation-2 border-0" 
-            @click="$router.push('/room/' + room.id)"
-          >
-            <v-img :src="room.image" height="280" cover class="align-end">
-              <div class="pa-6 block-card-content">
-                <v-chip size="x-small" color="primary" variant="flat" class="mb-2 font-weight-black shadow-sm">
-                  FIANZA: {{ room.deposit_amount }}€
-                </v-chip>
-                <h3 class="text-h5 font-weight-black text-white mb-1">{{ room.name }}</h3>
-                <div class="d-flex align-center text-white opacity-80 text-caption">
-                  <v-icon icon="mdi-account-group" size="14" class="me-1" />
-                  Aforo: {{ room.capacity }} personas
+          <section>
+            <div class="d-flex align-center mb-6">
+              <v-icon icon="mdi-bullhorn-outline" color="primary" class="me-3" />
+              <h2 class="text-h4 font-weight-black text-gradient">Comunicados</h2>
+            </div>
+            <v-card rounded="xl" class="pa-6 bg-blue-lighten-5 border-0 elevation-0">
+              <div class="d-flex align-start">
+                <v-icon icon="mdi-information-outline" color="blue" class="me-4 mt-1" />
+                <div>
+                  <div class="text-subtitle-1 font-weight-bold mb-1">Nueva Normativa de Uso (Abril 2026)</div>
+                  <p class="text-body-2 opacity-80">
+                    Se recuerda a todos los vecinos que el aforo máximo del Salón Social es de 50 personas y el horario límite son las 23:59. Es obligatorio dejar el espacio limpio para evitar la retención de la fianza.
+                  </p>
                 </div>
               </div>
-            </v-img>
-          </v-card>
+            </v-card>
+          </section>
+        </v-col>
+
+        <!-- Right Column: Room Selector -->
+        <v-col cols="12" md="4">
+          <div class="sticky-top">
+            <div class="d-flex align-center mb-6">
+              <v-icon icon="mdi-office-building-cog" color="primary" class="me-3" />
+              <h2 class="text-h5 font-weight-black">Instalaciones</h2>
+            </div>
+            
+            <v-card 
+              v-for="room in rooms" 
+              :key="room.id"
+              rounded="xl" 
+              class="mb-6 overflow-hidden elevation-3 room-selector-card"
+              @click="$router.push('/room/' + room.id)"
+            >
+              <v-img :src="room.image" height="150" cover class="align-end">
+                <div class="pa-4 glass-dark text-white">
+                  <div class="text-subtitle-1 font-weight-black">{{ room.name }}</div>
+                  <div class="text-caption opacity-80 d-flex align-center">
+                    <v-icon icon="mdi-account-group" size="14" class="me-1" />
+                    Aforo: {{ room.capacity }}
+                    <v-spacer />
+                    <span class="font-weight-black">Fianza: {{ room.deposit_amount }}€</span>
+                  </div>
+                </div>
+              </v-img>
+            </v-card>
+
+            <v-card color="primary" rounded="xl" class="pa-6 text-white mt-8 shadow-lg elevation-4">
+              <h3 class="text-h6 font-weight-black mb-2">¿Necesitas ayuda?</h3>
+              <p class="text-caption opacity-80 mb-4">
+                Si tienes problemas con una reserva o daños en las instalaciones, contacta con administración.
+              </p>
+              <v-btn block color="white" variant="flat" rounded="xl" class="text-primary font-weight-black">
+                Contactar Admin
+              </v-btn>
+            </v-card>
+          </div>
         </v-col>
       </v-row>
     </v-container>
-
-    <!-- Block Modal -->
-    <v-dialog v-model="blockModal" max-width="500">
-      <v-card rounded="xl">
-        <v-card-title class="pa-6 font-weight-bold">
-          {{ editedBlock.id ? 'Editar Bloque' : 'Nuevo Bloque' }}
-        </v-card-title>
-        <v-card-text class="px-6 pb-6">
-          <v-form ref="form">
-            <v-text-field v-model="editedBlock.name" label="Nombre" variant="outlined" rounded="lg" class="mb-4" />
-            <v-text-field v-model="editedBlock.location" label="Ubicación" variant="outlined" rounded="lg" class="mb-4" />
-            <v-textarea v-model="editedBlock.description" label="Descripción" variant="outlined" rounded="lg" class="mb-4" />
-            <v-text-field v-model="editedBlock.image" label="URL de Imagen" variant="outlined" rounded="lg" />
-          </v-form>
-        </v-card-text>
-        <v-card-actions class="pa-6 pt-0">
-          <v-spacer />
-          <v-btn variant="text" rounded="lg" @click="blockModal = false">Cancelar</v-btn>
-          <v-btn color="primary" variant="elevated" rounded="lg" @click="saveBlock" :loading="saving">
-            Guardar
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- Delete Confirmation -->
-    <v-dialog v-model="deleteDialog" max-width="400">
-      <v-card rounded="xl">
-        <v-card-title class="pa-6 font-weight-bold">¿Eliminar Bloque?</v-card-title>
-        <v-card-text class="px-6">
-          Esta acción no se puede deshacer. Se eliminarán todas las salas asociadas.
-        </v-card-text>
-        <v-card-actions class="pa-6">
-          <v-spacer />
-          <v-btn variant="text" rounded="lg" @click="deleteDialog = false">Cancelar</v-btn>
-          <v-btn color="error" variant="elevated" rounded="lg" @click="doDelete" :loading="saving">
-            Eliminar
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
@@ -164,29 +178,45 @@
 import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useBookingStore } from '@/stores/booking'
-import type { Block } from '@/types'
 
 const authStore = useAuthStore()
 const bookingStore = useBookingStore()
-const search = ref('')
+
 const loading = computed(() => bookingStore.isLoading)
 const rooms = computed(() => bookingStore.rooms)
+const myBookings = computed(() => 
+  bookingStore.bookings.filter(b => b.user_id === authStore.user?.id)
+)
 
 const isPending = computed(() => authStore.user?.status === 'PENDING')
 
-const fetchRooms = async () => {
-  await bookingStore.fetchRooms()
+const fetchDashboardData = async () => {
+  await Promise.all([
+    bookingStore.fetchRooms(),
+    bookingStore.fetchBookings()
+  ])
 }
 
-onMounted(fetchRooms)
+const getRoom = (roomId: number) => rooms.value.find(r => r.id === roomId)
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'PAID': return 'success'
+    case 'REFUNDED': return 'blue'
+    case 'CAPTURED': return 'error'
+    default: return 'amber'
+  }
+}
+
+onMounted(fetchDashboardData)
 </script>
 
 <style scoped>
-.workspace-explorer {
+.community-dashboard {
   margin-top: -40px;
 }
 
-.hero-section {
+.dashboard-header {
   background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
   padding: 100px 0 80px 0;
   border-radius: 0 0 60px 60px;
@@ -194,17 +224,12 @@ onMounted(fetchRooms)
   overflow: hidden;
 }
 
-.hero-section::before {
+.dashboard-header::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
   opacity: 0.1;
-}
-
-.search-bar-pro {
-  background: white !important;
-  max-width: 600px;
 }
 
 .glass-dark {
@@ -217,37 +242,32 @@ onMounted(fetchRooms)
   color: #4fc3f7;
 }
 
-.premium-block-card {
+.text-gradient {
+  background: linear-gradient(45deg, #1a237e, #0d47a1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.booking-card {
+  transition: transform 0.3s ease;
+}
+
+.booking-card:hover {
+  transform: translateX(10px);
+}
+
+.room-selector-card {
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  transition: all 0.3s ease;
 }
 
-.premium-block-card:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important;
+.room-selector-card:hover {
+  transform: scale(1.03);
 }
 
-.block-card-content {
-  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
-}
-
-.admin-actions {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(0,0,0,0.3);
-  backdrop-filter: blur(4px);
-  border-radius: 40px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.premium-block-card:hover .admin-actions {
-  opacity: 1;
-}
-
-.shadow-sm {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+.sticky-top {
+  position: sticky;
+  top: 100px;
 }
 
 @keyframes pulse {
