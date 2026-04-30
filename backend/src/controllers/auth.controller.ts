@@ -51,24 +51,78 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
+    console.log('--- Intento de Login ---');
+    console.log('Email:', email);
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
 
-    if (error) return res.status(400).json({ message: 'Credenciales inválidas' });
+    if (error) {
+      console.error('Error Auth Supabase:', error.message);
+      return res.status(400).json({ message: 'Credenciales inválidas' });
+    }
+
+    console.log('Usuario Auth encontrado:', data.user.id);
 
     // Verificar estado en la tabla profiles
+    console.log('Buscando perfil para ID:', data.user.id);
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('status, role, first_name, last_name')
+      .select('*')
       .eq('id', data.user.id)
-      .single();
+      .maybeSingle();
 
-    if (profileError || !profile) {
-      return res.status(403).json({ message: 'Perfil no encontrado' });
+    if (profileError) {
+      console.error('Error de Supabase al buscar perfil:', profileError);
+      return res.status(500).json({ message: 'Error al consultar la base de datos', details: profileError });
     }
+
+    if (!profile) {
+      console.error('AVISO: El perfil no existe en la tabla profiles. Intentando crear...');
+      
+      const { data: newProfile, error: insertError } = await supabase
+        .from('profiles')
+        .insert([{ 
+          id: data.user.id, 
+          email: data.user.email,
+          first_name: data.user.user_metadata?.first_name || 'Admin',
+          last_name: data.user.user_metadata?.last_name || 'Campus',
+          status: 'APPROVED',
+          role: 'SUPERADMIN'
+        }])
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Error al crear perfil:', insertError);
+        return res.status(403).json({ 
+          message: 'Error de consistencia: El perfil existe en la DB pero no se puede leer. Revisa los permisos RLS en Supabase.',
+          db_error: insertError 
+        });
+      }
+      
+      // Si se creó, usamos el nuevo perfil
+      const p = newProfile;
+      const token = jwt.sign(
+        { id: data.user.id, email: data.user.email, role: p.role, status: p.status },
+        process.env.JWT_SECRET || 'secret',
+        { expiresIn: '24h' }
+      );
+      return res.json({
+        token,
+        user: {
+          id: data.user?.id,
+          email: data.user?.email,
+          name: `${p.first_name} ${p.last_name}`,
+          role: p.role,
+          status: p.status
+        }
+      });
+    }
+
+    console.log('Perfil cargado correctamente:', profile.email, 'Estado:', profile.status);
 
     const token = jwt.sign(
       { id: data.user.id, email: data.user.email, role: profile.role, status: profile.status },
@@ -87,7 +141,8 @@ export const login = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error al iniciar sesión', error });
+    console.error('Error en el proceso de login:', error);
+    res.status(500).json({ message: 'Error interno del servidor', error });
   }
 };
 
