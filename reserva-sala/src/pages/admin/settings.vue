@@ -71,14 +71,14 @@
           <div class="text-caption">Así es como los vecinos verán la información en el panel principal.</div>
         </v-alert>
 
-        <v-card rounded="32" class="pa-8 bg-slate-900 text-white elevation-24">
-          <div class="text-overline opacity-40 mb-2">Previsualización del Panel</div>
-          <div class="text-h5 font-weight-black mb-4">{{ form.name || 'Cargando...' }}</div>
-          <div class="d-flex align-center opacity-60 text-caption mb-6">
+        <v-card rounded="32" class="pa-8 bg-grey-darken-4 text-white elevation-24">
+          <div class="text-overline text-grey-lighten-1 mb-2">Previsualización del Panel</div>
+          <div class="text-h5 font-weight-black mb-4">{{ form.name || 'Sin nombre definido' }}</div>
+          <div class="d-flex align-center text-grey-lighten-2 text-caption mb-6">
             <v-icon icon="mdi-map-marker" size="14" class="me-2" />
-            {{ form.address }}
+            {{ form.address || 'Sin dirección' }}
           </div>
-          <p class="text-body-2 opacity-80">{{ form.urbanization_details }}</p>
+          <p class="text-body-2 text-grey-lighten-3">{{ form.urbanization_details || 'Sin detalles configurados' }}</p>
         </v-card>
       </v-col>
     </v-row>
