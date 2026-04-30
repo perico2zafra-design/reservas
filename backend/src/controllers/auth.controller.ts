@@ -115,9 +115,13 @@ export const login = async (req: Request, res: Response) => {
         user: {
           id: data.user?.id,
           email: data.user?.email,
-          name: `${p.first_name} ${p.last_name}`,
+          name: (p.first_name || p.last_name) ? `${p.first_name || ''} ${p.last_name || ''}`.trim() : 'Nuevo Vecino',
           role: p.role,
-          status: p.status
+          status: p.status,
+          portal: p.portal,
+          floor: p.floor,
+          letter: p.letter,
+          avatar_url: p.avatar_url
         }
       });
     }
@@ -151,9 +155,13 @@ export const login = async (req: Request, res: Response) => {
       user: {
         id: data.user?.id,
         email: data.user?.email,
-        name: `${profile.first_name} ${profile.last_name}`,
+        name: (profile.first_name || profile.last_name) ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Vecino',
         role: profile.role,
-        status: profile.status
+        status: profile.status,
+        portal: profile.portal,
+        floor: profile.floor,
+        letter: profile.letter,
+        avatar_url: profile.avatar_url
       }
     });
   } catch (error) {
@@ -190,7 +198,7 @@ export const getMe = async (req: Request, res: Response) => {
 
     const { data: profile, error } = await supabase
       .from('profiles')
-      .select('first_name, last_name, role, status, email')
+      .select('*')
       .eq('id', userId)
       .single();
 
@@ -201,9 +209,13 @@ export const getMe = async (req: Request, res: Response) => {
     res.json({
       id: userId,
       email: profile.email,
-      name: `${profile.first_name} ${profile.last_name}`,
+      name: (profile.first_name || profile.last_name) ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Vecino',
       role: profile.role,
-      status: profile.status
+      status: profile.status,
+      portal: profile.portal,
+      floor: profile.floor,
+      letter: profile.letter,
+      avatar_url: profile.avatar_url
     });
   } catch (error) {
     console.error('Error in getMe:', error);
