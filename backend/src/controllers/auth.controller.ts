@@ -170,28 +170,27 @@ export const resetPassword = async (req: Request, res: Response) => {
 
 export const getMe = async (req: Request, res: Response) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ message: 'No autorizado' });
+    const userId = (req as any).user.id;
 
-    const token = authHeader.split(' ')[1];
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-
-    if (error || !user) return res.status(401).json({ message: 'Token inválido' });
-
-    const { data: profile } = await supabase
+    const { data: profile, error } = await supabase
       .from('profiles')
-      .select('first_name, last_name, role, status')
-      .eq('id', user.id)
+      .select('first_name, last_name, role, status, email')
+      .eq('id', userId)
       .single();
 
+    if (error || !profile) {
+      return res.status(404).json({ message: 'Perfil no encontrado' });
+    }
+
     res.json({
-      id: user.id,
-      email: user.email,
-      name: profile ? `${profile.first_name} ${profile.last_name}` : user.user_metadata?.first_name,
-      role: profile?.role || 'USER',
-      status: profile?.status || 'PENDING'
+      id: userId,
+      email: profile.email,
+      name: `${profile.first_name} ${profile.last_name}`,
+      role: profile.role,
+      status: profile.status
     });
   } catch (error) {
+    console.error('Error in getMe:', error);
     res.status(500).json({ message: 'Error al obtener perfil', error });
   }
 };

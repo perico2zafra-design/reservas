@@ -86,41 +86,30 @@
     <v-container>
       <div class="d-flex align-center mb-8">
         <div>
-          <h2 class="text-h4 font-weight-black text-gradient">Nuestros Edificios</h2>
-          <p class="text-subtitle-1 text-medium-emphasis">Selecciona un bloque para gestionar sus espacios.</p>
+          <h2 class="text-h4 font-weight-black text-gradient">Salas Disponibles</h2>
+          <p class="text-subtitle-1 text-medium-emphasis">Selecciona una sala para realizar tu reserva y abonar la fianza.</p>
         </div>
         <v-spacer />
-        <v-btn
-          v-if="authStore.isAdmin"
-          color="primary"
-          variant="tonal"
-          prepend-icon="mdi-plus"
-          rounded="xl"
-          class="font-weight-black"
-          @click="openBlockModal()"
-        >
-          Añadir Bloque
-        </v-btn>
       </div>
 
-      <!-- Blocks Grid -->
+      <!-- Rooms Grid -->
       <v-row v-if="!loading">
-        <v-col v-for="block in filteredBlocks" :key="block.id" cols="12" sm="6" lg="4">
-          <v-card rounded="xl" class="premium-block-card overflow-hidden elevation-2 border-0" @click="$router.push('/block/' + block.id)">
-            <v-img :src="block.image" height="280" cover class="align-end">
+        <v-col v-for="room in rooms" :key="room.id" cols="12" sm="6" lg="4">
+          <v-card 
+            rounded="xl" 
+            class="premium-block-card overflow-hidden elevation-2 border-0" 
+            @click="$router.push('/room/' + room.id)"
+          >
+            <v-img :src="room.image" height="280" cover class="align-end">
               <div class="pa-6 block-card-content">
-                <v-chip size="x-small" color="primary" variant="flat" class="mb-2 font-weight-black shadow-sm">EDIFICIO PRO</v-chip>
-                <h3 class="text-h5 font-weight-black text-white mb-1">{{ block.name }}</h3>
+                <v-chip size="x-small" color="primary" variant="flat" class="mb-2 font-weight-black shadow-sm">
+                  FIANZA: {{ room.deposit_amount }}€
+                </v-chip>
+                <h3 class="text-h5 font-weight-black text-white mb-1">{{ room.name }}</h3>
                 <div class="d-flex align-center text-white opacity-80 text-caption">
-                  <v-icon icon="mdi-map-marker" size="14" class="me-1" />
-                  {{ block.location }}
+                  <v-icon icon="mdi-account-group" size="14" class="me-1" />
+                  Aforo: {{ room.capacity }} personas
                 </div>
-              </div>
-              
-              <!-- Admin Actions Overlay -->
-              <div class="admin-actions pa-2" v-if="authStore.isAdmin" @click.stop>
-                <v-btn icon="mdi-pencil" size="x-small" color="white" variant="flat" class="me-1" @click="openBlockModal(block)" />
-                <v-btn icon="mdi-delete" size="x-small" color="error" variant="flat" @click="confirmDelete(block)" />
               </div>
             </v-img>
           </v-card>
@@ -181,55 +170,15 @@ const authStore = useAuthStore()
 const bookingStore = useBookingStore()
 const search = ref('')
 const loading = computed(() => bookingStore.isLoading)
-const blocks = computed(() => bookingStore.blocks)
-const saving = ref(false)
+const rooms = computed(() => bookingStore.rooms)
 
 const isPending = computed(() => authStore.user?.status === 'PENDING')
 
-const filteredBlocks = computed(() => {
-  if (!search.value) return blocks.value
-  return blocks.value.filter(b => 
-    b.name.toLowerCase().includes(search.value.toLowerCase()) ||
-    b.location.toLowerCase().includes(search.value.toLowerCase())
-  )
-})
-
-const blockModal = ref(false)
-const deleteDialog = ref(false)
-const editedBlock = ref<Partial<Block>>({})
-const blockToDelete = ref<Block | null>(null)
-
-const fetchBlocks = async () => {
-  await bookingStore.fetchBlocks()
+const fetchRooms = async () => {
+  await bookingStore.fetchRooms()
 }
 
-const openBlockModal = (block?: Block) => {
-  editedBlock.value = block ? { ...block } : { image: 'https://picsum.photos/400/300?random=' + Math.floor(Math.random() * 1000) }
-  blockModal.value = true
-}
-
-const saveBlock = async () => {
-  saving.value = true
-  // Note: For simplicity using store's fetch after mock action
-  await fetchBlocks()
-  blockModal.value = false
-  saving.value = false
-}
-
-const confirmDelete = (block: Block) => {
-  blockToDelete.value = block
-  deleteDialog.value = true
-}
-
-const doDelete = async () => {
-  if (!blockToDelete.value) return
-  saving.value = true
-  await fetchBlocks()
-  deleteDialog.value = false
-  saving.value = false
-}
-
-onMounted(fetchBlocks)
+onMounted(fetchRooms)
 </script>
 
 <style scoped>

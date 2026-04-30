@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { supabase } from '../lib/supabase.js';
+import jwt from 'jsonwebtoken';
 
 interface AuthRequest extends Request {
   user?: any;
 }
 
-export const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -14,22 +14,18 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
   }
 
   try {
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-
-    if (error || !user) {
-      return res.status(403).json({ message: 'Invalid or expired token' });
-    }
-
-    req.user = user;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    req.user = decoded;
     next();
   } catch (err) {
-    return res.status(500).json({ message: 'Error authenticating token' });
+    console.error('JWT Verification Error:', err);
+    return res.status(403).json({ message: 'Invalid or expired token' });
   }
 };
 
 export const authorizeAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const role = req.user && req.user.user_metadata?.role;
-  if (role === 'ADMIN' || role === 'SUPERADMIN') {
+  const role = req.user && req.user.role;
+  if (role === 'ADMIN' || role === 'SUPERADMIN' || role === 'SUPER_ADMIN') {
     next();
   } else {
     res.status(403).json({ message: 'Admin access required' });
@@ -37,8 +33,8 @@ export const authorizeAdmin = (req: AuthRequest, res: Response, next: NextFuncti
 };
 
 export const authorizeSuperAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const role = req.user && req.user.user_metadata?.role;
-  if (role === 'SUPERADMIN') {
+  const role = req.user && req.user.role;
+  if (role === 'SUPERADMIN' || role === 'SUPER_ADMIN') {
     next();
   } else {
     res.status(403).json({ message: 'SuperAdmin access required' });
