@@ -95,3 +95,32 @@ export const manualCreateUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error al crear usuario manualmente', error });
   }
 };
+
+export const updateMe = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const { first_name, last_name, phone, portal, floor, letter, avatar_url } = req.body;
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({
+        first_name,
+        last_name,
+        phone,
+        portal,
+        floor,
+        letter,
+        avatar_url,
+        updated_at: new Date()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al actualizar el perfil', error });
+  }
+};
+
