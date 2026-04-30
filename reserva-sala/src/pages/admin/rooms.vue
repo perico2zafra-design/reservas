@@ -95,8 +95,7 @@
               rows="3"
               class="mb-4"
             />
-            <v-row>
-              <v-col cols="6">
+              <v-col cols="4">
                 <v-text-field
                   v-model="editedRoom.capacity"
                   label="Capacidad"
@@ -105,10 +104,19 @@
                   rounded="lg"
                 />
               </v-col>
-              <v-col cols="6">
+              <v-col cols="4">
+                <v-text-field
+                  v-model="editedRoom.deposit_amount"
+                  label="Fianza (€)"
+                  type="number"
+                  variant="outlined"
+                  rounded="lg"
+                />
+              </v-col>
+              <v-col cols="4">
                 <v-text-field
                   v-model="editedRoom.image"
-                  label="URL Imagen (opcional)"
+                  label="URL Imagen"
                   variant="outlined"
                   rounded="lg"
                 />

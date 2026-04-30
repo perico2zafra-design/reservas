@@ -1,3 +1,4 @@
+import { Router } from 'express';
 import { getUsers, updateUserStatus, deleteUser, manualCreateUser } from '../controllers/user.controller.js';
 import { authenticateToken, authorizeAdmin } from '../middleware/auth.middleware.js';
 

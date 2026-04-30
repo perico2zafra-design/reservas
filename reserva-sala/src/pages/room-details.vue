@@ -96,27 +96,31 @@
         <v-card rounded="xl" class="premium-info-card overflow-hidden border-0 elevation-4 sticky-top">
           <v-img :src="currentRoom.image" height="250" cover />
           <div class="pa-8">
-            <h2 class="text-h4 font-weight-black mb-2">{{ currentRoom.name }}</h2>
-            <div class="d-flex align-center mb-6 text-primary font-weight-bold">
-              <v-icon icon="mdi-account-group" class="me-2" />
-              <span>Hasta {{ currentRoom.capacity }} personas</span>
-            </div>
+            <h3 class="text-overline font-weight-black mb-4">Normas de Uso (Acta 15/04/26)</h3>
+            <v-list density="compact" class="bg-transparent mb-6">
+              <v-list-item prepend-icon="mdi-check-circle-outline" density="compact">Aforo máximo: 50 personas</v-list-item>
+              <v-list-item prepend-icon="mdi-check-circle-outline" density="compact">Horario: 09:00 a 23:59</v-list-item>
+              <v-list-item prepend-icon="mdi-check-circle-outline" density="compact">Max. 2 reservas al mes</v-list-item>
+              <v-list-item prepend-icon="mdi-check-circle-outline" density="compact">Prohibido fumar/vapear</v-list-item>
+              <v-list-item prepend-icon="mdi-check-circle-outline" density="compact">Fianza de {{ currentRoom.deposit_amount }}€ obligatoria</v-list-item>
+            </v-list>
             
-            <p class="text-body-1 text-medium-emphasis mb-8 line-height-1-6">
-              {{ currentRoom.description || 'Este espacio está diseñado para fomentar la productividad y la colaboración creativa.' }}
-            </p>
-
-            <v-divider class="mb-8" />
-            
-            <h3 class="text-overline font-weight-black mb-4">Depósito de Fianza</h3>
-            <v-card color="amber-lighten-5" flat rounded="xl" class="pa-4 border-dashed border-amber">
+            <v-card color="amber-lighten-5" flat rounded="xl" class="pa-4 border-dashed border-amber mb-6">
               <div class="d-flex align-center text-amber-darken-4">
                 <v-icon icon="mdi-cash-lock" class="me-3" />
                 <div class="text-caption font-weight-bold">
-                  Se cobrarán 50€ de fianza que serán devueltos tras la reserva si no hay daños.
+                  La fianza de {{ currentRoom.deposit_amount }}€ será devuelta una vez comprobado el correcto estado del espacio.
                 </div>
               </div>
             </v-card>
+
+            <v-checkbox
+              v-model="acceptedRules"
+              label="He leído y acepto las normas de uso del Salón Social"
+              color="primary"
+              density="compact"
+              hide-details
+            />
           </div>
         </v-card>
       </v-col>
@@ -131,6 +135,12 @@
           <v-btn icon="mdi-close" variant="text" @click="paymentModal = false" />
         </div>
         
+        <div class="mb-6 pa-4 bg-blue-lighten-5 rounded-lg text-body-2">
+          <strong>Reserva para:</strong> {{ currentRoom.name }}<br>
+          <strong>Fecha:</strong> {{ new Date().toLocaleDateString() }}<br>
+          <strong>Tramo:</strong> {{ selectedRange.start }} - {{ selectedRange.end }}
+        </div>
+        
         <CheckoutForm 
           v-if="clientSecret" 
           :client-secret="clientSecret"
@@ -142,6 +152,10 @@
 
     <v-snackbar v-model="showSuccess" color="success" timeout="5000">
       Reserva confirmada. La fianza ha sido retenida correctamente.
+    </v-snackbar>
+
+    <v-snackbar v-model="showError" color="error" timeout="5000">
+      {{ errorMessage }}
     </v-snackbar>
   </div>
 </template>
@@ -165,6 +179,9 @@ const paymentModal = ref(false)
 const clientSecret = ref('')
 const selectedRange = ref({ start: null, end: null })
 const showSuccess = ref(false)
+const showError = ref(false)
+const errorMessage = ref('')
+const acceptedRules = ref(false)
 
 const roomBookings = computed(() => 
   bookingStore.bookings.filter(b => b.room_id === parseInt(roomId))
@@ -182,6 +199,12 @@ const formattedBookings = computed(() => {
 })
 
 const initiateBooking = async () => {
+  if (!acceptedRules.value) {
+    errorMessage.value = 'Debes aceptar las normas de uso para continuar'
+    showError.value = true
+    return
+  }
+  
   paymentLoading.value = true
   try {
     const today = new Date().toISOString().split('T')[0]
@@ -193,8 +216,9 @@ const initiateBooking = async () => {
     })
     clientSecret.value = res.clientSecret
     paymentModal.value = true
-  } catch (err) {
-    console.error('Error initiating payment:', err)
+  } catch (err: any) {
+    errorMessage.value = err.response?.data?.message || 'Error al iniciar el pago'
+    showError.value = true
   } finally {
     paymentLoading.value = false
   }

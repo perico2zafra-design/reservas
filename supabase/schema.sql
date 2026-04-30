@@ -15,15 +15,57 @@ DROP TABLE IF EXISTS profiles CASCADE;
 -- Información base de la web (Configurable por Super Admin)
 CREATE TABLE site_settings (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL DEFAULT 'Reserva Sala',
-    address TEXT,
-    urbanization_details TEXT,
+    name TEXT NOT NULL DEFAULT 'Mancomunidad Residencial Campus',
+    address TEXT DEFAULT 'Plaza Pepe Reyes 7-14, Badajoz',
+    urbanization_details TEXT DEFAULT 'Acta de Junta 15 de Abril 2026',
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insertar configuración inicial
+-- Insertar configuración inicial basada en el acta
 INSERT INTO site_settings (name, address, urbanization_details)
-VALUES ('Mi Urbanización', 'Calle Ejemplo 123', 'Detalles de la comunidad...');
+VALUES (
+    'Mancomunidad Residencial Campus', 
+    'Plaza Pepe Reyes 7-14, Badajoz', 
+    'Normativa aprobada en junta extraordinaria de 15 de abril de 2026. Salón social con aforo de 50 personas.'
+);
+
+-- Salas
+CREATE TABLE rooms (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT,
+    capacity INTEGER,
+    image TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    deposit_amount DECIMAL DEFAULT 50.00,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insertar sala principal basada en el acta
+INSERT INTO rooms (name, description, capacity, image, is_active, deposit_amount)
+VALUES (
+    'Salón Social', 
+    'Salón social de la Mancomunidad Residencial Campus. Aforo máximo 50 personas. Normativa de uso obligatoria.', 
+    50, 
+    'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&q=80&w=1200',
+    TRUE,
+    50.00
+);
+
+-- Insertar horarios por defecto (09:00 a 23:59)
+INSERT INTO room_schedules (room_id, day_of_week, start_time, end_time)
+SELECT 1, g.day, '09:00:00', '23:59:00'
+FROM generate_series(0, 6) AS g(day);
+
+-- Pre-llenar excepciones del acta (Días cerrados)
+INSERT INTO room_exceptions (room_id, exception_date, reason)
+VALUES 
+    (1, '2026-12-24', 'Nochebuena'),
+    (1, '2026-12-25', 'Navidad'),
+    (1, '2026-12-31', 'Nochevieja'),
+    (1, '2027-01-01', 'Año Nuevo'),
+    (1, '2027-01-05', 'Víspera de Reyes'),
+    (1, '2027-01-06', 'Día de Reyes');
 
 -- Perfiles de usuario (Extensión de auth.users)
 CREATE TABLE profiles (

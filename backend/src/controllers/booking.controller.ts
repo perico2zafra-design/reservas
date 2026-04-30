@@ -25,21 +25,53 @@ export const getAllBookings = async (req: Request, res: Response) => {
 export const createBookingPaymentIntent = async (req: Request, res: Response) => {
   try {
     const { roomId, bookingDate, startTime, endTime } = req.body;
+    const userId = (req as any).user.id;
+
+    // 1. Verificar límite de reservas por propietario (Máximo 2 al mes según acta)
+    const firstDayOfMonth = new Date();
+    firstDayOfMonth.setDate(1);
+    firstDayOfMonth.setHours(0,0,0,0);
+
+    const { count, error: countError } = await supabase
+      .from('bookings')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .gte('booking_date', firstDayOfMonth.toISOString().split('T')[0]);
+
+    if (countError) throw countError;
+
+    if (count !== null && count >= 2) {
+      return res.status(403).json({ 
+        error: 'Límite mensual alcanzado', 
+        message: 'Según las normas de la comunidad (Punto 4 del acta), el máximo es de 2 reservas al mes por propietario.' 
+      });
+    }
+
+    // 2. Obtener el precio de fianza configurado para esta sala
+    const { data: room, error: roomError } = await supabase
+      .from('rooms')
+      .select('deposit_amount')
+      .eq('id', roomId)
+      .single();
+
+    if (roomError || !room) throw new Error('Sala no encontrada');
     
-    // 1. Crear el Payment Intent en Stripe
+    const amountInCents = Math.round(room.deposit_amount * 100);
+
+    // 3. Crear el Payment Intent en Stripe
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: 5000, // 50.00€ en céntimos
+      amount: amountInCents,
       currency: 'eur',
       metadata: { 
         roomId, 
-        userId: (req as any).user.id,
+        userId,
         bookingDate 
       }
     });
 
     res.json({
       clientSecret: paymentIntent.client_secret,
-      depositAmount: 50
+      depositAmount: room.deposit_amount
     });
   } catch (error) {
     console.error('Stripe Error:', error);
@@ -53,6 +85,13 @@ export const confirmBooking = async (req: Request, res: Response) => {
     const { roomId, bookingDate, startTime, endTime, paymentIntentId } = req.body;
     const userId = (req as any).user.id;
 
+    // Obtener fianza configurada para la sala
+    const { data: room } = await supabase
+      .from('rooms')
+      .select('deposit_amount')
+      .eq('id', roomId)
+      .single();
+
     const { data: booking, error } = await supabase
       .from('bookings')
       .insert([{
@@ -64,7 +103,7 @@ export const confirmBooking = async (req: Request, res: Response) => {
         status: 'CONFIRMED',
         deposit_status: 'PAID',
         stripe_payment_intent_id: paymentIntentId,
-        deposit_amount: 50
+        deposit_amount: room?.deposit_amount || 50
       }])
       .select()
       .single();
