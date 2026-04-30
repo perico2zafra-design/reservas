@@ -1,161 +1,98 @@
 <template>
-  <div class="premium-page">
-    <div class="d-flex align-center mb-8">
-      <div>
-        <h1 class="text-h4 font-weight-black text-gradient mb-1">Panel de Admisión</h1>
-        <p class="text-subtitle-2 text-medium-emphasis">Gestiona las solicitudes de acceso y los vecinos admitidos.</p>
-      </div>
+  <div class="admin-users-page pa-4">
+    <div class="d-flex align-center mb-6">
+      <h1 class="text-h4 font-weight-black text-slate-900">Vecinos</h1>
       <v-spacer />
-      <v-btn
-        color="primary"
-        prepend-icon="mdi-account-plus"
-        rounded="xl"
-        class="font-weight-black elevation-4 px-6 me-4"
-        @click="openAddUserDialog"
-      >
-        Añadir Vecino
-      </v-btn>
-      <v-text-field
-        v-model="search"
-        prepend-inner-icon="mdi-magnify"
-        label="Buscar..."
-        variant="solo"
-        rounded="xl"
-        flat
-        density="comfortable"
-        hide-details
-        class="max-width-300 elevation-2"
-      />
+      <v-btn icon="mdi-magnify" variant="text" color="slate-400" @click="showSearch = !showSearch" />
     </div>
 
-    <v-tabs v-model="activeTab" color="primary" class="mb-6">
-      <v-tab value="pending">
-        Pendientes
-        <v-badge
-          v-if="pendingUsers.length > 0"
-          :content="pendingUsers.length"
-          color="error"
-          inline
-        />
-      </v-tab>
-      <v-tab value="approved">Admitidos</v-tab>
-      <v-tab value="rejected">Rechazados</v-tab>
-    </v-tabs>
+    <v-text-field
+      v-if="showSearch"
+      v-model="search"
+      placeholder="Buscar por nombre, email o portal..."
+      variant="solo"
+      rounded="xl"
+      flat
+      density="comfortable"
+      bg-color="white"
+      class="mb-6 elevation-2"
+      hide-details
+    />
 
-    <v-card rounded="xl" class="glass-card border-0 elevation-4 overflow-hidden">
-      <v-data-table
-        :headers="headers"
-        :items="filteredUsers"
-        :search="search"
-        :loading="loading"
-        class="bg-transparent"
-        hover
+    <!-- Tabs Estilo iOS -->
+    <div class="custom-tabs mb-6">
+      <button 
+        v-for="tab in ['PENDING', 'APPROVED', 'BLOCKED']" 
+        :key="tab"
+        :class="['tab-item', { active: activeStatus === tab }]"
+        @click="activeStatus = tab"
       >
-        <template v-slot:item.full_name="{ item }">
-          <div class="d-flex align-center py-2">
-            <v-avatar color="primary" size="36" class="me-3 elevation-2">
-              <span class="text-caption text-white font-weight-bold">{{ item.first_name?.charAt(0) || 'U' }}</span>
-            </v-avatar>
-            <div>
-              <div class="font-weight-bold">{{ item.first_name }} {{ item.last_name }}</div>
-              <div class="text-caption text-medium-emphasis">{{ item.email }}</div>
+        {{ getTabLabel(tab) }}
+        <v-badge v-if="tab === 'PENDING' && pendingCount > 0" :content="pendingCount" color="error" inline />
+      </button>
+    </div>
+
+    <!-- Lista de Vecinos -->
+    <v-fade-transition group>
+      <v-card 
+        v-for="user in filteredUsers" 
+        :key="user.id" 
+        rounded="24" 
+        class="mb-4 pa-4 border-0 elevation-xl premium-user-card"
+      >
+        <div class="d-flex align-center">
+          <v-avatar size="48" color="slate-100" class="me-4 elevation-2">
+            <span class="text-h6 font-weight-black text-primary">{{ user.first_name?.charAt(0) }}</span>
+          </v-avatar>
+          <div class="flex-grow-1">
+            <div class="d-flex align-center">
+              <span class="font-weight-black text-slate-900 me-2">{{ user.first_name }} {{ user.last_name }}</span>
+              <v-chip v-if="user.role === 'ADMIN'" size="x-small" color="primary" variant="flat">ADMIN</v-chip>
             </div>
+            <div class="text-caption text-slate-500">Portal {{ user.portal }}, {{ user.floor }}º{{ user.letter }}</div>
           </div>
-        </template>
+          
+          <!-- Acciones Contextuales -->
+          <v-menu location="bottom end">
+            <template v-slot:activator="{ props }">
+              <v-btn icon="mdi-dots-vertical" variant="text" color="slate-400" v-bind="props" />
+            </template>
+            <v-list rounded="xl" class="elevation-xl pa-2">
+              <v-list-item v-if="user.status === 'PENDING'" prepend-icon="mdi-check-decagram" title="Admitir" color="success" @click="updateStatus(user.id, 'APPROVED')" />
+              <v-list-item v-if="user.status === 'APPROVED'" prepend-icon="mdi-block-helper" title="Bloquear" color="warning" @click="openBlockDialog(user)" />
+              <v-list-item v-if="user.status === 'BLOCKED'" prepend-icon="mdi-account-check" title="Desbloquear" color="success" @click="updateStatus(user.id, 'APPROVED')" />
+              <v-divider class="my-2 opacity-10" />
+              <v-list-item prepend-icon="mdi-delete-outline" title="Eliminar" color="error" @click="confirmDelete(user)" />
+            </v-list>
+          </v-menu>
+        </div>
 
-        <template v-slot:item.address_full="{ item }">
-          <div class="text-caption">
-            {{ item.address }}, P:{{ item.portal }}, {{ item.floor }}º{{ item.letter }}
-          </div>
-        </template>
-
-        <template v-slot:item.actions="{ item }">
-          <div class="d-flex ga-2">
-            <v-btn
-              v-if="item.status === 'PENDING' || item.status === 'REJECTED'"
-              icon="mdi-check"
-              color="success"
-              variant="tonal"
-              size="small"
-              @click="handleUpdateStatus(item.id, 'APPROVED')"
-              title="Admitir"
-            />
-            <v-btn
-              v-if="item.status === 'PENDING' || item.status === 'APPROVED'"
-              icon="mdi-close"
-              color="error"
-              variant="tonal"
-              size="small"
-              @click="handleUpdateStatus(item.id, 'REJECTED')"
-              title="Denegar acceso"
-            />
-            <v-btn
-              icon="mdi-delete-outline"
-              color="error"
-              variant="text"
-              size="small"
-              @click="confirmDelete(item)"
-              title="Eliminar permanentemente"
-            />
-          </div>
-        </template>
-      </v-data-table>
-    </v-card>
-
-    <!-- Manual User Dialog -->
-    <v-dialog v-model="addUserDialog" max-width="600">
-      <v-card rounded="xl" class="pa-4">
-        <v-card-title class="text-h5 font-weight-bold">Añadir Vecino Manualmente</v-card-title>
-        <v-card-text>
-          <v-form v-model="formValid" ref="formRef">
-            <v-row>
-              <v-col cols="6">
-                <v-text-field v-model="newUser.firstName" label="Nombre" variant="outlined" rounded="lg" :rules="[v => !!v || 'Requerido']" />
-              </v-col>
-              <v-col cols="6">
-                <v-text-field v-model="newUser.lastName" label="Apellidos" variant="outlined" rounded="lg" :rules="[v => !!v || 'Requerido']" />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field v-model="newUser.email" label="Email" variant="outlined" rounded="lg" :rules="[v => !!v || 'Requerido', v => /.+@.+\..+/.test(v) || 'Email inválido']" />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field v-model="newUser.password" label="Contraseña" type="password" variant="outlined" rounded="lg" :rules="[v => !!v || 'Requerido']" />
-              </v-col>
-              <v-col cols="12">
-                <v-text-field v-model="newUser.address" label="Dirección" variant="outlined" rounded="lg" :rules="[v => !!v || 'Requerido']" />
-              </v-col>
-              <v-col cols="4">
-                <v-text-field v-model="newUser.portal" label="Portal" variant="outlined" rounded="lg" />
-              </v-col>
-              <v-col cols="4">
-                <v-text-field v-model="newUser.floor" label="Piso" variant="outlined" rounded="lg" />
-              </v-col>
-              <v-col cols="4">
-                <v-text-field v-model="newUser.letter" label="Letra" variant="outlined" rounded="lg" />
-              </v-col>
-            </v-row>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn variant="text" rounded="xl" @click="addUserDialog = false">Cancelar</v-btn>
-          <v-btn color="primary" variant="elevated" rounded="xl" @click="handleAddUser" :loading="actionLoading">Admitir Vecino</v-btn>
-        </v-card-actions>
+        <!-- Info de Bloqueo si aplica -->
+        <div v-if="user.status === 'BLOCKED' && user.blocked_until" class="mt-3 pa-2 bg-amber-lighten-5 rounded-lg text-caption text-amber-darken-4 d-flex align-center">
+          <v-icon icon="mdi-clock-outline" size="14" class="me-2" />
+          Bloqueado hasta: {{ new Date(user.blocked_until).toLocaleDateString() }}
+        </div>
       </v-card>
-    </v-dialog>
+    </v-fade-transition>
 
-    <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialog" max-width="400">
-      <v-card rounded="xl" class="pa-4">
-        <v-card-title class="text-h6 font-weight-bold">¿Eliminar usuario?</v-card-title>
-        <v-card-text>
-          Esta acción eliminará permanentemente a <strong>{{ selectedUser?.first_name }} {{ selectedUser?.last_name }}</strong> y todas sus reservas.
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn variant="text" rounded="xl" @click="deleteDialog = false">Cancelar</v-btn>
-          <v-btn color="error" variant="elevated" rounded="xl" @click="handleDelete" :loading="actionLoading">Eliminar</v-btn>
-        </v-card-actions>
+    <!-- Diálogo de Bloqueo Temporal -->
+    <v-dialog v-model="blockDialog" max-width="400">
+      <v-card rounded="24" class="pa-6">
+        <h3 class="text-h6 font-weight-black mb-2">Bloquear Vecino</h3>
+        <p class="text-body-2 text-slate-500 mb-6">Indica cuánto tiempo durará la sanción para {{ selectedUser?.first_name }}.</p>
+        
+        <v-select
+          v-model="blockDuration"
+          :items="blockOptions"
+          label="Duración del bloqueo"
+          variant="outlined"
+          rounded="xl"
+          class="mb-4"
+        />
+
+        <v-btn block color="warning" size="large" rounded="xl" class="font-weight-black" @click="applyBlock">
+          Confirmar Bloqueo
+        </v-btn>
       </v-card>
     </v-dialog>
   </div>
@@ -166,106 +103,98 @@ import { ref, onMounted, computed } from 'vue'
 import api from '@/services/api'
 
 const users = ref<any[]>([])
-const loading = ref(false)
+const activeStatus = ref('PENDING')
 const search = ref('')
-const activeTab = ref('pending')
-const deleteDialog = ref(false)
-const addUserDialog = ref(false)
+const showSearch = ref(false)
+const blockDialog = ref(false)
 const selectedUser = ref<any>(null)
-const actionLoading = ref(false)
-const formValid = ref(false)
-const formRef = ref<any>(null)
+const blockDuration = ref(7)
 
-const newUser = ref({
-  firstName: '',
-  lastName: '',
-  email: '',
-  password: '',
-  address: '',
-  portal: '',
-  floor: '',
-  letter: ''
-})
-
-const headers = [
-  { title: 'Vecino', key: 'full_name' },
-  { title: 'Vivienda', key: 'address_full' },
-  { title: 'Rol', key: 'role' },
-  { title: 'Acciones', key: 'actions', sortable: false },
+const blockOptions = [
+  { title: '1 Semana', value: 7 },
+  { title: '15 Días', value: 15 },
+  { title: '1 Mes', value: 30 },
+  { title: '3 Meses', value: 90 },
+  { title: 'Indefinido', value: 3650 }
 ]
 
-const pendingUsers = computed(() => users.value.filter(u => u.status === 'PENDING'))
+const pendingCount = computed(() => users.value.filter(u => u.status === 'PENDING').length)
+
 const filteredUsers = computed(() => {
-  return users.value.filter(u => u.status === activeTab.value.toUpperCase())
+  return users.value.filter(u => {
+    const matchesStatus = u.status === activeStatus.value
+    const matchesSearch = !search.value || 
+      `${u.first_name} ${u.last_name}`.toLowerCase().includes(search.value.toLowerCase()) ||
+      u.email.toLowerCase().includes(search.value.toLowerCase()) ||
+      u.portal.includes(search.value)
+    return matchesStatus && matchesSearch
+  })
 })
+
+const getTabLabel = (status: string) => {
+  switch(status) {
+    case 'PENDING': return 'Solicitudes'
+    case 'APPROVED': return 'Activos'
+    case 'BLOCKED': return 'Sancionados'
+    default: return status
+  }
+}
 
 const fetchUsers = async () => {
-  loading.value = true
-  try {
-    const res = await api.get('/users')
-    users.value = res.data
-  } catch (err) {
-    console.error('Error fetching users:', err)
-  } finally {
-    loading.value = false
-  }
+  const res = await api.get('/users')
+  users.value = res.data
 }
 
-const handleUpdateStatus = async (userId: string, status: string) => {
-  try {
-    await api.patch(`/users/${userId}/status`, { status })
-    fetchUsers()
-  } catch (err) {
-    console.error('Error updating status:', err)
-  }
-}
-
-const openAddUserDialog = () => {
-  newUser.value = { firstName: '', lastName: '', email: '', password: '', address: '', portal: '', floor: '', letter: '' }
-  addUserDialog.value = true
-}
-
-const handleAddUser = async () => {
-  if (!formValid.value) return
-  actionLoading.value = true
-  try {
-    await api.post('/users', newUser.value)
-    addUserDialog.value = false
-    fetchUsers()
-    activeTab.value = 'approved'
-  } catch (err) {
-    console.error('Error adding user:', err)
-  } finally {
-    actionLoading.value = false
-  }
-}
-
-const confirmDelete = (user: any) => {
-  selectedUser.value = user
-  deleteDialog.value = true
-}
-
-const handleDelete = async () => {
-  if (!selectedUser.value) return
-  actionLoading.value = true
-  try {
-    await api.delete(`/users/${selectedUser.value.id}`)
-    deleteDialog.value = false
-    fetchUsers()
-  } catch (err) {
-    console.error('Error deleting user:', err)
-  } finally {
-    actionLoading.value = false
-  }
-}
-
-onMounted(() => {
+const updateStatus = async (userId: string, status: string, blockedUntil: any = null) => {
+  await api.patch(`/users/${userId}/status`, { status, blocked_until: blockedUntil })
   fetchUsers()
-})
+}
+
+const openBlockDialog = (user: any) => {
+  selectedUser.value = user
+  blockDialog.value = true
+}
+
+const applyBlock = () => {
+  const date = new Date()
+  date.setDate(date.getDate() + blockDuration.value)
+  updateStatus(selectedUser.value.id, 'BLOCKED', date.toISOString())
+  blockDialog.value = false
+}
+
+onMounted(fetchUsers)
 </script>
 
 <style scoped>
-.max-width-300 {
-  max-width: 300px;
+.custom-tabs {
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 16px;
+  ga: 4px;
+}
+
+.tab-item {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  transition: all 0.3s ease;
+}
+
+.tab-item.active {
+  background: white;
+  color: #0f172a;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.premium-user-card {
+  transition: transform 0.2s ease;
+}
+
+.premium-user-card:active {
+  transform: scale(0.98);
 }
 </style>

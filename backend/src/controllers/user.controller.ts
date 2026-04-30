@@ -18,11 +18,15 @@ export const getUsers = async (req: Request, res: Response) => {
 export const updateUserStatus = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, blocked_until } = req.body;
 
     const { data, error } = await supabase
       .from('profiles')
-      .update({ status, updated_at: new Date() })
+      .update({ 
+        status, 
+        blocked_until: blocked_until || null,
+        updated_at: new Date() 
+      })
       .eq('id', id)
       .select()
       .single();

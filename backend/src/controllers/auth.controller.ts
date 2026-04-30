@@ -124,6 +124,22 @@ export const login = async (req: Request, res: Response) => {
 
     console.log('Perfil cargado correctamente:', profile.email, 'Estado:', profile.status);
 
+    // Verificar bloqueos
+    if (profile.status === 'BLOCKED') {
+      const now = new Date();
+      const blockedUntil = profile.blocked_until ? new Date(profile.blocked_until) : null;
+      
+      if (blockedUntil && blockedUntil > now) {
+        return res.status(403).json({ 
+          message: `Tu cuenta está temporalmente bloqueada por incumplimiento de las normas hasta el ${blockedUntil.toLocaleDateString()}.` 
+        });
+      } else {
+        // El bloqueo ha expirado, restauramos a APPROVED
+        await supabase.from('profiles').update({ status: 'APPROVED', blocked_until: null }).eq('id', data.user.id);
+        profile.status = 'APPROVED';
+      }
+    }
+
     const token = jwt.sign(
       { id: data.user.id, email: data.user.email, role: profile.role, status: profile.status },
       process.env.JWT_SECRET || 'secret',
