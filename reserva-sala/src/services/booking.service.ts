@@ -54,5 +54,34 @@ export const bookingService = {
   async manageDeposit(id: number, action: 'REFUND' | 'CAPTURE'): Promise<any> {
     const response = await api.patch(`/bookings/${id}/deposit`, { action });
     return response.data;
+  },
+
+  // Schedules & Exceptions
+  async getRoomSchedules(roomId: number): Promise<any[]> {
+    const response = await api.get(`/rooms/${roomId}/schedules`);
+    return response.data;
+  },
+
+  async addRoomSchedule(roomId: number, scheduleData: any): Promise<any> {
+    const response = await api.post(`/rooms/${roomId}/schedules`, scheduleData);
+    return response.data;
+  },
+
+  async deleteRoomSchedule(slotId: number): Promise<void> {
+    await api.delete(`/rooms/schedules/${slotId}`);
+  },
+
+  async getRoomExceptions(roomId: number): Promise<any[]> {
+    const response = await api.get(`/rooms/${roomId}/exceptions`);
+    return response.data;
+  },
+
+  async addRoomException(roomId: number, exceptionData: any): Promise<any> {
+    const response = await api.post(`/rooms/${roomId}/exceptions`, exceptionData);
+    return response.data;
+  },
+
+  async deleteRoomException(excId: number): Promise<void> {
+    await api.delete(`/rooms/exceptions/${excId}`);
   }
 };

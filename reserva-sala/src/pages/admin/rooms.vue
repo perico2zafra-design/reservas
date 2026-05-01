@@ -28,7 +28,7 @@
         </v-col>
       </v-row>
 
-      <!-- Lista de Salas Usando RoomCard -->
+      <!-- Lista de Salas -->
       <v-row>
         <v-col v-for="room in bookingStore.rooms" :key="room.id" cols="12" sm="6" lg="4">
           <v-fade-transition>
@@ -65,142 +65,176 @@
       </div>
     </v-container>
 
-    <!-- Diálogo de Edición/Creación (Premium Dark Style) -->
-    <v-dialog v-model="dialog" max-width="500" persistent transition="dialog-bottom-transition">
-      <v-card rounded="xl" class="elite-dark-modal-v2 overflow-hidden">
+    <!-- Diálogo de Edición/Creación (Premium Dark Style con Tabs) -->
+    <v-dialog v-model="dialog" max-width="600" persistent transition="dialog-bottom-transition">
+      <v-card rounded="xl" class="elite-dark-modal-v3 overflow-hidden">
         <div class="elite-modal-glow bg-gold"></div>
-        <div class="pa-6 pa-md-8">
-          <div class="text-center mb-6">
-            <div class="icon-ring-small bg-white-op mb-3">
-              <v-icon :icon="isEditing ? 'mdi-pencil-box-outline' : 'mdi-plus-box-outline'" color="white" size="28" />
-            </div>
-            <h3 class="modal-title-white-v2">{{ isEditing ? 'Editar Instalación' : 'Nueva Instalación' }}</h3>
-            <p class="modal-subtitle-silver-v2 mt-1">Gestión de espacios exclusivos</p>
-          </div>
-          
-          <v-form @submit.prevent="saveRoom">
-            <v-row dense>
-              <v-col cols="12">
-                <v-text-field 
-                  v-model="roomForm.name" 
-                  label="Nombre de la sala" 
-                  variant="solo" 
-                  rounded="lg" 
-                  bg-color="rgba(255,255,255,0.03)"
-                  class="mb-1 select-dark-elite-v2" 
-                  hide-details
-                />
-              </v-col>
-              
-              <v-col cols="12">
-                <v-textarea 
-                  v-model="roomForm.description" 
-                  label="Descripción" 
-                  variant="solo" 
-                  rounded="lg" 
-                  bg-color="rgba(255,255,255,0.03)"
-                  rows="2" 
-                  class="mb-1 select-dark-elite-v2" 
-                  hide-details
-                />
-              </v-col>
-              
-              <v-col cols="6">
-                <v-text-field 
-                  v-model.number="roomForm.capacity" 
-                  label="Aforo" 
-                  type="number" 
-                  variant="solo" 
-                  rounded="lg" 
-                  bg-color="rgba(255,255,255,0.03)"
-                  class="select-dark-elite-v2"
-                  hide-details
-                />
-              </v-col>
-              <v-col cols="6">
-                <v-text-field 
-                  v-model.number="roomForm.deposit_amount" 
-                  label="Fianza (€)" 
-                  type="number" 
-                  variant="solo" 
-                  rounded="lg" 
-                  bg-color="rgba(255,255,255,0.03)"
-                  class="select-dark-elite-v2"
-                  hide-details
-                />
-              </v-col>
+        
+        <v-tabs v-model="modalTab" grow bg-color="transparent" color="amber" class="modal-tabs-elite">
+          <v-tab value="basic" class="text-none font-weight-bold">INFORMACIÓN</v-tab>
+          <v-tab value="availability" class="text-none font-weight-bold">DISPONIBILIDAD</v-tab>
+        </v-tabs>
 
-              <v-col cols="12">
-                <v-text-field 
-                  v-model="roomForm.image" 
-                  label="URL de imagen" 
-                  variant="solo" 
-                  rounded="lg" 
-                  bg-color="rgba(255,255,255,0.03)"
-                  class="mb-4 select-dark-elite-v2" 
-                  hide-details
-                />
-              </v-col>
-            </v-row>
-            
-            <div class="d-flex align-center justify-space-between mb-6 px-1">
-              <span class="text-caption text-silver-v2 font-weight-bold">ESTADO OPERATIVO</span>
-              <v-switch 
-                v-model="roomForm.is_active" 
-                color="amber" 
-                hide-details
-                inset
-                density="compact"
-                class="elite-switch-compact"
-              />
-            </div>
+        <v-window v-model="modalTab">
+          <!-- TAB 1: BASIC INFO -->
+          <v-window-item value="basic">
+            <div class="pa-6 pa-md-8">
+              <v-form @submit.prevent="modalTab = 'availability'">
+                <v-row dense>
+                  <v-col cols="12" class="mb-4">
+                    <v-text-field 
+                      v-model="roomForm.name" 
+                      label="Nombre de la sala" 
+                      variant="solo" 
+                      rounded="lg" 
+                      bg-color="rgba(255,255,255,0.03)"
+                      class="select-dark-elite-v2" 
+                      hide-details
+                    />
+                  </v-col>
+                  
+                  <v-col cols="12" class="mb-4">
+                    <v-textarea 
+                      v-model="roomForm.description" 
+                      label="Descripción" 
+                      variant="solo" 
+                      rounded="lg" 
+                      bg-color="rgba(255,255,255,0.03)"
+                      rows="3" 
+                      class="select-dark-elite-v2" 
+                      hide-details
+                    />
+                  </v-col>
+                  
+                  <v-col cols="6" class="mb-4">
+                    <v-text-field 
+                      v-model.number="roomForm.capacity" 
+                      label="Aforo Máx" 
+                      type="number" 
+                      variant="solo" 
+                      rounded="lg" 
+                      bg-color="rgba(255,255,255,0.03)"
+                      class="select-dark-elite-v2"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="6" class="mb-4">
+                    <v-text-field 
+                      v-model.number="roomForm.deposit_amount" 
+                      label="Fianza (€)" 
+                      type="number" 
+                      variant="solo" 
+                      rounded="lg" 
+                      bg-color="rgba(255,255,255,0.03)"
+                      class="select-dark-elite-v2"
+                      hide-details
+                    />
+                  </v-col>
 
-            <div class="d-flex flex-column ga-2">
-              <v-btn 
-                block 
-                color="#fbbf24" 
-                height="50" 
-                rounded="lg" 
-                class="btn-elite-gold-v2" 
-                type="submit" 
-                :loading="saving"
-              >
-                {{ isEditing ? 'GUARDAR CAMBIOS' : 'CREAR INSTALACIÓN' }}
-              </v-btn>
-              <v-btn 
-                variant="text" 
-                height="40" 
-                rounded="lg" 
-                color="grey-lighten-1" 
-                class="btn-elite-cancel-v2"
-                @click="dialog = false"
-              >
-                Cerrar
-              </v-btn>
+                  <v-col cols="12" class="mb-6">
+                    <v-text-field 
+                      v-model="roomForm.image" 
+                      label="URL de imagen" 
+                      variant="solo" 
+                      rounded="lg" 
+                      bg-color="rgba(255,255,255,0.03)"
+                      class="select-dark-elite-v2" 
+                      hide-details
+                    />
+                  </v-col>
+                </v-row>
+
+                <div class="d-flex ga-3">
+                  <v-btn block color="#fbbf24" height="50" rounded="lg" class="btn-elite-gold-v2" @click="modalTab = 'availability'">
+                    CONTINUAR <v-icon icon="mdi-chevron-right" end />
+                  </v-btn>
+                </div>
+              </v-form>
             </div>
-          </v-form>
-        </div>
+          </v-window-item>
+
+          <!-- TAB 2: AVAILABILITY -->
+          <v-window-item value="availability">
+            <div class="pa-6 pa-md-8">
+              <v-form @submit.prevent="saveRoom">
+                <h4 class="text-subtitle-2 font-weight-black text-amber mb-4">HORARIO DE OPERACIÓN</h4>
+                <v-row dense class="mb-6">
+                  <v-col cols="6">
+                    <v-text-field 
+                      v-model="roomConfig.startTime" 
+                      label="Apertura" 
+                      type="time" 
+                      variant="solo" 
+                      rounded="lg" 
+                      bg-color="rgba(255,255,255,0.03)"
+                      class="select-dark-elite-v2"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field 
+                      v-model="roomConfig.endTime" 
+                      label="Cierre" 
+                      type="time" 
+                      variant="solo" 
+                      rounded="lg" 
+                      bg-color="rgba(255,255,255,0.03)"
+                      class="select-dark-elite-v2"
+                      hide-details
+                    />
+                  </v-col>
+                </v-row>
+
+                <h4 class="text-subtitle-2 font-weight-black text-amber mb-2">DÍAS DISPONIBLES</h4>
+                <div class="d-flex flex-wrap ga-2 mb-8">
+                  <div 
+                    v-for="(day, idx) in daysOfWeek" 
+                    :key="idx"
+                    :class="['day-pill-elite', roomConfig.availableDays.includes(idx) ? 'active' : '']"
+                    @click="toggleDay(idx)"
+                  >
+                    {{ day.substr(0, 1) }}
+                  </div>
+                </div>
+
+                <div class="d-flex align-center justify-space-between mb-8 px-1">
+                  <span class="text-caption text-silver-v2 font-weight-bold">ESTADO OPERATIVO</span>
+                  <v-switch v-model="roomForm.is_active" color="amber" hide-details inset density="compact" />
+                </div>
+
+                <div class="d-flex flex-column ga-2">
+                  <v-btn block color="#fbbf24" height="50" rounded="lg" class="btn-elite-gold-v2" type="submit" :loading="saving">
+                    {{ isEditing ? 'GUARDAR TODO' : 'CREAR INSTALACIÓN' }}
+                  </v-btn>
+                  <v-btn variant="text" height="40" rounded="lg" color="grey-lighten-1" class="btn-elite-cancel-v2" @click="modalTab = 'basic'">
+                    <v-icon icon="mdi-chevron-left" start /> Atrás
+                  </v-btn>
+                </div>
+              </v-form>
+            </div>
+          </v-window-item>
+        </v-window>
       </v-card>
     </v-dialog>
 
     <!-- Diálogo de Eliminación -->
     <v-dialog v-model="deleteDialog" max-width="440" transition="dialog-bottom-transition">
-      <v-card rounded="xl" class="elite-dark-modal overflow-hidden">
+      <v-card rounded="xl" class="elite-dark-modal-v3 overflow-hidden">
         <div class="elite-modal-glow bg-error"></div>
         <div class="pa-8">
           <div class="text-center mb-8">
-            <div class="icon-ring bg-error-op mb-4">
+            <div class="icon-ring-small bg-error-op mb-4">
               <v-icon icon="mdi-trash-can-outline" color="error" size="32" />
             </div>
-            <h3 class="modal-title-white">¿Eliminar Sala?</h3>
-            <p class="modal-subtitle-silver mt-2">Esta acción no se puede deshacer.</p>
+            <h3 class="modal-title-white-v2">¿Eliminar Sala?</h3>
+            <p class="modal-subtitle-silver-v2 mt-2">Esta acción no se puede deshacer.</p>
           </div>
 
           <div class="d-flex flex-column ga-3">
             <v-btn color="#ef4444" height="54" rounded="lg" block class="btn-elite-danger-v2" @click="executeDelete">
               ELIMINAR DEFINITIVAMENTE
             </v-btn>
-            <v-btn variant="text" color="grey-lighten-1" height="44" rounded="lg" block class="btn-elite-cancel" @click="deleteDialog = false">
+            <v-btn variant="text" color="grey-lighten-1" height="44" rounded="lg" block class="btn-elite-cancel-v2" @click="deleteDialog = false">
               Volver
             </v-btn>
           </div>
@@ -213,6 +247,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import { useBookingStore } from '@/stores/booking'
+import { bookingService } from '@/services/booking.service'
 import RoomCard from '@/components/common/RoomCard.vue'
 import type { Room } from '@/types'
 
@@ -222,6 +257,9 @@ const deleteDialog = ref(false)
 const isEditing = ref(false)
 const saving = ref(false)
 const selectedRoom = ref<Room | null>(null)
+const modalTab = ref('basic')
+
+const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
 
 const roomForm = reactive({
   name: '',
@@ -232,16 +270,45 @@ const roomForm = reactive({
   is_active: true
 })
 
-const openRoomDialog = (room?: Room) => {
+const roomConfig = reactive({
+  startTime: '09:00',
+  endTime: '23:00',
+  availableDays: [1, 2, 3, 4, 5, 6, 0] as number[],
+  exceptions: [] as any[]
+})
+
+const toggleDay = (idx: number) => {
+  const pos = roomConfig.availableDays.indexOf(idx)
+  if (pos === -1) roomConfig.availableDays.push(idx)
+  else roomConfig.availableDays.splice(pos, 1)
+}
+
+const openRoomDialog = async (room?: Room) => {
+  modalTab.value = 'basic'
   if (room) {
     isEditing.value = true
     selectedRoom.value = room
     Object.assign(roomForm, room)
+    
+    // Fetch schedules
+    try {
+      const schedules = await bookingService.getRoomSchedules(room.id)
+      if (schedules.length > 0) {
+        roomConfig.startTime = schedules[0].start_time.substring(0, 5)
+        roomConfig.endTime = schedules[0].end_time.substring(0, 5)
+        roomConfig.availableDays = schedules.map((s: any) => s.day_of_week)
+      }
+    } catch (err) {
+      console.error('Error fetching schedules', err)
+    }
   } else {
     isEditing.value = false
     selectedRoom.value = null
     Object.assign(roomForm, {
       name: '', description: '', capacity: 50, deposit_amount: 50, image: '', is_active: true
+    })
+    Object.assign(roomConfig, {
+      startTime: '09:00', endTime: '23:00', availableDays: [0, 1, 2, 3, 4, 5, 6]
     })
   }
   dialog.value = true
@@ -250,11 +317,29 @@ const openRoomDialog = (room?: Room) => {
 const saveRoom = async () => {
   saving.value = true
   try {
+    let roomId: number
     if (isEditing.value && selectedRoom.value) {
-      await bookingStore.updateRoom(selectedRoom.value.id, roomForm)
+      const updated = await bookingStore.updateRoom(selectedRoom.value.id, roomForm)
+      roomId = updated.id
     } else {
-      await bookingStore.addRoom(roomForm as any)
+      const created = await bookingStore.addRoom(roomForm as any)
+      roomId = created.id
     }
+
+    // Save Schedules (Wipe and recreate for simplicity in this version)
+    const currentSchedules = await bookingService.getRoomSchedules(roomId)
+    for (const s of currentSchedules) {
+      await bookingService.deleteRoomSchedule(s.id)
+    }
+
+    for (const day of roomConfig.availableDays) {
+      await bookingService.addRoomSchedule(roomId, {
+        day_of_week: day,
+        start_time: roomConfig.startTime,
+        end_time: roomConfig.endTime
+      })
+    }
+
     dialog.value = false
   } catch (err) {
     console.error(err)
@@ -366,10 +451,30 @@ onMounted(() => {
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-/* DIALOGS ELITE V2 COMPACT */
-.elite-dark-modal-v2 {
+/* MODAL TABS */
+.modal-tabs-elite {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.modal-tabs-elite :deep(.v-tab) {
+  font-size: 0.75rem !important;
+  letter-spacing: 1px !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.modal-tabs-elite :deep(.v-tab--selected) {
+  color: #fbbf24 !important;
+}
+
+/* DIALOGS ELITE V3 */
+.elite-dark-modal-v3 {
   background: #0f172a !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.elite-modal-glow {
+  height: 2px;
+  width: 100%;
 }
 
 .icon-ring-small {
@@ -412,11 +517,34 @@ onMounted(() => {
   letter-spacing: 1px;
 }
 
+.day-pill-elite {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.day-pill-elite.active {
+  background: #fbbf24;
+  color: #0f172a;
+  border-color: #fbbf24;
+  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+}
+
 .btn-elite-gold-v2 {
   font-weight: 900 !important;
-  letter-spacing: 1px !important;
+  letter-spacing: 1.5px !important;
   color: #0f172a !important;
   box-shadow: 0 8px 20px rgba(251, 191, 36, 0.2) !important;
+  text-transform: uppercase !important;
 }
 
 .btn-elite-cancel-v2 {
@@ -425,11 +553,7 @@ onMounted(() => {
   color: rgba(255,255,255,0.4) !important;
 }
 
-.elite-switch :deep(.v-label) {
-  color: #94a3b8 !important;
-  font-weight: 700 !important;
-  font-size: 0.9rem !important;
-}
+.bg-error-op { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); }
 
 .empty-state-premium {
   background: white;

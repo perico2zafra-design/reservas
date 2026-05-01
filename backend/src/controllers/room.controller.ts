@@ -16,11 +16,11 @@ export const getAllRooms = async (req: Request, res: Response) => {
 };
 
 export const createRoom = async (req: Request, res: Response) => {
-  const { name, capacity, description, image } = req.body;
+  const { name, capacity, description, image, is_active, deposit_amount } = req.body;
   try {
     const { data: room, error } = await supabase
       .from('rooms')
-      .insert([{ name, capacity, description, image }])
+      .insert([{ name, capacity, description, image, is_active, deposit_amount }])
       .select()
       .single();
 
@@ -33,11 +33,11 @@ export const createRoom = async (req: Request, res: Response) => {
 
 export const updateRoom = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { name, capacity, description, image, is_active } = req.body;
+  const { name, capacity, description, image, is_active, deposit_amount } = req.body;
   try {
     const { data: room, error } = await supabase
       .from('rooms')
-      .update({ name, capacity, description, image, is_active })
+      .update({ name, capacity, description, image, is_active, deposit_amount })
       .eq('id', id)
       .select()
       .single();
