@@ -19,7 +19,7 @@
           <slot name="top-right"></slot>
         </div>
         
-        <h3 :class="[$vuetify.display.mobile ? 'text-h6' : 'text-h5', 'font-weight-black text-white mb-1 room-name']">
+        <h3 :class="[$vuetify.display.mobile ? 'text-h6' : 'text-h5', 'font-weight-black text-white mb-2 room-name text-playfair']">
           {{ name }}
         </h3>
         
@@ -54,51 +54,53 @@ defineEmits(['click'])
 
 <style scoped>
 .room-card-premium {
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
   cursor: pointer;
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid #f1f5f9 !important;
 }
 
 .room-card-premium:hover {
-  transform: translateY(-12px);
-  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.3) !important;
-  border-color: rgba(251, 191, 36, 0.2) !important;
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 30px 60px -12px rgba(15, 23, 42, 0.25) !important;
+  border-color: #d4af37 !important;
 }
 
 .card-image-zoom :deep(.v-img__img) {
-  transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .room-card-premium:hover .card-image-zoom :deep(.v-img__img) {
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
 .room-overlay {
   background: linear-gradient(to top, 
     rgba(15, 23, 42, 0.95) 0%, 
-    rgba(15, 23, 42, 0.6) 40%, 
-    rgba(15, 23, 42, 0) 100%
+    rgba(15, 23, 42, 0.5) 50%, 
+    transparent 100%
   );
   width: 100%;
 }
 
 .fianza-chip {
-  background: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: white !important;
-  font-weight: 800 !important;
+  background: #fbbf24 !important;
+  color: #0f172a !important;
+  font-weight: 900 !important;
   letter-spacing: 1px;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 10px rgba(251, 191, 36, 0.3);
 }
 
 .room-name {
   letter-spacing: -0.5px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  text-shadow: 0 4px 8px rgba(0,0,0,0.5);
 }
 
 .text-white-op-80 {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .amber-text {
