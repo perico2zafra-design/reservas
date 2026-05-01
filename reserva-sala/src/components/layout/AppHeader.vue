@@ -36,7 +36,13 @@
         <v-list rounded="24" class="mt-4 pa-2 glass-panel" width="240">
           <v-list-item prepend-icon="mdi-account-circle-outline" title="Mi Perfil" to="/settings" rounded="xl" class="py-3 font-weight-bold" />
           <v-divider class="my-2 opacity-5" />
-          <v-list-item prepend-icon="mdi-logout" title="Cerrar Sesión" color="error" rounded="xl" class="py-3 font-weight-bold" @click="$emit('logout')" />
+          <v-list-item 
+            prepend-icon="mdi-logout" 
+            title="Cerrar Sesión" 
+            rounded="xl" 
+            class="py-3 font-weight-bold logout-menu-item" 
+            @click="$emit('logout')" 
+          />
         </v-list>
       </v-menu>
     </div>
@@ -131,6 +137,16 @@ defineEmits(['toggle-drawer', 'logout'])
   font-weight: 700 !important;
   letter-spacing: 2px !important;
   opacity: 0.8;
+}
+
+.logout-menu-item {
+  color: rgba(255, 255, 255, 0.6) !important;
+  transition: all 0.3s ease;
+}
+
+.logout-menu-item:hover {
+  background: rgba(251, 191, 36, 0.08) !important;
+  color: #fbbf24 !important;
 }
 
 @media (max-width: 600px) {

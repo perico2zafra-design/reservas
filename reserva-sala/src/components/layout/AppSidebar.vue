@@ -182,15 +182,20 @@ const adminItems = [
 }
 
 .logout-btn-premium {
-  background: rgba(239, 68, 68, 0.1) !important;
-  color: #ef4444 !important;
-  border: 1px solid rgba(239, 68, 68, 0.2) !important;
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: none !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 0.5px !important;
 }
 
 .logout-btn-premium:hover {
-  background: #ef4444 !important;
-  color: white !important;
-  box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.4) !important;
+  background: rgba(251, 191, 36, 0.05) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(251, 191, 36, 0.3) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3) !important;
+  transform: translateY(-2px);
 }
 </style>

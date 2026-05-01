@@ -69,7 +69,7 @@ onMounted(() => {
 <style>
 /* Estilos globales simplificados en App.vue */
 .app-shell {
-  background: #f8fafc !important;
+  background: #f1f5f9 !important;
 }
 .main-content {
   min-height: 100vh;

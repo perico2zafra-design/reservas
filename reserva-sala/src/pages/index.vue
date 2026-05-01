@@ -1,6 +1,6 @@
 <template>
-  <div class="community-dashboard">
-    <v-container class="pt-8 pb-16 px-4 px-md-8">
+  <div class="community-dashboard dashboard-container">
+    <v-container class="pt-4 pb-8 px-4 px-md-8">
       <!-- Resident Profile Panel -->
       <v-card
         rounded="24"
@@ -26,7 +26,9 @@
             </div>
 
             <div class="mb-4">
-              <h1 class="text-subtitle-1 font-weight-light text-white mb-0 opacity-60">
+              <h1
+                class="text-subtitle-1 font-weight-light text-white mb-0 opacity-60"
+              >
                 Bienvenido de nuevo,
               </h1>
               <h2
@@ -53,7 +55,8 @@
                   <span class="info-label">UBICACIÓN</span>
                 </div>
                 <div class="info-value text-caption">
-                  P. {{ authStore.user?.portal || "-" }} · Letra {{ authStore.user?.letter || "-" }}
+                  P. {{ authStore.user?.portal || "-" }} · Letra
+                  {{ authStore.user?.letter || "-" }}
                 </div>
               </v-card>
 
@@ -103,7 +106,11 @@
             </div>
           </v-col>
 
-          <v-col cols="12" md="3" class="text-center position-relative d-none d-md-block">
+          <v-col
+            cols="12"
+            md="3"
+            class="text-center position-relative d-none d-md-block"
+          >
             <div class="avatar-panel-aura"></div>
             <InitialAvatar
               :name="authStore.user?.name"
@@ -117,38 +124,36 @@
       </v-card>
 
       <!-- Facilities Section -->
-      <div class="section-container mt-6">
-        <div class="d-flex align-center justify-space-between mb-2 px-2">
+      <div class="section-container mt-4">
+        <div class="d-flex align-center justify-space-between mb-4 px-2">
           <div class="d-flex align-center">
             <div class="section-accent me-2"></div>
-            <h2 class="text-h5 text-sm-h4 font-weight-black text-slate-900 section-title">
+            <h2
+              class="text-h5 text-sm-h4 font-weight-black text-slate-900 section-title"
+            >
               Instalaciones
             </h2>
           </div>
-          <v-btn
-            variant="flat"
-            class="filter-btn-elite"
-            rounded="xl"
-            prepend-icon="mdi-tune-variant"
-            :size="$vuetify.display.mobile ? 'small' : 'default'"
-          >
-            Filtrar
-          </v-btn>
         </div>
 
-        <v-row class="ga-y-8">
-          <v-col v-for="room in rooms" :key="room.id" cols="12" sm="6" lg="4">
-            <RoomCard
-              :name="room.name"
-              :image="room.image"
-              :deposit="room.deposit_amount"
-              :capacity="room.capacity"
-              height="320"
-              custom-class="room-card-hover-pro"
-              @click="$router.push('/room/' + room.id)"
-            />
-          </v-col>
-        </v-row>
+        <v-slide-group class="pa-0 rooms-carousel-clean" show-arrows>
+          <v-slide-group-item v-for="room in rooms" :key="room.id">
+            <div
+              class="py-4 px-3"
+              :style="{ width: $vuetify.display.mobile ? '260px' : '320px' }"
+            >
+              <RoomCard
+                :name="room.name"
+                :image="room.image"
+                :deposit="room.deposit_amount"
+                :capacity="room.capacity"
+                :height="$vuetify.display.mobile ? 220 : 300"
+                custom-class="room-card-hover-pro"
+                @click="$router.push('/room/' + room.id)"
+              />
+            </div>
+          </v-slide-group-item>
+        </v-slide-group>
       </div>
     </v-container>
   </div>
@@ -200,7 +205,7 @@ onMounted(async () => {
 }
 
 .panel-brand-bottom {
-  font-size: 1.0rem;
+  font-size: 1rem;
   font-weight: 300;
   letter-spacing: 1px;
   color: #ffffff;
@@ -290,6 +295,37 @@ onMounted(async () => {
 
 .filter-btn-elite :deep(.v-icon) {
   color: #fbbf24 !important;
+}
+
+.rooms-carousel-clean {
+  background: transparent !important;
+}
+
+.rooms-carousel-clean :deep(.v-slide-group__content) {
+  background: transparent !important;
+}
+
+.rooms-carousel-clean :deep(.v-slide-group__prev),
+.rooms-carousel-clean :deep(.v-slide-group__next) {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  margin: 0 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  min-width: 40px;
+  height: 40px;
+  transition: all 0.3s ease;
+}
+
+.rooms-carousel-clean :deep(.v-slide-group__prev:hover),
+.rooms-carousel-clean :deep(.v-slide-group__next:hover) {
+  background: #0f172a !important;
+  color: #fbbf24 !important;
+}
+
+.dashboard-container {
+  background: #f1f5f9;
+  overflow-x: hidden;
 }
 
 @media (max-width: 600px) {
