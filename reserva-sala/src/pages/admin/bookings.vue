@@ -8,8 +8,14 @@
         <v-col cols="12" md="7" class="d-flex mb-4 mb-md-0">
           <div class="elite-gold-marker me-4 align-self-stretch"></div>
           <div>
-            <h1 class="page-title-elite text-slate-900 text-playfair mb-1 mt-0">Control de Fianzas</h1>
-            <p class="text-caption text-slate-500 font-weight-bold text-uppercase letter-spacing-lg">Gestión de reembolsos y cargos de Stripe</p>
+            <h1 class="page-title-elite text-slate-900 text-playfair mb-1 mt-0">
+              Control de Fianzas
+            </h1>
+            <p
+              class="text-caption text-slate-500 font-weight-bold text-uppercase letter-spacing-lg"
+            >
+              Gestión de reembolsos y cargos de Stripe
+            </p>
           </div>
         </v-col>
 
@@ -33,16 +39,16 @@
           class="tabs-elite-full"
         >
           <v-tab value="PAID" class="tab-item-elite text-none">
-            <v-icon start icon="mdi-wallet-outline" size="18" />
-            Pendientes
+            <v-icon start icon="mdi-wallet-outline" size="18" class="tab-icon" />
+            <span class="tab-label">Pendientes</span>
           </v-tab>
           <v-tab value="REFUNDED" class="tab-item-elite text-none">
-            <v-icon start icon="mdi-cash-refund" size="18" />
-            Devueltas
+            <v-icon start icon="mdi-cash-refund" size="18" class="tab-icon" />
+            <span class="tab-label">Devueltas</span>
           </v-tab>
           <v-tab value="CAPTURED" class="tab-item-elite text-none">
-            <v-icon start icon="mdi-cash-check" size="18" />
-            Cobradas
+            <v-icon start icon="mdi-cash-check" size="18" class="tab-icon" />
+            <span class="tab-label">Cobradas</span>
           </v-tab>
         </v-tabs>
       </div>
@@ -50,33 +56,33 @@
       <!-- Lista de Reservas Admin -->
       <div v-if="filteredBookings.length > 0">
         <v-fade-transition group>
-          <BookingCard 
-            v-for="booking in filteredBookings" 
+          <BookingCard
+            v-for="booking in filteredBookings"
             :key="booking.id"
             :booking="booking"
             isAdmin
           >
             <template #actions>
-              <div v-if="booking.deposit_status === 'PAID'" class="d-flex flex-column flex-md-row ga-3">
-                <v-btn 
-                  color="#10b981" 
+              <div v-if="booking.deposit_status === 'PAID'" class="d-flex ga-2">
+                <v-btn
+                  color="#10b981"
                   variant="flat"
-                  rounded="lg" 
-                  height="44"
-                  class="btn-elite-action success px-6"
-                  @click="manageDeposit(booking.id, 'REFUND')"
+                  rounded="lg"
+                  height="36"
+                  class="btn-elite-compact success px-4"
+                  @click="openActionModal(booking, 'REFUND')"
                 >
-                  DEVOLVER FIANZA
+                  DEVOLVER
                 </v-btn>
-                <v-btn 
-                  color="#ef4444" 
+                <v-btn
+                  color="#ef4444"
                   variant="tonal"
-                  rounded="lg" 
-                  height="44"
-                  class="btn-elite-action danger px-6"
-                  @click="manageDeposit(booking.id, 'CAPTURE')"
+                  rounded="lg"
+                  height="36"
+                  class="btn-elite-compact danger px-4"
+                  @click="openActionModal(booking, 'CAPTURE')"
                 >
-                  COBRAR DAÑOS
+                  COBRAR
                 </v-btn>
               </div>
             </template>
@@ -86,59 +92,180 @@
 
       <!-- Empty State -->
       <div v-else class="empty-state-premium py-16 px-6">
-        <v-icon icon="mdi-cash-lock-open" size="64" color="slate-200" class="mb-4" />
-        <h2 class="text-h6 font-weight-black text-slate-400">No hay transacciones en este estado</h2>
+        <v-icon
+          icon="mdi-cash-lock-open"
+          size="64"
+          color="slate-200"
+          class="mb-4"
+        />
+        <h2 class="text-h6 font-weight-black text-slate-400">
+          No hay transacciones en este estado
+        </h2>
       </div>
     </v-container>
 
-    <v-snackbar v-model="snackbar" :color="snackColor" rounded="pill" class="elite-snackbar">
-      <div class="d-flex align-center">
-        <v-icon :icon="snackColor === 'success' ? 'mdi-check-circle' : 'mdi-alert-circle'" class="me-3" />
-        <span class="font-weight-bold">{{ snackText }}</span>
-      </div>
-    </v-snackbar>
+    <!-- MODAL PREMIUM DE CONFIRMACIÓN (REEMBOLSO) -->
+    <v-dialog
+      v-model="refundDialog"
+      max-width="440"
+      transition="dialog-bottom-transition"
+    >
+      <v-card rounded="xl" class="elite-dark-modal overflow-hidden">
+        <div class="elite-modal-glow bg-success"></div>
+        <div class="pa-8">
+          <div class="text-center mb-8">
+            <div class="icon-ring-v2 bg-success-op mb-4">
+              <v-icon icon="mdi-cash-refund" color="#10b981" size="32" />
+            </div>
+            <h3 class="modal-title-white-v2">Devolver Fianza</h3>
+            <p class="modal-subtitle-silver-v2 mt-2">
+              ¿Confirmas la devolución de
+              <strong>{{ selectedBooking?.deposit_amount }}€</strong> a
+              {{ selectedBooking?.user?.first_name }}?
+            </p>
+          </div>
+
+          <div class="d-flex flex-column ga-3">
+            <v-btn
+              color="#10b981"
+              height="54"
+              rounded="lg"
+              block
+              class="btn-elite-confirm-v2"
+              @click="executeAction('REFUND')"
+              :loading="processing"
+            >
+              CONFIRMAR DEVOLUCIÓN
+            </v-btn>
+            <v-btn
+              variant="text"
+              color="grey-lighten-1"
+              height="44"
+              rounded="lg"
+              block
+              class="btn-elite-cancel-v2"
+              @click="refundDialog = false"
+            >
+              Volver atrás
+            </v-btn>
+          </div>
+        </div>
+      </v-card>
+    </v-dialog>
+
+    <!-- MODAL PREMIUM DE CONFIRMACIÓN (COBRO POR DAÑOS) -->
+    <v-dialog
+      v-model="captureDialog"
+      max-width="440"
+      transition="dialog-bottom-transition"
+    >
+      <v-card rounded="xl" class="elite-dark-modal overflow-hidden">
+        <div class="elite-modal-glow bg-error"></div>
+        <div class="pa-8">
+          <div class="text-center mb-8">
+            <div class="icon-ring-v2 bg-error-op mb-4">
+              <v-icon icon="mdi-alert-octagon" color="#ef4444" size="32" />
+            </div>
+            <h3 class="modal-title-white-v2">Ejecutar Cobro</h3>
+            <p class="modal-subtitle-silver-v2 mt-2">
+              Esta acción cargará definitivamente
+              <strong>{{ selectedBooking?.deposit_amount }}€</strong> por daños.
+              No se puede revertir.
+            </p>
+          </div>
+
+          <div class="d-flex flex-column ga-3">
+            <v-btn
+              color="#ef4444"
+              height="54"
+              rounded="lg"
+              block
+              class="btn-elite-confirm-v2"
+              @click="executeAction('CAPTURE')"
+              :loading="processing"
+            >
+              EJECUTAR CARGO
+            </v-btn>
+            <v-btn
+              variant="text"
+              color="grey-lighten-1"
+              height="44"
+              rounded="lg"
+              block
+              class="btn-elite-cancel-v2"
+              @click="captureDialog = false"
+            >
+              Cancelar
+            </v-btn>
+          </div>
+        </div>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useBookingStore } from '@/stores/booking'
-import api from '@/services/api'
-import BookingCard from '@/components/common/BookingCard.vue'
+import { ref, onMounted, computed } from "vue";
+import { useBookingStore } from "@/stores/booking";
+import api from "@/services/api";
+import BookingCard from "@/components/common/BookingCard.vue";
+import type { Booking } from "@/types";
 
-const bookingStore = useBookingStore()
-const filterTab = ref('PAID')
-const snackbar = ref(false)
-const snackText = ref('')
-const snackColor = ref('success')
+import { useAppStore } from "@/stores/app";
+
+const bookingStore = useBookingStore();
+const appStore = useAppStore();
+const filterTab = ref("PAID");
+
+const refundDialog = ref(false);
+const captureDialog = ref(false);
+const processing = ref(false);
+const selectedBooking = ref<Booking | null>(null);
 
 const filteredBookings = computed(() => {
-  return bookingStore.bookings.filter(b => b.deposit_status === filterTab.value)
-})
+  return bookingStore.bookings.filter(
+    (b) => b.deposit_status === filterTab.value,
+  );
+});
 
-const manageDeposit = async (id: number, action: 'REFUND' | 'CAPTURE') => {
-  const confirmMsg = action === 'REFUND' 
-    ? '¿Confirmas la devolución de la fianza al vecino?' 
-    : '¿Confirmas el cobro de la fianza por daños? Esta acción es irreversible.'
-  
-  if (confirm(confirmMsg)) {
-    try {
-      await api.post(`/bookings/${id}/deposit`, { action })
-      snackText.value = action === 'REFUND' ? 'Fianza devuelta correctamente' : 'Fianza cobrada por daños'
-      snackColor.value = action === 'REFUND' ? 'success' : 'warning'
-      snackbar.value = true
-      bookingStore.fetchBookings()
-    } catch (err) {
-      snackText.value = 'Error al gestionar la fianza'
-      snackColor.value = 'error'
-      snackbar.value = true
-    }
+const openActionModal = (booking: Booking, action: "REFUND" | "CAPTURE") => {
+  selectedBooking.value = booking;
+  if (action === "REFUND") refundDialog.value = true;
+  else captureDialog.value = true;
+};
+
+const executeAction = async (action: "REFUND" | "CAPTURE") => {
+  if (!selectedBooking.value) return;
+
+  processing.value = true;
+  try {
+    await api.post(`/bookings/${selectedBooking.value.id}/deposit`, { action });
+
+    // Close modals
+    refundDialog.value = false;
+    captureDialog.value = false;
+
+    // Refresh list
+    bookingStore.fetchBookings();
+
+    // Global Notification
+    appStore.showSnackbar(
+      action === "REFUND"
+        ? "Fianza devuelta correctamente"
+        : "Fianza cobrada por daños",
+      action === "REFUND" ? "success" : "warning",
+    );
+  } catch (err) {
+    appStore.showSnackbar("Error al gestionar la fianza", "error");
+  } finally {
+    processing.value = false;
+    selectedBooking.value = null;
   }
-}
+};
 
 onMounted(() => {
-  bookingStore.fetchBookings()
-})
+  bookingStore.fetchBookings();
+});
 </script>
 
 <style scoped>
@@ -182,7 +309,7 @@ onMounted(() => {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* TABS PREMIUM (Shared from users.vue) */
+/* TABS PREMIUM */
 .tabs-container-premium {
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(10px);
@@ -213,24 +340,91 @@ onMounted(() => {
   display: none !important;
 }
 
-/* ACTION BUTTONS */
-.btn-elite-action {
+@media (max-width: 600px) {
+  .tabs-elite-full :deep(.v-tab) {
+    min-width: 0 !important;
+    padding: 0 8px !important;
+    font-size: 0.65rem !important;
+    letter-spacing: 0.5px !important;
+  }
+  .tab-icon {
+    margin-right: 4px !important;
+    font-size: 16px !important;
+  }
+}
+
+/* MODALS PREMIUM ELITE */
+.elite-dark-modal {
+  background: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.elite-modal-glow {
+  height: 2px;
+  width: 100%;
+}
+
+.icon-ring-v2 {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.bg-success-op {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+.bg-error-op {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.modal-title-white-v2 {
+  font-family: "Playfair Display", serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+}
+
+.modal-subtitle-silver-v2 {
+  font-size: 1rem;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.btn-elite-confirm-v2 {
   font-weight: 900 !important;
-  letter-spacing: 1px !important;
-  font-size: 0.75rem !important;
-  transition: all 0.3s ease !important;
+  letter-spacing: 1.5px !important;
+  color: white !important;
+  text-transform: uppercase !important;
 }
 
-.btn-elite-action.success:hover {
+.btn-elite-cancel-v2 {
+  font-weight: 800 !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  text-transform: none !important;
+}
+
+/* COMPACT ACTION BUTTONS */
+.btn-elite-compact {
+  font-weight: 900 !important;
+  letter-spacing: 0.5px !important;
+  font-size: 0.65rem !important;
+  text-transform: uppercase !important;
+}
+
+.btn-elite-compact.success:hover {
   background: #059669 !important;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
 }
 
-.btn-elite-action.danger:hover {
-  background: #dc2626 !important;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2) !important;
+.btn-elite-compact.danger:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1) !important;
 }
 
 .empty-state-premium {
@@ -243,7 +437,6 @@ onMounted(() => {
 .elite-snackbar :deep(.v-snackbar__content) {
   background: #0f172a !important;
   color: white !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 @media (max-width: 600px) {

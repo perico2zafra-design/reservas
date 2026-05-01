@@ -37,6 +37,7 @@
     <!-- Global UI Components -->
     <AppSnackbar />
     <AppSpinner />
+    <LogoutModal v-model="showLogoutModal" @confirm="confirmLogout" />
   </v-app>
 </template>
 
@@ -51,10 +52,12 @@ import AppSidebar from '@/components/layout/AppSidebar.vue'
 import AppBottomNav from '@/components/layout/AppBottomNav.vue'
 import AppSnackbar from '@/components/common/AppSnackbar.vue'
 import AppSpinner from '@/components/common/AppSpinner.vue'
+import LogoutModal from '@/components/common/LogoutModal.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
 const drawer = ref(true)
+const showLogoutModal = ref(false)
 
 const userInitials = computed(() => {
   if (!authStore.user?.name) return 'U'
@@ -63,6 +66,11 @@ const userInitials = computed(() => {
 })
 
 const handleLogout = () => {
+  showLogoutModal.value = true
+}
+
+const confirmLogout = () => {
+  showLogoutModal.value = false
   authStore.logout()
   router.push('/login')
 }

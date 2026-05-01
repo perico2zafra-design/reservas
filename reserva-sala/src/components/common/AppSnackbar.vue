@@ -95,19 +95,21 @@ const closeSnackbar = () => {
 .close-btn {
   background: none;
   border: none;
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.4);
   cursor: pointer;
-  padding: 4px;
-  transition: color 0.2s;
+  padding: 8px;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: -4px;
+  margin-top: -8px;
   margin-right: -8px;
+  border-radius: 50%;
 }
 
 .close-btn:hover {
   color: white;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .progress-bar {
