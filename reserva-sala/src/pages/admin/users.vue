@@ -43,10 +43,10 @@
               class="tabs-elite-full"
             >
               <v-tab value="PENDING" class="tab-item-elite text-none">
-                <v-icon start icon="mdi-account-clock" size="18" />
-                Solicitudes
-                <v-badge v-if="pendingCount > 0" :content="pendingCount" color="error" class="ms-2" />
-              </v-tab>
+              <v-icon start icon="mdi-account-clock" size="18" />
+              Solicitudes
+              <span v-if="pendingCount > 0" class="badge-custom-elite ms-2">{{ pendingCount }}</span>
+            </v-tab>
               <v-tab value="APPROVED" class="tab-item-elite text-none">
                 <v-icon start icon="mdi-account-check" size="18" />
                 Activos
@@ -87,24 +87,89 @@
       </div>
     </v-container>
 
-    <!-- Diálogo de Bloqueo Temporal -->
-    <v-dialog v-model="blockDialog" max-width="400">
-      <v-card rounded="24" class="pa-6">
-        <h3 class="text-h6 font-weight-black mb-2">Bloquear Vecino</h3>
-        <p class="text-body-2 text-slate-500 mb-6">Indica cuánto tiempo durará la sanción para {{ selectedUser?.first_name }}.</p>
-        
-        <v-select
-          v-model="blockDuration"
-          :items="blockOptions"
-          label="Duración del bloqueo"
-          variant="outlined"
-          rounded="xl"
-          class="mb-4"
-        />
+    <!-- Diálogo de Bloqueo Temporal (Sancionar) -->
+    <v-dialog v-model="blockDialog" max-width="440" persistent transition="dialog-bottom-transition">
+      <v-card rounded="xl" class="elite-dark-modal overflow-hidden">
+        <div class="elite-modal-glow bg-amber"></div>
+        <div class="pa-8">
+          <div class="text-center mb-8">
+            <div class="icon-ring bg-amber-op mb-4">
+              <v-icon icon="mdi-shield-alert" color="amber" size="32" />
+            </div>
+            <h3 class="modal-title-white">Aplicar Sanción</h3>
+            <p class="modal-subtitle-silver mt-2">Se restringirá el acceso a las instalaciones</p>
+          </div>
+          
+          <v-select
+            v-model="blockDuration"
+            :items="blockOptions"
+            label="Periodo de restricción"
+            variant="solo"
+            rounded="lg"
+            bg-color="rgba(255,255,255,0.05)"
+            class="mb-8 select-dark-elite"
+            hide-details
+          />
 
-        <v-btn block color="warning" size="large" rounded="xl" class="font-weight-black" @click="applyBlock">
-          Confirmar Bloqueo
-        </v-btn>
+          <div class="d-flex flex-column ga-3">
+            <v-btn color="#fbbf24" height="54" rounded="lg" block class="btn-elite-gold" @click="applyBlock">
+              CONFIRMAR SANCIÓN
+            </v-btn>
+            <v-btn variant="text" color="grey-lighten-1" height="44" rounded="lg" block class="btn-elite-cancel" @click="blockDialog = false">
+              Cancelar y volver
+            </v-btn>
+          </div>
+        </div>
+      </v-card>
+    </v-dialog>
+
+    <!-- Diálogo de Confirmación General (Admitir/Rehabilitar) -->
+    <v-dialog v-model="confirmDialog" max-width="440" transition="dialog-bottom-transition">
+      <v-card rounded="xl" class="elite-dark-modal overflow-hidden">
+        <div class="elite-modal-glow bg-gold"></div>
+        <div class="pa-8">
+          <div class="text-center mb-8">
+            <div class="icon-ring bg-white-op mb-4">
+              <v-icon icon="mdi-shield-check" color="white" size="32" />
+            </div>
+            <h3 class="modal-title-white">Confirmar Acción</h3>
+            <p class="modal-subtitle-silver mt-2">¿Autorizar acceso a {{ selectedUser?.first_name }}?</p>
+          </div>
+
+          <div class="d-flex flex-column ga-3">
+            <v-btn color="#fbbf24" height="54" rounded="lg" block class="btn-elite-gold" @click="executeConfirmedAction">
+              AUTORIZAR ACCESO
+            </v-btn>
+            <v-btn variant="text" color="grey-lighten-1" height="44" rounded="lg" block class="btn-elite-cancel" @click="confirmDialog = false">
+              Cerrar
+            </v-btn>
+          </div>
+        </div>
+      </v-card>
+    </v-dialog>
+
+    <!-- Diálogo de Eliminación (Danger Zone) -->
+    <v-dialog v-model="deleteDialog" max-width="440" transition="dialog-bottom-transition">
+      <v-card rounded="xl" class="elite-dark-modal overflow-hidden">
+        <div class="elite-modal-glow bg-error"></div>
+        <div class="pa-8">
+          <div class="text-center mb-8">
+            <div class="icon-ring bg-error-op mb-4">
+              <v-icon icon="mdi-alert-octagon" color="error" size="32" />
+            </div>
+            <h3 class="modal-title-white">Eliminar Vecino</h3>
+            <p class="modal-subtitle-silver mt-2">Esta acción eliminará todos los datos de forma permanente.</p>
+          </div>
+
+          <div class="d-flex flex-column ga-3">
+            <v-btn color="#ef4444" height="54" rounded="lg" block class="btn-elite-danger-v2" @click="executeDelete">
+              ELIMINAR DEFINITIVAMENTE
+            </v-btn>
+            <v-btn variant="text" color="grey-lighten-1" height="44" rounded="lg" block class="btn-elite-cancel" @click="deleteDialog = false">
+              Volver atrás
+            </v-btn>
+          </div>
+        </div>
       </v-card>
     </v-dialog>
   </div>
@@ -120,8 +185,11 @@ const activeStatus = ref('PENDING')
 const search = ref('')
 const showSearch = ref(false)
 const blockDialog = ref(false)
+const confirmDialog = ref(false)
+const deleteDialog = ref(false)
 const selectedUser = ref<any>(null)
 const blockDuration = ref(7)
+const pendingAction = ref<{ type: string, userId: string, status: string } | null>(null)
 
 const blockOptions = [
   { title: '1 Semana', value: 7 },
@@ -158,9 +226,20 @@ const fetchUsers = async () => {
   users.value = res.data
 }
 
-const updateStatus = async (userId: string, status: string, blockedUntil: any = null) => {
-  await api.patch(`/users/${userId}/status`, { status, blocked_until: blockedUntil })
-  fetchUsers()
+const updateStatus = (userId: string, status: string) => {
+  const user = users.value.find(u => u.id === userId)
+  selectedUser.value = user
+  pendingAction.value = { type: 'status', userId, status }
+  confirmDialog.value = true
+}
+
+const executeConfirmedAction = async () => {
+  if (pendingAction.value) {
+    await api.patch(`/users/${pendingAction.value.userId}/status`, { status: pendingAction.value.status })
+    fetchUsers()
+  }
+  confirmDialog.value = false
+  pendingAction.value = null
 }
 
 const openBlockDialog = (user: any) => {
@@ -168,18 +247,28 @@ const openBlockDialog = (user: any) => {
   blockDialog.value = true
 }
 
-const applyBlock = () => {
+const applyBlock = async () => {
   const date = new Date()
   date.setDate(date.getDate() + blockDuration.value)
-  updateStatus(selectedUser.value.id, 'BLOCKED', date.toISOString())
+  await api.patch(`/users/${selectedUser.value.id}/status`, { 
+    status: 'BLOCKED', 
+    blocked_until: date.toISOString() 
+  })
+  fetchUsers()
   blockDialog.value = false
 }
 
-const confirmDelete = async (user: any) => {
-  if (confirm(`¿Estás seguro de que quieres eliminar a ${user.first_name}? Esta acción no se puede deshacer.`)) {
-    await api.delete(`/users/${user.id}`)
+const confirmDelete = (user: any) => {
+  selectedUser.value = user
+  deleteDialog.value = true
+}
+
+const executeDelete = async () => {
+  if (selectedUser.value) {
+    await api.delete(`/users/${selectedUser.value.id}`)
     fetchUsers()
   }
+  deleteDialog.value = false
 }
 
 onMounted(fetchUsers)
@@ -201,48 +290,77 @@ onMounted(fetchUsers)
 }
 
 .elite-gold-marker {
-  width: 6px;
+  width: 5px;
   background: #d4af37;
-  border-radius: 3px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
 }
 
 .page-title-elite {
-  font-size: 2.5rem;
-  line-height: 1;
+  font-size: 2.75rem;
+  line-height: 0.9;
   font-weight: 900;
-  letter-spacing: -1px;
+  letter-spacing: -2px;
+  color: #0f172a;
 }
 
 .search-refined :deep(.v-field) {
   border: 1px solid #e2e8f0 !important;
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(8px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .search-refined :deep(.v-field--focused) {
+  background: white !important;
   border-color: #d4af37 !important;
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1) !important;
+  box-shadow: 0 10px 25px rgba(212, 175, 55, 0.1) !important;
+  transform: translateY(-2px);
 }
 
 .tabs-container-premium {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.badge-custom-elite {
+  background: #ef4444;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 900;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4);
 }
 
 .tabs-elite-full :deep(.v-tab) {
   flex: 1;
-  height: 48px !important;
-  font-size: 0.9rem !important;
-  font-weight: 700 !important;
+  height: 52px !important;
+  font-size: 0.85rem !important;
+  font-weight: 800 !important;
   color: #64748b !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase !important;
+  letter-spacing: 1.5px !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px !important;
 }
 
 .tabs-elite-full :deep(.v-tab--selected) {
   background: #0f172a !important;
-  color: white !important;
-  border-radius: 8px !important;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
+  color: #fbbf24 !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3) !important;
+}
+
+.tabs-elite-full :deep(.v-tab__slider) {
+  display: none !important;
 }
 
 .empty-state-premium {
@@ -250,6 +368,82 @@ onMounted(fetchUsers)
   border: 1px dashed #e2e8f0;
   border-radius: 24px;
   text-align: center;
+}
+
+/* DIALOGS ELITE DARK */
+.elite-dark-modal {
+  background: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7) !important;
+}
+
+.elite-modal-glow {
+  height: 2px;
+  width: 100%;
+}
+
+.icon-ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.bg-amber-op { background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.2); }
+.bg-white-op { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); }
+.bg-error-op { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); }
+
+.modal-title-white {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.5px;
+}
+
+.modal-subtitle-silver {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.btn-elite-gold {
+  font-weight: 900 !important;
+  letter-spacing: 1.5px !important;
+  color: #0f172a !important;
+  text-transform: uppercase !important;
+  box-shadow: 0 10px 20px rgba(251, 191, 36, 0.3) !important;
+}
+
+.btn-elite-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(251, 191, 36, 0.4) !important;
+}
+
+.btn-elite-danger-v2 {
+  font-weight: 900 !important;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+}
+
+.btn-elite-cancel {
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: none !important;
+  color: rgba(255,255,255,0.5) !important;
+}
+
+.select-dark-elite :deep(.v-field) {
+  border-radius: 12px !important;
+  color: white !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.select-dark-elite :deep(.v-field__input) {
+  color: white !important;
 }
 
 @media (max-width: 600px) {

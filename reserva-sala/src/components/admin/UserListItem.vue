@@ -11,176 +11,230 @@ defineEmits(['update-status', 'open-block', 'confirm-delete'])
 <template>
   <v-card 
     rounded="xl" 
-    class="mb-4 pa-5 border-0 premium-neighbor-card elevation-1"
+    class="mb-6 border-0 luxury-clean-card elevation-1"
   >
-    <div class="d-flex align-center">
-      <div class="avatar-wrapper me-4">
-        <InitialAvatar :name="user.first_name" :url="user.avatar_url" size="56" />
-        <div v-if="user.status === 'APPROVED'" class="status-indicator-online"></div>
-      </div>
-      
-      <div class="flex-grow-1">
-        <div class="d-flex align-center flex-wrap ga-2 mb-1">
-          <span class="neighbor-name text-slate-900">{{ user.first_name }} {{ user.last_name }}</span>
-          <v-chip v-if="user.role === 'ADMIN'" size="x-small" class="role-chip-admin">ADMIN</v-chip>
+    <!-- Subtle Gold Top Accents -->
+    <div class="luxury-accent-line"></div>
+
+    <div class="pa-6">
+      <div class="d-flex align-center mb-6">
+        <div class="avatar-luxury me-5">
+          <InitialAvatar :name="user.first_name" :url="user.avatar_url" size="68" />
+          <div v-if="user.status === 'APPROVED'" class="status-indicator-gold"></div>
         </div>
-        <div class="d-flex align-center text-slate-500">
-          <v-icon icon="mdi-map-marker-outline" size="14" class="me-1" />
-          <span class="location-text">Portal {{ user.portal }}, {{ user.floor }}º{{ user.letter }}</span>
+        
+        <div class="flex-grow-1">
+          <div class="d-flex align-center flex-wrap ga-2">
+            <span class="luxury-name">{{ user.first_name }} {{ user.last_name }}</span>
+            <span v-if="user.role === 'ADMIN'" class="admin-luxury-tag">ADMIN</span>
+          </div>
+          <div class="d-flex align-center mt-1">
+            <span class="luxury-meta-label">PORTAL {{ user.portal }}</span>
+            <span class="mx-3 luxury-meta-dot"></span>
+            <span class="luxury-meta-label">{{ user.floor }}º{{ user.letter }}</span>
+          </div>
         </div>
       </div>
-      
-      <!-- Premium Actions Menu -->
-      <v-menu location="bottom end" transition="scale-transition" offset="10">
-        <template v-slot:activator="{ props }">
+
+      <!-- VISIBLE ACTIONS - CLEAN LUXURY -->
+      <div class="luxury-actions-wrapper">
+        <template v-if="user.status === 'PENDING'">
           <v-btn 
-            icon="mdi-dots-horizontal" 
-            variant="tonal" 
-            color="slate-300" 
-            size="small"
-            v-bind="props"
-            class="action-btn-refined"
-          />
+            block 
+            flat 
+            height="48"
+            class="btn-luxury-primary mb-3"
+            @click="$emit('update-status', user.id, 'APPROVED')"
+          >
+            <v-icon icon="mdi-check-circle-outline" class="me-2" size="20" />
+            ADMITIR VECINO
+          </v-btn>
         </template>
-        <v-list class="dropdown-premium pa-2" width="200">
-          <v-list-item 
-            v-if="user.status === 'PENDING'" 
-            prepend-icon="mdi-check-decagram-outline" 
-            title="Admitir" 
-            class="menu-item-premium"
-            @click="$emit('update-status', user.id, 'APPROVED')" 
-          />
-          <v-list-item 
-            v-if="user.status === 'APPROVED'" 
-            prepend-icon="mdi-block-helper" 
-            title="Bloquear" 
-            class="menu-item-premium"
-            @click="$emit('open-block', user)" 
-          />
-          <v-list-item 
-            v-if="user.status === 'BLOCKED'" 
-            prepend-icon="mdi-account-check-outline" 
-            title="Desbloquear" 
-            class="menu-item-premium"
-            @click="$emit('update-status', user.id, 'APPROVED')" 
-          />
-          <v-divider class="my-2 border-white-op" />
-          <v-list-item 
-            prepend-icon="mdi-delete-outline" 
-            title="Eliminar" 
-            class="menu-item-premium logout-item" 
-            @click="$emit('confirm-delete', user)" 
-          />
-        </v-list>
-      </v-menu>
+        
+        <template v-if="user.status === 'APPROVED'">
+          <v-btn 
+            block 
+            variant="outlined" 
+            height="48"
+            class="btn-luxury-outlined mb-3"
+            @click="$emit('open-block', user)"
+          >
+            <v-icon icon="mdi-shield-alert-outline" class="me-2" size="20" />
+            SANCIONAR RESIDENTE
+          </v-btn>
+        </template>
+
+        <template v-if="user.status === 'BLOCKED'">
+          <v-btn 
+            block 
+            flat 
+            height="48"
+            class="btn-luxury-primary mb-3"
+            @click="$emit('update-status', user.id, 'APPROVED')"
+          >
+            <v-icon icon="mdi-refresh" class="me-2" size="20" />
+            REHABILITAR ACCESO
+          </v-btn>
+        </template>
+
+        <v-btn 
+          block 
+          variant="text" 
+          height="40"
+          class="btn-luxury-danger"
+          @click="$emit('confirm-delete', user)"
+        >
+          <v-icon icon="mdi-trash-can-outline" class="me-2" size="18" />
+          ELIMINAR CUENTA
+        </v-btn>
+      </div>
     </div>
 
-    <!-- Block Info Banner -->
+    <!-- Sanción Info - Refined -->
     <v-expand-transition>
-      <div v-if="user.status === 'BLOCKED' && user.blocked_until" class="mt-4 block-banner pa-3 rounded-lg d-flex align-center">
-        <v-icon icon="mdi-alert-circle-outline" size="18" class="me-2" />
-        <div class="d-flex flex-column">
-          <span class="font-weight-black text-uppercase text-tiny letter-spacing-lg">Sanción Activa</span>
-          <span class="text-caption">Hasta el {{ new Date(user.blocked_until).toLocaleDateString() }}</span>
-        </div>
+      <div v-if="user.status === 'BLOCKED' && user.blocked_until" class="luxury-blocked-banner pa-3 d-flex align-center justify-center">
+        <v-icon icon="mdi-alert-decagram-outline" size="16" class="me-2 gold-text" />
+        <span class="luxury-banner-text">BAJO RESTRICCIÓN HASTA EL <span class="font-weight-black">{{ new Date(user.blocked_until).toLocaleDateString() }}</span></span>
       </div>
     </v-expand-transition>
   </v-card>
 </template>
 
 <style scoped>
-.premium-neighbor-card {
-  background: white;
+.luxury-clean-card {
+  background: #ffffff;
   border: 1px solid #f1f5f9 !important;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.premium-neighbor-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05) !important;
-  border-color: #e2e8f0 !important;
-}
-
-.avatar-wrapper {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
   position: relative;
 }
 
-.status-indicator-online {
+.luxury-accent-line {
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent 0%, #d4af37 50%, transparent 100%);
+  opacity: 0.3;
+}
+
+.luxury-clean-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 30px 60px -12px rgba(15, 23, 42, 0.12) !important;
+  border-color: #d4af37 !important;
+}
+
+.luxury-clean-card:hover .luxury-accent-line {
+  opacity: 1;
+}
+
+.avatar-luxury {
+  position: relative;
+  padding: 4px;
+  background: #f8fafc;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+}
+
+.status-indicator-gold {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 12px;
-  height: 12px;
+  bottom: 6px;
+  right: 6px;
+  width: 14px;
+  height: 14px;
   background: #10b981;
-  border: 2px solid white;
+  border: 3px solid white;
   border-radius: 50%;
 }
 
-.neighbor-name {
+.luxury-name {
   font-family: 'Outfit', sans-serif;
   font-weight: 800;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  color: #0f172a;
   letter-spacing: -0.5px;
 }
 
-.location-text {
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.role-chip-admin {
-  background: #0f172a !important;
-  color: #fbbf24 !important;
-  font-weight: 900 !important;
-  border-radius: 4px !important;
-}
-
-.action-btn-refined {
-  background: #f8fafc !important;
-  color: #64748b !important;
-}
-
-.block-banner {
-  background: #fef2f2;
-  border: 1px solid #fee2e2;
-  color: #ef4444;
-}
-
-.letter-spacing-lg {
+.admin-luxury-tag {
+  font-size: 0.6rem;
+  font-weight: 900;
+  background: #0f172a;
+  color: #fbbf24;
+  padding: 2px 8px;
+  border-radius: 4px;
   letter-spacing: 1px;
 }
 
-.text-tiny {
-  font-size: 0.6rem;
+.luxury-meta-label {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #64748b;
+  letter-spacing: 0.5px;
 }
 
-/* Custom Dropdown Override for Card Menu */
-.dropdown-premium {
-  background: rgba(15, 23, 42, 0.95) !important;
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: white !important;
+.luxury-meta-dot {
+  width: 4px;
+  height: 4px;
+  background: #cbd5e1;
+  border-radius: 50%;
+}
+
+/* LUXURY BUTTONS */
+.btn-luxury-primary {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px !important;
+  font-size: 0.85rem !important;
   border-radius: 12px !important;
+  transition: all 0.3s ease !important;
 }
 
-.menu-item-premium {
-  color: rgba(255, 255, 255, 0.7) !important;
-  border-radius: 8px !important;
-  margin-bottom: 2px;
-  transition: all 0.2s ease;
-}
-
-.menu-item-premium:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
+.btn-luxury-primary:hover {
+  background: #1e293b !important;
   color: #fbbf24 !important;
+  transform: scale(1.02);
 }
 
-.logout-item:hover {
-  background: rgba(239, 68, 68, 0.08) !important;
+.btn-luxury-outlined {
+  border: 2px solid #0f172a !important;
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  letter-spacing: 1px !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-luxury-outlined:hover {
+  background: #f1f5f9 !important;
+  border-color: #d4af37 !important;
+  color: #d4af37 !important;
+}
+
+.btn-luxury-danger {
+  color: #94a3b8 !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.5px !important;
+}
+
+.btn-luxury-danger:hover {
   color: #ef4444 !important;
+  background: #fef2f2 !important;
 }
 
-.border-white-op {
-  border-color: rgba(255, 255, 255, 0.05) !important;
+/* BANNER */
+.luxury-blocked-banner {
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+}
+
+.luxury-banner-text {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: 1px;
+}
+
+.gold-text {
+  color: #d4af37 !important;
 }
 </style>
