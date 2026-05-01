@@ -33,6 +33,10 @@
         </v-fade-transition>
       </router-view>
     </v-main>
+
+    <!-- Global UI Components -->
+    <AppSnackbar />
+    <AppSpinner />
   </v-app>
 </template>
 
@@ -45,6 +49,8 @@ import { useAuthStore } from '@/stores/auth'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
 import AppBottomNav from '@/components/layout/AppBottomNav.vue'
+import AppSnackbar from '@/components/common/AppSnackbar.vue'
+import AppSpinner from '@/components/common/AppSpinner.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()

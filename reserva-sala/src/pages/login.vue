@@ -98,11 +98,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useAppStore } from '@/stores/app'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const appStore = useAppStore()
 
 const email = ref('')
 const password = ref('')
@@ -112,10 +113,15 @@ const handleLogin = async () => {
   if (!valid.value) return
   
   try {
+    appStore.setLoading(true)
     await authStore.login({ email: email.value, password: password.value })
+    appStore.showSuccess('¡Bienvenido de nuevo!')
     router.push('/')
   } catch (error: any) {
     console.error('Login failed:', error)
+    appStore.showError(error.response?.data?.message || 'Error al iniciar sesión. Verifique sus credenciales.')
+  } finally {
+    appStore.setLoading(false)
   }
 }
 </script>

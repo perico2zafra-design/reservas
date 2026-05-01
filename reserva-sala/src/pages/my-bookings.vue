@@ -135,10 +135,12 @@
 import { onMounted, computed, ref } from "vue";
 import { useBookingStore } from "@/stores/booking";
 import { useAuthStore } from "@/stores/auth";
+import { useAppStore } from "@/stores/app";
 import BookingCard from "@/components/common/BookingCard.vue";
 
 const bookingStore = useBookingStore();
 const authStore = useAuthStore();
+const appStore = useAppStore();
 const activeTab = ref("upcoming");
 
 const userBookings = computed(() => {
@@ -168,12 +170,27 @@ const pastBookings = computed(() => {
 
 const cancelBooking = async (id: number) => {
   if (confirm("¿Estás seguro de que quieres cancelar esta reserva?")) {
-    await bookingStore.cancelBooking(id);
+    try {
+      appStore.setLoading(true);
+      await bookingStore.cancelBooking(id);
+      appStore.showSuccess("Reserva cancelada correctamente");
+    } catch (error) {
+      appStore.showError("Error al cancelar la reserva");
+    } finally {
+      appStore.setLoading(false);
+    }
   }
 };
 
-onMounted(() => {
-  bookingStore.fetchBookings();
+onMounted(async () => {
+  try {
+    appStore.setLoading(true);
+    await bookingStore.fetchBookings();
+  } catch (error) {
+    appStore.showError("Error al cargar las reservas");
+  } finally {
+    appStore.setLoading(false);
+  }
 });
 </script>
 
