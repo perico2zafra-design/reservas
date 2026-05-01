@@ -142,7 +142,7 @@ const adminItems = [
   font-weight: 300;
   letter-spacing: 1px;
   color: #ffffff;
-  font-family: 'Playfair Display', serif;
+  font-family: "Playfair Display", serif;
   line-height: 1.2;
 }
 
@@ -169,16 +169,27 @@ const adminItems = [
 }
 
 .nav-active {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(124, 58, 237, 0.9) 100%) !important;
-  color: white !important;
-  box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4), 
-              inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%) !important;
+  color: #fbbf24 !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(212, 175, 55, 0.3) !important;
+  position: relative;
+}
+
+.nav-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 3px;
+  background: #d4af37;
+  border-radius: 0 4px 4px 0;
 }
 
 .nav-active :deep(.v-icon) {
-  color: white !important;
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+  color: #fbbf24 !important;
+  filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.3));
 }
 
 .logout-btn-premium {
