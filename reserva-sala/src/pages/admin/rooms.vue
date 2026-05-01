@@ -8,8 +8,14 @@
         <v-col cols="12" md="6" class="d-flex mb-4 mb-md-0">
           <div class="elite-gold-marker me-4 align-self-stretch"></div>
           <div>
-            <h1 class="page-title-elite text-slate-900 text-playfair mb-1 mt-0">Instalaciones</h1>
-            <p class="text-caption text-slate-500 font-weight-bold text-uppercase letter-spacing-lg">Gestión de Espacios Comunes</p>
+            <h1 class="page-title-elite text-slate-900 text-playfair mb-1 mt-0">
+              Instalaciones
+            </h1>
+            <p
+              class="text-caption text-slate-500 font-weight-bold text-uppercase letter-spacing-lg"
+            >
+              Gestión de Espacios Comunes
+            </p>
           </div>
         </v-col>
 
@@ -30,7 +36,13 @@
 
       <!-- Lista de Salas -->
       <v-row>
-        <v-col v-for="room in bookingStore.rooms" :key="room.id" cols="12" sm="6" lg="4">
+        <v-col
+          v-for="room in bookingStore.rooms"
+          :key="room.id"
+          cols="12"
+          sm="6"
+          lg="4"
+        >
           <v-fade-transition>
             <RoomCard
               :name="room.name"
@@ -42,14 +54,33 @@
             >
               <template #top-right>
                 <div class="d-flex ga-2 action-pills">
-                  <v-btn icon="mdi-pencil-outline" size="x-small" color="white" variant="flat" class="action-pill-btn" @click.stop="openRoomDialog(room)" />
-                  <v-btn icon="mdi-trash-can-outline" size="x-small" color="white" variant="flat" class="action-pill-btn danger" @click.stop="confirmDelete(room)" />
+                  <v-btn
+                    icon="mdi-pencil-outline"
+                    size="x-small"
+                    color="white"
+                    variant="flat"
+                    class="action-pill-btn"
+                    @click.stop="openRoomDialog(room)"
+                  />
+                  <v-btn
+                    icon="mdi-trash-can-outline"
+                    size="x-small"
+                    color="white"
+                    variant="flat"
+                    class="action-pill-btn danger"
+                    @click.stop="confirmDelete(room)"
+                  />
                 </div>
               </template>
               <template #footer>
                 <div class="d-flex align-center mt-4">
-                  <div :class="['status-badge', room.is_active ? 'active' : 'inactive']">
-                    {{ room.is_active ? 'DISPONIBLE' : 'MANTENIMIENTO' }}
+                  <div
+                    :class="[
+                      'status-badge',
+                      room.is_active ? 'active' : 'inactive',
+                    ]"
+                  >
+                    {{ room.is_active ? "DISPONIBLE" : "MANTENIMIENTO" }}
                   </div>
                 </div>
               </template>
@@ -59,20 +90,47 @@
       </v-row>
 
       <!-- Empty State -->
-      <div v-if="bookingStore.rooms.length === 0" class="empty-state-premium py-16 px-6">
-        <v-icon icon="mdi-office-building-cog-outline" size="64" color="slate-200" class="mb-4" />
-        <h2 class="text-h6 font-weight-black text-slate-400">No hay instalaciones configuradas todavía</h2>
+      <div
+        v-if="bookingStore.rooms.length === 0"
+        class="empty-state-premium py-16 px-6"
+      >
+        <v-icon
+          icon="mdi-office-building-cog-outline"
+          size="64"
+          color="slate-200"
+          class="mb-4"
+        />
+        <h2 class="text-h6 font-weight-black text-slate-400">
+          No hay instalaciones configuradas todavía
+        </h2>
       </div>
     </v-container>
 
     <!-- Diálogo de Edición/Creación (Premium Dark Style con Tabs) -->
-    <v-dialog v-model="dialog" max-width="600" persistent transition="dialog-bottom-transition">
+    <v-dialog
+      v-model="dialog"
+      max-width="600"
+      transition="dialog-bottom-transition"
+    >
       <v-card rounded="xl" class="elite-dark-modal-v3 overflow-hidden">
         <div class="elite-modal-glow bg-gold"></div>
-        
-        <v-tabs v-model="modalTab" grow bg-color="transparent" color="amber" class="modal-tabs-elite">
-          <v-tab value="basic" class="text-none font-weight-bold">INFORMACIÓN</v-tab>
-          <v-tab value="availability" class="text-none font-weight-bold">DISPONIBILIDAD</v-tab>
+
+        <v-tabs
+          v-model="modalTab"
+          grow
+          bg-color="transparent"
+          color="amber"
+          class="modal-tabs-elite"
+        >
+          <v-tab value="basic" class="text-none font-weight-bold"
+            >INFORMACIÓN</v-tab
+          >
+          <v-tab value="availability" class="text-none font-weight-bold"
+            >DISPONIBILIDAD</v-tab
+          >
+          <v-tab value="exceptions" class="text-none font-weight-bold"
+            >DÍAS BLOQUEADOS</v-tab
+          >
         </v-tabs>
 
         <v-window v-model="modalTab">
@@ -82,49 +140,49 @@
               <v-form @submit.prevent="modalTab = 'availability'">
                 <v-row dense>
                   <v-col cols="12" class="mb-4">
-                    <v-text-field 
-                      v-model="roomForm.name" 
-                      label="Nombre de la sala" 
-                      variant="solo" 
-                      rounded="lg" 
+                    <v-text-field
+                      v-model="roomForm.name"
+                      label="Nombre de la sala"
+                      variant="solo"
+                      rounded="lg"
                       bg-color="rgba(255,255,255,0.03)"
-                      class="select-dark-elite-v2" 
+                      class="select-dark-elite-v2"
                       hide-details
                     />
                   </v-col>
-                  
+
                   <v-col cols="12" class="mb-4">
-                    <v-textarea 
-                      v-model="roomForm.description" 
-                      label="Descripción" 
-                      variant="solo" 
-                      rounded="lg" 
+                    <v-textarea
+                      v-model="roomForm.description"
+                      label="Descripción"
+                      variant="solo"
+                      rounded="lg"
                       bg-color="rgba(255,255,255,0.03)"
-                      rows="3" 
-                      class="select-dark-elite-v2" 
+                      rows="3"
+                      class="select-dark-elite-v2"
                       hide-details
                     />
                   </v-col>
-                  
+
                   <v-col cols="6" class="mb-4">
-                    <v-text-field 
-                      v-model.number="roomForm.capacity" 
-                      label="Aforo Máx" 
-                      type="number" 
-                      variant="solo" 
-                      rounded="lg" 
+                    <v-text-field
+                      v-model.number="roomForm.capacity"
+                      label="Aforo Máx"
+                      type="number"
+                      variant="solo"
+                      rounded="lg"
                       bg-color="rgba(255,255,255,0.03)"
                       class="select-dark-elite-v2"
                       hide-details
                     />
                   </v-col>
                   <v-col cols="6" class="mb-4">
-                    <v-text-field 
-                      v-model.number="roomForm.deposit_amount" 
-                      label="Fianza (€)" 
-                      type="number" 
-                      variant="solo" 
-                      rounded="lg" 
+                    <v-text-field
+                      v-model.number="roomForm.deposit_amount"
+                      label="Fianza (€)"
+                      type="number"
+                      variant="solo"
+                      rounded="lg"
                       bg-color="rgba(255,255,255,0.03)"
                       class="select-dark-elite-v2"
                       hide-details
@@ -132,13 +190,13 @@
                   </v-col>
 
                   <v-col cols="12" class="mb-6">
-                    <v-text-field 
-                      v-model="roomForm.image" 
-                      label="URL de imagen" 
-                      variant="solo" 
-                      rounded="lg" 
+                    <v-text-field
+                      v-model="roomForm.image"
+                      label="URL de imagen"
+                      variant="solo"
+                      rounded="lg"
                       bg-color="rgba(255,255,255,0.03)"
-                      class="select-dark-elite-v2" 
+                      class="select-dark-elite-v2"
                       hide-details
                     />
                   </v-col>
@@ -149,6 +207,11 @@
                     CONTINUAR <v-icon icon="mdi-chevron-right" end />
                   </v-btn>
                 </div>
+                <div class="text-center mt-4">
+                  <v-btn variant="text" color="grey-lighten-1" size="small" class="btn-elite-cancel-v2" @click="dialog = false">
+                    Cancelar y salir
+                  </v-btn>
+                </div>
               </v-form>
             </div>
           </v-window-item>
@@ -156,28 +219,30 @@
           <!-- TAB 2: AVAILABILITY -->
           <v-window-item value="availability">
             <div class="pa-6 pa-md-8">
-              <v-form @submit.prevent="saveRoom">
-                <h4 class="text-subtitle-2 font-weight-black text-amber mb-4">HORARIO DE OPERACIÓN</h4>
+              <v-form @submit.prevent="modalTab = 'exceptions'">
+                <h4 class="text-subtitle-2 font-weight-black text-amber mb-4">
+                  HORARIO DE OPERACIÓN
+                </h4>
                 <v-row dense class="mb-6">
                   <v-col cols="6">
-                    <v-text-field 
-                      v-model="roomConfig.startTime" 
-                      label="Apertura" 
-                      type="time" 
-                      variant="solo" 
-                      rounded="lg" 
+                    <v-text-field
+                      v-model="roomConfig.startTime"
+                      label="Apertura"
+                      type="time"
+                      variant="solo"
+                      rounded="lg"
                       bg-color="rgba(255,255,255,0.03)"
                       class="select-dark-elite-v2"
                       hide-details
                     />
                   </v-col>
                   <v-col cols="6">
-                    <v-text-field 
-                      v-model="roomConfig.endTime" 
-                      label="Cierre" 
-                      type="time" 
-                      variant="solo" 
-                      rounded="lg" 
+                    <v-text-field
+                      v-model="roomConfig.endTime"
+                      label="Cierre"
+                      type="time"
+                      variant="solo"
+                      rounded="lg"
                       bg-color="rgba(255,255,255,0.03)"
                       class="select-dark-elite-v2"
                       hide-details
@@ -185,32 +250,155 @@
                   </v-col>
                 </v-row>
 
-                <h4 class="text-subtitle-2 font-weight-black text-amber mb-2">DÍAS DISPONIBLES</h4>
+                <h4 class="text-subtitle-2 font-weight-black text-amber mb-2">
+                  DÍAS DISPONIBLES SEMANALES
+                </h4>
                 <div class="d-flex flex-wrap ga-2 mb-8">
-                  <div 
-                    v-for="(day, idx) in daysOfWeek" 
+                  <div
+                    v-for="(day, idx) in daysOfWeek"
                     :key="idx"
-                    :class="['day-pill-elite', roomConfig.availableDays.includes(idx) ? 'active' : '']"
+                    :class="[
+                      'day-pill-elite',
+                      roomConfig.availableDays.includes(idx) ? 'active' : '',
+                    ]"
                     @click="toggleDay(idx)"
                   >
-                    {{ day.substr(0, 1) }}
+                    {{ day.substr(0, 3) }}
                   </div>
                 </div>
 
-                <div class="d-flex align-center justify-space-between mb-8 px-1">
-                  <span class="text-caption text-silver-v2 font-weight-bold">ESTADO OPERATIVO</span>
-                  <v-switch v-model="roomForm.is_active" color="amber" hide-details inset density="compact" />
+                <div
+                  class="d-flex align-center justify-space-between mb-8 px-1"
+                >
+                  <span class="text-caption text-silver-v2 font-weight-bold"
+                    >ESTADO OPERATIVO</span
+                  >
+                  <v-switch
+                    v-model="roomForm.is_active"
+                    color="amber"
+                    hide-details
+                    inset
+                    density="compact"
+                  />
                 </div>
 
-                <div class="d-flex flex-column ga-2">
-                  <v-btn block color="#fbbf24" height="50" rounded="lg" class="btn-elite-gold-v2" type="submit" :loading="saving">
-                    {{ isEditing ? 'GUARDAR TODO' : 'CREAR INSTALACIÓN' }}
+                <div class="d-flex ga-3">
+                  <v-btn block color="#fbbf24" height="50" rounded="lg" class="btn-elite-gold-v2" @click="modalTab = 'exceptions'">
+                    DÍAS BLOQUEADOS <v-icon icon="mdi-chevron-right" end />
                   </v-btn>
-                  <v-btn variant="text" height="40" rounded="lg" color="grey-lighten-1" class="btn-elite-cancel-v2" @click="modalTab = 'basic'">
-                    <v-icon icon="mdi-chevron-left" start /> Atrás
+                </div>
+                <div class="text-center mt-4">
+                  <v-btn variant="text" color="grey-lighten-1" size="small" class="btn-elite-cancel-v2" @click="dialog = false">
+                    Cerrar sin guardar
                   </v-btn>
                 </div>
               </v-form>
+            </div>
+          </v-window-item>
+
+          <!-- TAB 3: EXCEPTIONS (Días Sueltos) -->
+          <v-window-item value="exceptions">
+            <div class="pa-6 pa-md-8">
+              <h4 class="text-subtitle-2 font-weight-black text-amber mb-4">
+                AÑADIR DÍA NO RESERVABLE
+              </h4>
+              <v-row dense class="mb-6">
+                <v-col cols="12" sm="5">
+                  <v-text-field
+                    v-model="newException.date"
+                    type="date"
+                    variant="solo"
+                    rounded="lg"
+                    bg-color="rgba(255,255,255,0.03)"
+                    class="select-dark-elite-v2"
+                    hide-details
+                  />
+                </v-col>
+                <v-col cols="12" sm="5">
+                  <v-text-field
+                    v-model="newException.reason"
+                    placeholder="Ej: Navidad"
+                    variant="solo"
+                    rounded="lg"
+                    bg-color="rgba(255,255,255,0.03)"
+                    class="select-dark-elite-v2"
+                    hide-details
+                  />
+                </v-col>
+                <v-col cols="12" sm="2">
+                  <v-btn
+                    color="amber"
+                    height="48"
+                    rounded="lg"
+                    block
+                    icon="mdi-plus"
+                    class="btn-elite-gold-v2"
+                    @click="addLocalException"
+                  />
+                </v-col>
+              </v-row>
+
+              <h4 class="text-subtitle-2 font-weight-black text-amber mb-4">
+                DÍAS BLOQUEADOS ACTUALES
+              </h4>
+              <div class="exceptions-list mb-8">
+                <div
+                  v-for="(exc, i) in roomConfig.exceptions"
+                  :key="i"
+                  class="exc-item-elite d-flex align-center pa-3 mb-2"
+                >
+                  <v-icon
+                    icon="mdi-calendar-remove"
+                    color="error"
+                    class="me-3"
+                  />
+                  <div class="flex-grow-1">
+                    <div class="text-white font-weight-bold text-caption">
+                      {{ formatDate(exc.exception_date) }}
+                    </div>
+                    <div class="text-silver-v2 text-caption">
+                      {{ exc.reason }}
+                    </div>
+                  </div>
+                  <v-btn
+                    icon="mdi-close-circle-outline"
+                    size="small"
+                    variant="text"
+                    color="error"
+                    @click="removeLocalException(i, exc.id)"
+                  />
+                </div>
+                <div
+                  v-if="roomConfig.exceptions.length === 0"
+                  class="text-center py-4 text-silver-v2 text-caption italic"
+                >
+                  No hay fechas bloqueadas configuradas.
+                </div>
+              </div>
+
+              <div class="d-flex flex-column ga-2">
+                <v-btn
+                  block
+                  color="#fbbf24"
+                  height="54"
+                  rounded="lg"
+                  class="btn-elite-gold-v2"
+                  @click="saveRoom"
+                  :loading="saving"
+                >
+                  GUARDAR CONFIGURACIÓN FINAL
+                </v-btn>
+                <v-btn
+                  variant="text"
+                  height="40"
+                  rounded="lg"
+                  color="grey-lighten-1"
+                  class="btn-elite-cancel-v2"
+                  @click="modalTab = 'availability'"
+                >
+                  <v-icon icon="mdi-chevron-left" start /> Atrás
+                </v-btn>
+              </div>
             </div>
           </v-window-item>
         </v-window>
@@ -218,7 +406,11 @@
     </v-dialog>
 
     <!-- Diálogo de Eliminación -->
-    <v-dialog v-model="deleteDialog" max-width="440" transition="dialog-bottom-transition">
+    <v-dialog
+      v-model="deleteDialog"
+      max-width="440"
+      transition="dialog-bottom-transition"
+    >
       <v-card rounded="xl" class="elite-dark-modal-v3 overflow-hidden">
         <div class="elite-modal-glow bg-error"></div>
         <div class="pa-8">
@@ -227,14 +419,31 @@
               <v-icon icon="mdi-trash-can-outline" color="error" size="32" />
             </div>
             <h3 class="modal-title-white-v2">¿Eliminar Sala?</h3>
-            <p class="modal-subtitle-silver-v2 mt-2">Esta acción no se puede deshacer.</p>
+            <p class="modal-subtitle-silver-v2 mt-2">
+              Esta acción no se puede deshacer.
+            </p>
           </div>
 
           <div class="d-flex flex-column ga-3">
-            <v-btn color="#ef4444" height="54" rounded="lg" block class="btn-elite-danger-v2" @click="executeDelete">
+            <v-btn
+              color="#ef4444"
+              height="54"
+              rounded="lg"
+              block
+              class="btn-elite-danger-v2"
+              @click="executeDelete"
+            >
               ELIMINAR DEFINITIVAMENTE
             </v-btn>
-            <v-btn variant="text" color="grey-lighten-1" height="44" rounded="lg" block class="btn-elite-cancel-v2" @click="deleteDialog = false">
+            <v-btn
+              variant="text"
+              color="grey-lighten-1"
+              height="44"
+              rounded="lg"
+              block
+              class="btn-elite-cancel-v2"
+              @click="deleteDialog = false"
+            >
               Volver
             </v-btn>
           </div>
@@ -245,124 +454,191 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
-import { useBookingStore } from '@/stores/booking'
-import { bookingService } from '@/services/booking.service'
-import RoomCard from '@/components/common/RoomCard.vue'
-import type { Room } from '@/types'
+import { ref, onMounted, reactive } from "vue";
+import { useBookingStore } from "@/stores/booking";
+import { bookingService } from "@/services/booking.service";
+import RoomCard from "@/components/common/RoomCard.vue";
+import type { Room } from "@/types";
 
-const bookingStore = useBookingStore()
-const dialog = ref(false)
-const deleteDialog = ref(false)
-const isEditing = ref(false)
-const saving = ref(false)
-const selectedRoom = ref<Room | null>(null)
-const modalTab = ref('basic')
+const bookingStore = useBookingStore();
+const dialog = ref(false);
+const deleteDialog = ref(false);
+const isEditing = ref(false);
+const saving = ref(false);
+const selectedRoom = ref<Room | null>(null);
+const modalTab = ref("basic");
 
-const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+const daysOfWeek = [
+  "Domingo",
+  "Lunes",
+  "Martes",
+  "Miércoles",
+  "Jueves",
+  "Viernes",
+  "Sábado",
+];
 
 const roomForm = reactive({
-  name: '',
-  description: '',
+  name: "",
+  description: "",
   capacity: 50,
   deposit_amount: 50,
-  image: '',
-  is_active: true
-})
+  image: "",
+  is_active: true,
+});
 
 const roomConfig = reactive({
-  startTime: '09:00',
-  endTime: '23:00',
+  startTime: "09:00",
+  endTime: "23:00",
   availableDays: [1, 2, 3, 4, 5, 6, 0] as number[],
-  exceptions: [] as any[]
-})
+  exceptions: [] as any[],
+});
+
+const newException = reactive({
+  date: "",
+  reason: "",
+});
+
+const deletedExceptionIds = ref<number[]>([]);
 
 const toggleDay = (idx: number) => {
-  const pos = roomConfig.availableDays.indexOf(idx)
-  if (pos === -1) roomConfig.availableDays.push(idx)
-  else roomConfig.availableDays.splice(pos, 1)
-}
+  const pos = roomConfig.availableDays.indexOf(idx);
+  if (pos === -1) roomConfig.availableDays.push(idx);
+  else roomConfig.availableDays.splice(pos, 1);
+};
+
+const addLocalException = () => {
+  if (!newException.date) return;
+  roomConfig.exceptions.push({
+    exception_date: newException.date,
+    reason: newException.reason,
+  });
+  newException.date = "";
+  newException.reason = "";
+};
+
+const removeLocalException = (idx: number, id?: number) => {
+  if (id) deletedExceptionIds.value.push(id);
+  roomConfig.exceptions.splice(idx, 1);
+};
+
+const formatDate = (dateStr: string) => {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+};
 
 const openRoomDialog = async (room?: Room) => {
-  modalTab.value = 'basic'
+  modalTab.value = "basic";
+  deletedExceptionIds.value = [];
+
   if (room) {
-    isEditing.value = true
-    selectedRoom.value = room
-    Object.assign(roomForm, room)
-    
+    isEditing.value = true;
+    selectedRoom.value = room;
+    Object.assign(roomForm, room);
+
     // Fetch schedules
     try {
-      const schedules = await bookingService.getRoomSchedules(room.id)
+      const schedules = await bookingService.getRoomSchedules(room.id);
       if (schedules.length > 0) {
-        roomConfig.startTime = schedules[0].start_time.substring(0, 5)
-        roomConfig.endTime = schedules[0].end_time.substring(0, 5)
-        roomConfig.availableDays = schedules.map((s: any) => s.day_of_week)
+        roomConfig.startTime = schedules[0].start_time.substring(0, 5);
+        roomConfig.endTime = schedules[0].end_time.substring(0, 5);
+        roomConfig.availableDays = schedules.map((s: any) => s.day_of_week);
       }
+
+      const exceptions = await bookingService.getRoomExceptions(room.id);
+      roomConfig.exceptions = exceptions;
     } catch (err) {
-      console.error('Error fetching schedules', err)
+      console.error("Error fetching schedules/exceptions", err);
     }
   } else {
-    isEditing.value = false
-    selectedRoom.value = null
+    isEditing.value = false;
+    selectedRoom.value = null;
     Object.assign(roomForm, {
-      name: '', description: '', capacity: 50, deposit_amount: 50, image: '', is_active: true
-    })
+      name: "",
+      description: "",
+      capacity: 50,
+      deposit_amount: 50,
+      image: "",
+      is_active: true,
+    });
     Object.assign(roomConfig, {
-      startTime: '09:00', endTime: '23:00', availableDays: [0, 1, 2, 3, 4, 5, 6]
-    })
+      startTime: "09:00",
+      endTime: "23:00",
+      availableDays: [0, 1, 2, 3, 4, 5, 6],
+      exceptions: [],
+    });
   }
-  dialog.value = true
-}
+  dialog.value = true;
+};
 
 const saveRoom = async () => {
-  saving.value = true
+  saving.value = true;
   try {
-    let roomId: number
+    let roomId: number;
     if (isEditing.value && selectedRoom.value) {
-      const updated = await bookingStore.updateRoom(selectedRoom.value.id, roomForm)
-      roomId = updated.id
+      const updated = await bookingStore.updateRoom(
+        selectedRoom.value.id,
+        roomForm,
+      );
+      roomId = updated.id;
     } else {
-      const created = await bookingStore.addRoom(roomForm as any)
-      roomId = created.id
+      const created = await bookingStore.addRoom(roomForm as any);
+      roomId = created.id;
     }
 
-    // Save Schedules (Wipe and recreate for simplicity in this version)
-    const currentSchedules = await bookingService.getRoomSchedules(roomId)
+    // Save Schedules
+    const currentSchedules = await bookingService.getRoomSchedules(roomId);
     for (const s of currentSchedules) {
-      await bookingService.deleteRoomSchedule(s.id)
+      await bookingService.deleteRoomSchedule(s.id);
     }
 
     for (const day of roomConfig.availableDays) {
       await bookingService.addRoomSchedule(roomId, {
         day_of_week: day,
         start_time: roomConfig.startTime,
-        end_time: roomConfig.endTime
-      })
+        end_time: roomConfig.endTime,
+      });
     }
 
-    dialog.value = false
+    // Save Exceptions
+    for (const id of deletedExceptionIds.value) {
+      await bookingService.deleteRoomException(id);
+    }
+
+    for (const exc of roomConfig.exceptions) {
+      if (!exc.id) {
+        // Only new ones
+        await bookingService.addRoomException(roomId, exc);
+      }
+    }
+
+    dialog.value = false;
   } catch (err) {
-    console.error(err)
+    console.error(err);
   } finally {
-    saving.value = false
+    saving.value = false;
   }
-}
+};
 
 const confirmDelete = (room: Room) => {
-  selectedRoom.value = room
-  deleteDialog.value = true
-}
+  selectedRoom.value = room;
+  deleteDialog.value = true;
+};
 
 const executeDelete = async () => {
   if (selectedRoom.value) {
-    await bookingStore.deleteRoom(selectedRoom.value.id)
-    deleteDialog.value = false
+    await bookingStore.deleteRoom(selectedRoom.value.id);
+    deleteDialog.value = false;
   }
-}
+};
 
 onMounted(() => {
-  bookingStore.fetchRooms()
-})
+  bookingStore.fetchRooms();
+});
 </script>
 
 <style scoped>
@@ -490,7 +766,7 @@ onMounted(() => {
 }
 
 .modal-title-white-v2 {
-  font-family: 'Playfair Display', serif;
+  font-family: "Playfair Display", serif;
   font-size: 1.5rem;
   font-weight: 700;
   color: white;
@@ -504,11 +780,11 @@ onMounted(() => {
 .select-dark-elite-v2 :deep(.v-field) {
   border-radius: 10px !important;
   color: white !important;
-  border: 1px solid rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
 .select-dark-elite-v2 :deep(.v-label) {
-  color: rgba(255,255,255,0.4) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
   font-size: 0.85rem !important;
 }
 
@@ -518,7 +794,7 @@ onMounted(() => {
 }
 
 .day-pill-elite {
-  width: 42px;
+  width: 54px;
   height: 42px;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.03);
@@ -527,6 +803,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   color: #94a3b8;
+  font-size: 0.7rem;
   font-weight: 900;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -537,6 +814,18 @@ onMounted(() => {
   color: #0f172a;
   border-color: #fbbf24;
   box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+}
+
+.exceptions-list {
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.exc-item-elite {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
 }
 
 .btn-elite-gold-v2 {
@@ -550,10 +839,13 @@ onMounted(() => {
 .btn-elite-cancel-v2 {
   font-weight: 700 !important;
   text-transform: none !important;
-  color: rgba(255,255,255,0.4) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
 }
 
-.bg-error-op { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); }
+.bg-error-op {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
 
 .empty-state-premium {
   background: white;

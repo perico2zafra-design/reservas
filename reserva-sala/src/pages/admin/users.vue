@@ -41,19 +41,20 @@
               grow
               hide-slider
               class="tabs-elite-full"
+              :show-arrows="false"
             >
-              <v-tab value="PENDING" class="tab-item-elite text-none">
-              <v-icon start icon="mdi-account-clock" size="18" />
-              Solicitudes
-              <span v-if="pendingCount > 0" class="badge-custom-elite ms-2">{{ pendingCount }}</span>
-            </v-tab>
-              <v-tab value="APPROVED" class="tab-item-elite text-none">
-                <v-icon start icon="mdi-account-check" size="18" />
-                Activos
+              <v-tab value="PENDING" class="tab-item-elite text-none px-2 px-md-4">
+                <v-icon :start="!$vuetify.display.mobile" icon="mdi-account-clock" size="18" />
+                <span class="tab-text-elite">{{ $vuetify.display.mobile ? 'Pend.' : 'Solicitudes' }}</span>
+                <span v-if="pendingCount > 0" class="badge-custom-elite ms-1">{{ pendingCount }}</span>
               </v-tab>
-              <v-tab value="BLOCKED" class="tab-item-elite text-none">
-                <v-icon start icon="mdi-account-cancel" size="18" />
-                Sancionados
+              <v-tab value="APPROVED" class="tab-item-elite text-none px-2 px-md-4">
+                <v-icon :start="!$vuetify.display.mobile" icon="mdi-account-check" size="18" />
+                <span class="tab-text-elite">{{ $vuetify.display.mobile ? 'Act.' : 'Activos' }}</span>
+              </v-tab>
+              <v-tab value="BLOCKED" class="tab-item-elite text-none px-2 px-md-4">
+                <v-icon :start="!$vuetify.display.mobile" icon="mdi-account-cancel" size="18" />
+                <span class="tab-text-elite">{{ $vuetify.display.mobile ? 'Sanc.' : 'Sancionados' }}</span>
               </v-tab>
             </v-tabs>
           </div>
@@ -88,7 +89,7 @@
     </v-container>
 
     <!-- Diálogo de Bloqueo Temporal (Sancionar) -->
-    <v-dialog v-model="blockDialog" max-width="440" persistent transition="dialog-bottom-transition">
+    <v-dialog v-model="blockDialog" max-width="440" transition="dialog-bottom-transition">
       <v-card rounded="xl" class="elite-dark-modal overflow-hidden">
         <div class="elite-modal-glow bg-amber"></div>
         <div class="pa-8">
@@ -343,20 +344,31 @@ onMounted(fetchUsers)
 
 .tabs-elite-full :deep(.v-tab) {
   flex: 1;
-  height: 52px !important;
-  font-size: 0.85rem !important;
+  height: 48px !important;
+  font-size: 0.75rem !important;
   font-weight: 800 !important;
   color: #64748b !important;
   text-transform: uppercase !important;
-  letter-spacing: 1.5px !important;
+  letter-spacing: 0.5px !important;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 12px !important;
+  min-width: auto !important;
 }
 
 .tabs-elite-full :deep(.v-tab--selected) {
   background: #0f172a !important;
   color: #fbbf24 !important;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3) !important;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.2) !important;
+}
+
+@media (max-width: 600px) {
+  .tab-text-elite {
+    font-size: 0.65rem;
+    margin-left: 4px;
+  }
+  .tabs-elite-full :deep(.v-tab) {
+    padding: 0 8px !important;
+  }
 }
 
 .tabs-elite-full :deep(.v-tab__slider) {
