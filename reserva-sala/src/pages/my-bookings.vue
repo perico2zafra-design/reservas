@@ -1,132 +1,130 @@
 <template>
-  <div class="bookings-page dashboard-container">
-    <div class="panel-mesh-glow"></div>
-    
-    <v-container class="pt-6 pb-12 px-4 px-md-8 position-relative z-10">
-      <!-- Header Section -->
-      <div class="d-flex flex-column flex-md-row align-md-center justify-space-between mb-10">
-        <div>
-          <div class="d-flex align-center mb-3">
-            <div class="section-accent me-4"></div>
-            <h1 class="text-h3 font-weight-black text-slate-900 section-title text-playfair">Mis Reservas</h1>
-          </div>
-          <p class="text-slate-500 text-h6 font-weight-light ml-4 opacity-80">
-            Gestiona tus espacios y consulta tu historial de eventos
-          </p>
-        </div>
-        
-        <v-btn
-          to="/"
-          color="primary"
-          prepend-icon="mdi-plus"
-          size="large"
-          rounded="xl"
-          class="font-weight-black elevation-12 mt-4 mt-md-0 btn-elite-action"
-        >
-          Nueva Reserva
-        </v-btn>
-      </div>
+  <div class="bookings-page-elite">
+    <div class="elite-top-accent"></div>
 
-      <!-- Filters & Stats -->
-      <v-row class="mb-6">
+    <v-container class="pt-4 pt-md-6 pb-12 px-4 px-md-10 main-content-limit">
+      <!-- Header Section: Minimal & Compact -->
+      <v-row no-gutters align="center" class="mb-6">
+        <v-col cols="auto" class="d-flex">
+          <div class="elite-gold-marker-small me-3 align-self-stretch"></div>
+          <h1
+            class="page-title-compact-elite text-slate-900 text-playfair mb-0 mt-0 d-flex align-center"
+          >
+            Mis <span class="text-indigo-darken-4 ms-2">Reservas</span>
+          </h1>
+        </v-col>
+
+        <v-spacer></v-spacer>
+
+        <v-col cols="auto">
+          <v-btn
+            to="/"
+            color="indigo-darken-4"
+            prepend-icon="mdi-plus"
+            size="default"
+            rounded="lg"
+            class="font-weight-black btn-elite-small"
+            height="40"
+          >
+            NUEVA RESERVA
+          </v-btn>
+        </v-col>
+      </v-row>
+
+      <!-- Filters: 100% Width & 50/50 Split -->
+      <v-row class="mb-8">
         <v-col cols="12">
-          <v-card rounded="24" class="glass-tabs-card pa-1 border-0">
+          <div class="tabs-container-full pa-1">
             <v-tabs
               v-model="activeTab"
-              color="primary"
-              align-tabs="start"
+              color="white"
+              grow
               hide-slider
-              class="elite-tabs"
+              class="tabs-elite-pro-full"
             >
-              <v-tab value="upcoming" class="rounded-xl px-6 text-none font-weight-bold">
-                <v-icon start icon="mdi-calendar-clock" class="me-2" />
-                Próximas
-                <v-badge
-                  v-if="upcomingBookings.length > 0"
-                  color="primary"
-                  :content="upcomingBookings.length"
-                  inline
-                  class="ms-2"
-                />
+              <v-tab
+                value="upcoming"
+                class="tab-half text-none font-weight-black"
+              >
+                <v-icon start icon="mdi-calendar-check" size="18" />
+                PRÓXIMAS ({{ upcomingBookings.length }})
               </v-tab>
-              <v-tab value="past" class="rounded-xl px-6 text-none font-weight-bold">
-                <v-icon start icon="mdi-history" class="me-2" />
-                Historial
+              <v-tab value="past" class="tab-half text-none font-weight-black">
+                <v-icon start icon="mdi-history" size="18" />
+                HISTORIAL
               </v-tab>
             </v-tabs>
-          </v-card>
+          </div>
         </v-col>
       </v-row>
 
       <!-- Content Area -->
-      <v-window v-model="activeTab" class="bg-transparent mt-4">
-        <!-- Upcoming Tab -->
-        <v-window-item value="upcoming">
-          <div v-if="upcomingBookings.length === 0" class="empty-state-elite text-center py-12">
-            <div class="illustration-container mb-8">
-              <v-img
-                src="/empty_bookings_illustration.png"
-                max-width="400"
-                class="mx-auto floating-anim"
-                alt="No bookings"
-              />
-            </div>
-            <h2 class="text-h5 font-weight-black text-slate-800 mb-2">No tienes reservas activas</h2>
-            <p class="text-slate-500 mb-8 max-width-text mx-auto">
-              Parece que aún no has reservado ningún espacio. ¡Anímate a disfrutar de las instalaciones del Residencial Campus!
-            </p>
+      <v-window v-model="activeTab" class="bg-transparent overflow-visible-elite">
+        <v-window-item value="upcoming" class="overflow-visible-elite">
+          <div
+            v-if="upcomingBookings.length === 0"
+            class="empty-state-compact py-12 px-6"
+          >
+            <v-icon
+              icon="mdi-calendar-blank"
+              size="48"
+              color="indigo-lighten-4"
+              class="mb-4"
+            />
+            <h2 class="text-h6 font-weight-black text-slate-900">
+              Sin reservas activas
+            </h2>
             <v-btn
               to="/"
-              variant="outlined"
+              variant="text"
               color="primary"
-              rounded="xl"
-              class="font-weight-black px-8"
-              size="large"
+              class="mt-2 font-weight-black"
+              >Explorar Salas</v-btn
             >
-              Explorar Salas
-            </v-btn>
           </div>
 
-          <v-fade-transition group>
-            <BookingCard 
-              v-for="booking in upcomingBookings" 
+          <div class="bookings-grid-elite">
+            <BookingCard
+              v-for="booking in upcomingBookings"
               :key="booking.id"
               :booking="booking"
-              class="booking-card-elite mb-6"
             >
               <template #actions>
-                <v-btn 
-                  v-if="booking.status === 'CONFIRMED' || booking.status === 'PENDING'"
-                  variant="tonal" 
-                  color="error" 
-                  size="small" 
-                  rounded="xl"
-                  prepend-icon="mdi-cancel"
-                  class="font-weight-black px-4"
+                <v-btn
+                  v-if="
+                    booking.status === 'CONFIRMED' ||
+                    booking.status === 'PENDING'
+                  "
+                  color="red-darken-4"
+                  size="small"
+                  rounded="lg"
+                  variant="tonal"
+                  prepend-icon="mdi-close"
+                  class="font-weight-black btn-cancel-compact"
                   @click="cancelBooking(booking.id)"
                 >
                   Cancelar
                 </v-btn>
               </template>
             </BookingCard>
-          </v-fade-transition>
+          </div>
         </v-window-item>
 
-        <!-- Past Tab -->
         <v-window-item value="past">
-          <div v-if="pastBookings.length === 0" class="text-center py-16 opacity-60">
-            <v-icon icon="mdi-history" size="64" color="slate-300" class="mb-4" />
-            <h3 class="text-h6 text-slate-400">No hay reservas anteriores</h3>
+          <div v-if="pastBookings.length === 0" class="text-center py-12">
+            <h3 class="text-subtitle-1 text-slate-400 font-weight-bold">
+              Historial vacío
+            </h3>
           </div>
 
-          <v-fade-transition group>
-            <BookingCard 
-              v-for="booking in pastBookings" 
+          <div class="bookings-grid-elite">
+            <BookingCard
+              v-for="booking in pastBookings"
               :key="booking.id"
               :booking="booking"
-              class="booking-card-elite past-booking opacity-80 mb-6"
+              class="past-booking-compact"
             />
-          </v-fade-transition>
+          </div>
         </v-window-item>
       </v-window>
     </v-container>
@@ -134,145 +132,136 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue'
-import { useBookingStore } from '@/stores/booking'
-import { useAuthStore } from '@/stores/auth'
-import BookingCard from '@/components/common/BookingCard.vue'
+import { onMounted, computed, ref } from "vue";
+import { useBookingStore } from "@/stores/booking";
+import { useAuthStore } from "@/stores/auth";
+import BookingCard from "@/components/common/BookingCard.vue";
 
-const bookingStore = useBookingStore()
-const authStore = useAuthStore()
-const activeTab = ref('upcoming')
+const bookingStore = useBookingStore();
+const authStore = useAuthStore();
+const activeTab = ref("upcoming");
 
 const userBookings = computed(() => {
   return bookingStore.bookings
-    .filter(b => b.user_id === authStore.user?.id)
-    .sort((a, b) => new Date(b.booking_date).getTime() - new Date(a.booking_date).getTime())
-})
+    .filter((b) => b.user_id === authStore.user?.id)
+    .sort(
+      (a, b) =>
+        new Date(b.booking_date).getTime() - new Date(a.booking_date).getTime(),
+    );
+});
 
 const upcomingBookings = computed(() => {
-  const today = new Date().setHours(0,0,0,0)
-  return userBookings.value.filter(b => {
-    const bookingDate = new Date(b.booking_date).getTime()
-    return bookingDate >= today && b.status !== 'CANCELLED'
-  })
-})
+  const today = new Date().setHours(0, 0, 0, 0);
+  return userBookings.value.filter((b) => {
+    const bookingDate = new Date(b.booking_date).getTime();
+    return bookingDate >= today && b.status !== "CANCELLED";
+  });
+});
 
 const pastBookings = computed(() => {
-  const today = new Date().setHours(0,0,0,0)
-  return userBookings.value.filter(b => {
-    const bookingDate = new Date(b.booking_date).getTime()
-    return bookingDate < today || b.status === 'CANCELLED'
-  })
-})
+  const today = new Date().setHours(0, 0, 0, 0);
+  return userBookings.value.filter((b) => {
+    const bookingDate = new Date(b.booking_date).getTime();
+    return bookingDate < today || b.status === "CANCELLED";
+  });
+});
 
 const cancelBooking = async (id: number) => {
-  if (confirm('¿Estás seguro de que quieres cancelar esta reserva?')) {
-    await bookingStore.cancelBooking(id)
+  if (confirm("¿Estás seguro de que quieres cancelar esta reserva?")) {
+    await bookingStore.cancelBooking(id);
   }
-}
+};
 
 onMounted(() => {
-  bookingStore.fetchBookings()
-})
+  bookingStore.fetchBookings();
+});
 </script>
 
 <style scoped>
-.bookings-page {
-  position: relative;
+.bookings-page-elite {
   min-height: 100vh;
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.03) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(30, 27, 75, 0.02) 0px, transparent 50%);
 }
 
-.panel-mesh-glow {
-  position: absolute;
-  top: -10%;
-  right: -5%;
-  width: 60%;
-  height: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(99, 102, 241, 0.08) 0%,
-    transparent 70%
-  );
-  filter: blur(100px);
-  z-index: 0;
+.overflow-visible-elite {
+  overflow: visible !important;
 }
 
-.section-accent {
-  width: 4px;
-  height: 32px;
-  background: linear-gradient(to bottom, #6366f1, #4338ca);
-  border-radius: 4px;
+.bookings-grid-elite {
+  padding: 12px 4px; /* Espacio para el hover */
 }
 
-.section-title {
+.elite-top-accent {
+  height: 4px;
+  background: linear-gradient(to right, #d97706, #fbbf24);
+}
+
+.elite-gold-marker-small {
+  width: 5px;
+  background: #d97706;
+  border-radius: 2px;
+}
+
+.page-title-compact-elite {
+  font-size: 2.25rem;
+  line-height: 1;
+  font-weight: 900;
   letter-spacing: -1px;
 }
 
-.glass-tabs-card {
-  background: rgba(255, 255, 255, 0.5) !important;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+.btn-elite-small {
+  font-size: 0.75rem !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
 }
 
-.elite-tabs :deep(.v-tab) {
-  transition: all 0.3s ease;
+.tabs-container-full {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.tabs-elite-pro-full :deep(.v-tab) {
+  flex: 1;
+  height: 44px !important;
+  font-size: 0.8rem !important;
   color: #64748b !important;
-}
-
-.elite-tabs :deep(.v-tab--selected) {
-  background: #6366f1 !important;
-  color: white !important;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
-
-.empty-state-elite {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.max-width-text {
-  max-width: 400px;
-}
-
-.illustration-container {
-  perspective: 1000px;
-}
-
-.floating-anim {
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(1deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
-}
-
-.btn-elite-action {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn-elite-action:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4) !important;
+.tabs-elite-pro-full :deep(.v-tab--selected) {
+  background: #1e1b4b !important;
+  color: white !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(30, 27, 75, 0.3);
 }
 
-.booking-card-elite {
-  transition: all 0.3s ease;
+.empty-state-compact {
+  background: white;
+  border: 1px dashed #e2e8f0;
+  border-radius: 16px;
+  text-align: center;
 }
 
-.past-booking {
-  filter: grayscale(0.5);
+.past-booking-compact {
+  opacity: 0.6;
 }
 
-.dashboard-container {
-  background: #f8fafc;
+.main-content-limit {
+  max-width: 1000px;
+}
+
+.btn-cancel-compact {
+  font-size: 0.7rem !important;
+  height: 32px !important;
 }
 
 @media (max-width: 600px) {
-  .section-title {
-    font-size: 1.75rem !important;
+  .page-title-compact-elite {
+    font-size: 1.25rem;
   }
 }
 </style>
-

@@ -1,79 +1,65 @@
 <template>
   <v-card 
-    rounded="24" 
-    class="mb-6 pa-5 border-0 elevation-xl booking-card-elite"
+    flat 
+    class="mb-4 booking-card-elite"
   >
-    <div class="card-glass-bg"></div>
-    <v-row align="center" class="position-relative z-10">
-      <!-- Icono/Imagen de la Sala -->
-      <v-col cols="12" sm="3" class="d-flex justify-center justify-sm-start">
-        <div class="image-container-elite">
-          <v-img 
-            :src="booking.room?.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=200'" 
-            cover 
-            class="rounded-xl elite-image"
-          />
-          <div class="image-overlay"></div>
-        </div>
-      </v-col>
+    <v-container fluid class="pa-0">
+      <v-row no-gutters align="center">
+        <!-- Imagen: Con marco premium -->
+        <v-col cols="12" md="2" class="pa-3">
+          <div class="image-wrapper-elite">
+            <v-img 
+              :src="booking.room?.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=400'" 
+              cover 
+              class="rounded-lg main-image-elite"
+            />
+          </div>
+        </v-col>
 
-      <!-- Info Principal -->
-      <v-col cols="12" sm="5">
-        <div class="d-flex align-center mb-2 flex-wrap ga-2">
-          <h3 class="text-h6 font-weight-black text-slate-900 leading-tight">{{ booking.room?.name }}</h3>
-          <div :class="['status-badge-elite', booking.status.toLowerCase()]">
-            <span class="status-dot"></span>
-            {{ booking.status }}
+        <!-- Información: Tipografía refinada -->
+        <v-col cols="12" md="6" class="pa-4 ps-md-6 d-flex flex-column justify-center">
+          <div class="d-flex align-center mb-2 flex-wrap ga-3">
+            <h3 class="room-title-elite text-playfair">{{ booking.room?.name || 'SALA SOCIAL' }}</h3>
+            <div :class="['status-chip-elite', booking.status?.toLowerCase()]">
+              <span class="dot"></span>
+              {{ booking.status }}
+            </div>
           </div>
-        </div>
-        
-        <div class="d-flex flex-column ga-1">
-          <div class="d-flex align-center text-body-2 text-slate-500">
-            <v-icon icon="mdi-calendar-range" size="18" color="primary" class="me-2" />
-            <span class="font-weight-medium">{{ formatDate(booking.booking_date) }}</span>
+          
+          <div class="d-flex flex-row flex-wrap ga-5 mt-2">
+            <div class="d-flex align-center info-item-elite">
+              <v-icon icon="mdi-calendar-gold" color="amber-darken-3" size="20" class="me-2" />
+              <span>{{ formatDate(booking.booking_date) }}</span>
+            </div>
+            <div class="d-flex align-center info-item-elite">
+              <v-icon icon="mdi-clock-outline" color="amber-darken-3" size="20" class="me-2" />
+              <span>{{ formatTime(booking.start_time) }} — {{ formatTime(booking.end_time) }}</span>
+            </div>
           </div>
-          <div class="d-flex align-center text-body-2 text-slate-500">
-            <v-icon icon="mdi-clock-outline" size="18" color="primary" class="me-2" />
-            <span class="font-weight-medium">{{ formatTime(booking.start_time) }} - {{ formatTime(booking.end_time) }}</span>
-          </div>
-        </div>
+        </v-col>
 
-        <div v-if="isAdmin && booking.user" class="d-flex align-center mt-3 pt-3 border-top-light">
-          <InitialAvatar :name="booking.user.name" size="28" class="me-2 elevation-2" />
+        <!-- Pago y Acciones: Estilo Boutique -->
+        <v-col cols="12" md="4" class="pa-4 bg-elite-accent d-flex flex-row align-center justify-space-between border-left-elite">
           <div class="d-flex flex-column">
-            <span class="text-caption text-slate-400 font-weight-bold leading-tight">SOLICITANTE</span>
-            <span class="text-subtitle-2 font-weight-black text-slate-700 leading-tight">{{ booking.user.name }}</span>
+            <span class="label-mini-elite">DEPOSITO FIANZA</span>
+            <div class="price-box-elite">
+              <span class="currency">€</span>
+              <span class="amount text-playfair">{{ booking.deposit_amount }}</span>
+            </div>
+            <div class="status-pill-elite">{{ booking.deposit_status }}</div>
           </div>
-        </div>
-      </v-col>
-
-      <!-- Info de Pago / Fianza -->
-      <v-col cols="12" sm="4" class="text-sm-right d-flex flex-column align-sm-end">
-        <div class="price-tag-elite mb-1">
-          <span class="currency">€</span>
-          <span class="amount">{{ booking.deposit_amount }}</span>
-        </div>
-        
-        <v-chip 
-          :color="getStatusColor(booking.deposit_status)" 
-          size="x-small" 
-          variant="tonal" 
-          class="font-weight-black mb-4 elite-fianza-chip"
-        >
-          FIANZA {{ booking.deposit_status }}
-        </v-chip>
-        
-        <div class="d-flex ga-2 justify-sm-end w-100 mt-auto">
-          <slot name="actions"></slot>
-        </div>
-      </v-col>
-    </v-row>
+          
+          <div class="actions-wrapper-elite">
+            <slot name="actions"></slot>
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
   </v-card>
 </template>
 
 <script setup lang="ts">
-import { formatDate, formatCurrency, formatTime, getStatusColor } from '@/utils/formatters'
-import InitialAvatar from '@/components/common/InitialAvatar.vue'
+import { formatDate, formatTime } from '@/utils/formatters'
 import type { Booking } from '@/types'
 
 defineProps<{
@@ -84,122 +70,133 @@ defineProps<{
 
 <style scoped>
 .booking-card-elite {
-  position: relative;
-  overflow: hidden;
-  background: white !important;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(0, 0, 0, 0.03) !important;
-}
-
-.card-glass-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%);
-  z-index: 1;
+  background: linear-gradient(to right, #ffffff, #fafafa) !important;
+  border: 1px solid #e2e8f0 !important;
+  border-left: 4px solid #d97706 !important; /* El hilo de oro */
+  border-radius: 16px !important;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
 .booking-card-elite:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1) !important;
-  border-color: rgba(99, 102, 241, 0.2) !important;
+  transform: translateY(-4px) scale(1.005);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: #d97706 !important;
 }
 
-.image-container-elite {
-  position: relative;
-  width: 100%;
-  padding-top: 75%; /* 4:3 Aspect Ratio */
-  border-radius: 20px;
+.image-wrapper-elite {
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
 }
 
-.elite-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.5s ease;
+.main-image-elite {
+  height: 100px;
+  transition: transform 0.6s ease;
 }
 
-.booking-card-elite:hover .elite-image {
-  transform: scale(1.05);
+.booking-card-elite:hover .main-image-elite {
+  transform: scale(1.1);
 }
 
-.image-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to top, rgba(0,0,0,0.2) 0%, transparent 50%);
+.room-title-elite {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.5px;
 }
 
-.status-badge-elite {
-  display: inline-flex;
+.status-chip-elite {
+  display: flex;
   align-items: center;
   padding: 4px 12px;
   border-radius: 100px;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  background: white;
+  border: 1px solid #e2e8f0;
 }
 
-.status-dot {
+.status-chip-elite .dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  margin-right: 6px;
+  margin-right: 8px;
 }
 
-.confirmed { background: #ecfdf5; color: #059669; }
-.confirmed .status-dot { background: #10b981; }
+.confirmed { color: #15803d; border-color: #bbf7d0; }
+.confirmed .dot { background: #22c55e; }
 
-.pending { background: #fffbeb; color: #d97706; }
-.pending .status-dot { background: #f59e0b; }
+.pending { color: #b45309; border-color: #fef08a; }
+.pending .dot { background: #f59e0b; }
 
-.cancelled { background: #fef2f2; color: #dc2626; }
-.cancelled .status-dot { background: #ef4444; }
+.cancelled { color: #b91c1c; border-color: #fecaca; }
+.cancelled .dot { background: #ef4444; }
 
-.price-tag-elite {
-  color: #0f172a;
-  display: flex;
-  align-items: baseline;
-}
-
-.price-tag-elite .currency {
+.info-item-elite {
   font-size: 1rem;
   font-weight: 700;
-  margin-right: 2px;
+  color: #334155;
 }
 
-.price-tag-elite .amount {
-  font-size: 1.75rem;
+.bg-elite-accent {
+  background-color: #f8fafc;
+}
+
+.border-left-elite {
+  border-left: 1px solid #f1f5f9;
+}
+
+.label-mini-elite {
+  font-size: 0.6rem;
   font-weight: 900;
-  letter-spacing: -1px;
-}
-
-.elite-fianza-chip {
-  font-size: 0.6rem !important;
+  color: #94a3b8;
   letter-spacing: 1px;
 }
 
-.border-top-light {
-  border-top: 1px solid rgba(0,0,0,0.05);
+.price-box-elite {
+  display: flex;
+  align-items: baseline;
+  margin: 2px 0;
 }
 
-.leading-tight {
-  line-height: 1.2 !important;
+.price-box-elite .currency {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #d97706;
+  margin-right: 4px;
 }
 
-@media (max-width: 600px) {
-  .image-container-elite {
-    padding-top: 56.25%; /* 16:9 on mobile */
-    margin-bottom: 16px;
-  }
+.price-box-elite .amount {
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.status-pill-elite {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #1e293b;
+  background: #e2e8f0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.actions-wrapper-elite :deep(.v-btn) {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 900 !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+}
+
+/* Responsive */
+@media (max-width: 959px) {
+  .main-image-elite { height: 160px; }
+  .border-left-elite { border-left: none; border-top: 1px solid #f1f5f9; }
+  .bg-elite-accent { background-color: #fff; border-top: 1px solid #f1f5f9; }
 }
 </style>
