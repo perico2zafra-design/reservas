@@ -16,8 +16,8 @@
       <span class="nav-text">RESERVAS</span>
     </v-btn>
     
-    <v-btn v-if="isAdmin" to="/admin/users" value="admin">
-      <v-icon>mdi-shield-account-outline</v-icon>
+    <v-btn v-if="isAdmin" to="/admin" value="admin">
+      <v-icon>mdi-shield-crown-outline</v-icon>
       <span class="nav-text">ADMIN</span>
     </v-btn>
   </v-bottom-navigation>

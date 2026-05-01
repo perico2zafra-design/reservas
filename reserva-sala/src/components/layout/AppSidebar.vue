@@ -88,6 +88,7 @@ const menuItems = [
 ]
 
 const adminItems = [
+  { title: 'Panel de Control', icon: 'mdi-view-dashboard-outline', to: '/admin', color: 'amber-darken-1' },
   { title: 'Vecinos', icon: 'mdi-account-group-outline', to: '/admin/users', color: 'indigo' },
   { title: 'Instalaciones', icon: 'mdi-store-cog-outline', to: '/admin/rooms', color: 'pink-darken-1' },
   { title: 'Control Fianzas', icon: 'mdi-shield-check-outline', to: '/admin/bookings', color: 'cyan-darken-2' },
