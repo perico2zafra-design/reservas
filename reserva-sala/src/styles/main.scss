@@ -1,6 +1,6 @@
 /* Global Premium Styles */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 :root {
   --premium-shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -63,6 +63,21 @@ html, body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+.text-playfair {
+  font-family: 'Playfair Display', serif !important;
+}
+
+.text-slate-900 { color: #0f172a !important; }
+.text-slate-800 { color: #1e293b !important; }
+.text-slate-700 { color: #334155 !important; }
+.text-slate-600 { color: #475569 !important; }
+.text-slate-500 { color: #64748b !important; }
+.text-slate-400 { color: #94a3b8 !important; }
+.text-slate-300 { color: #cbd5e1 !important; }
+
+.opacity-60 { opacity: 0.6; }
+.opacity-80 { opacity: 0.8; }
 
 .v-card--variant-elevated {
   box-shadow: var(--premium-shadow) !important;
