@@ -5,10 +5,10 @@
     <div class="elite-top-accent"></div>
 
     <v-container
-      class="pt-10 pb-6 px-4 px-md-10 main-content-limit position-relative z-10"
+      class="pt-6 pb-6 px-4 px-md-10 main-content-limit position-relative z-10"
     >
       <!-- Header Section -->
-      <v-row no-gutters align="center" class="mb-12">
+      <v-row no-gutters align="center" class="mb-8">
         <v-col cols="12" md="8" class="d-flex align-center">
           <div class="elite-gold-marker-thick me-5"></div>
           <div>
@@ -51,7 +51,7 @@
         <!-- Info Card: Glassmorphism style -->
         <v-col cols="12" lg="8">
           <div
-            class="elite-glass-card pa-8 pa-md-12 position-relative overflow-hidden mb-8"
+            class="elite-glass-card pa-6 pa-md-8 position-relative overflow-hidden mb-8"
           >
             <div class="glass-shine"></div>
 
@@ -90,19 +90,22 @@
                 </div>
               </v-col>
 
-            <div class="info-block-elite">
-              <div class="info-label">LÍMITE DE RESERVAS POR VECINO</div>
-              <div class="info-value d-flex align-center">
-                <v-icon icon="mdi-calendar-check" size="24" class="me-3 text-amber-darken-1" />
-                {{ form.max_bookings_per_month }} reservas / mes natural
-              </div>
-              <div class="gold-line-under"></div>
-            </div>
+              <v-col cols="12">
+                <div class="info-group-ultimate">
+                  <label>LÍMITE DE RESERVAS POR VECINO</label>
+                  <div class="info-content d-flex align-center">
+                    <v-icon icon="mdi-calendar-check" size="24" class="me-3 text-amber-darken-1" />
+                    {{ form.max_bookings_per_month }} reservas / mes natural
+                  </div>
+                  <div class="gold-line-under"></div>
+                </div>
+              </v-col>
 
-            <v-divider class="my-10 opacity-10" />
-
-            <div class="info-block-elite">
-              <div class="info-label">NORMATIVA Y GOBERNANZA</div>
+              <v-col cols="12">
+                <v-divider class="my-6 opacity-10" />
+                <div class="info-group-ultimate">
+                  <label>NORMATIVA Y GOBERNANZA</label>
+                  <div class="info-text-box mt-4">
                     {{
                       form.urbanization_details ||
                       "Los estatutos de la comunidad definen un entorno de convivencia exclusiva y respetuosa."
@@ -369,10 +372,10 @@ onMounted(fetchSettings);
 }
 
 .page-title-ultimate {
-  font-size: 3.25rem;
-  line-height: 0.8;
+  font-size: 2.25rem;
+  line-height: 1;
   font-weight: 900;
-  letter-spacing: -2.5px;
+  letter-spacing: -1.5px;
   color: #0f172a;
 }
 
@@ -391,7 +394,7 @@ onMounted(fetchSettings);
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.8) !important;
-  border-radius: 32px !important;
+  border-radius: 24px !important;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02) !important;
 }
 
@@ -430,10 +433,10 @@ onMounted(fetchSettings);
 }
 
 .info-content {
-  font-size: 1.75rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #0f172a;
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 .gold-line-under {
@@ -516,13 +519,13 @@ onMounted(fetchSettings);
 
 @media (max-width: 600px) {
   .page-title-ultimate {
-    font-size: 2.25rem;
+    font-size: 1.75rem;
   }
   .info-content {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
   }
   .elite-glass-card {
-    padding: 24px !important;
+    padding: 20px !important;
   }
 }
 </style>
