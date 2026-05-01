@@ -17,11 +17,17 @@ export const getSettings = async (req: Request, res: Response) => {
 
 export const updateSettings = async (req: Request, res: Response) => {
   try {
-    const { name, address, urbanization_details } = req.body;
+    const { name, address, urbanization_details, max_bookings_per_month } = req.body;
 
     const { data, error } = await supabase
       .from('site_settings')
-      .update({ name, address, urbanization_details, updated_at: new Date() })
+      .update({ 
+        name, 
+        address, 
+        urbanization_details, 
+        max_bookings_per_month,
+        updated_at: new Date() 
+      })
       .eq('id', 1)
       .select()
       .single();

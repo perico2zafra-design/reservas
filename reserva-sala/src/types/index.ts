@@ -52,5 +52,6 @@ export interface SiteSettings {
   name: string;
   address: string;
   urbanization_details: string;
+  max_bookings_per_month: number;
   updated_at: string;
 }

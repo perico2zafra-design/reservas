@@ -90,10 +90,19 @@
                 </div>
               </v-col>
 
-              <v-col cols="12">
-                <div class="info-group-ultimate">
-                  <label>NORMATIVA Y GOBERNANZA</label>
-                  <div class="info-text-box mt-4">
+            <div class="info-block-elite">
+              <div class="info-label">LÍMITE DE RESERVAS POR VECINO</div>
+              <div class="info-value d-flex align-center">
+                <v-icon icon="mdi-calendar-check" size="24" class="me-3 text-amber-darken-1" />
+                {{ form.max_bookings_per_month }} reservas / mes natural
+              </div>
+              <div class="gold-line-under"></div>
+            </div>
+
+            <v-divider class="my-10 opacity-10" />
+
+            <div class="info-block-elite">
+              <div class="info-label">NORMATIVA Y GOBERNANZA</div>
                     {{
                       form.urbanization_details ||
                       "Los estatutos de la comunidad definen un entorno de convivencia exclusiva y respetuosa."
@@ -212,6 +221,22 @@
                 />
               </v-col>
 
+              <v-col cols="12" md="6">
+                <div class="dark-input-label">Límite Reservas / Mes</div>
+                <v-text-field
+                  v-model.number="form.max_bookings_per_month"
+                  type="number"
+                  variant="solo"
+                  flat
+                  bg-color="rgba(255,255,255,0.03)"
+                  class="elite-input-field"
+                  rounded="lg"
+                  min="1"
+                  max="30"
+                  prepend-inner-icon="mdi-counter"
+                />
+              </v-col>
+
               <v-col cols="12">
                 <label class="dark-input-label">Estatutos y Normativa</label>
                 <v-textarea
@@ -258,6 +283,7 @@ const form = reactive({
   name: "",
   address: "",
   urbanization_details: "",
+  max_bookings_per_month: 2,
 });
 
 const fetchSettings = async () => {
@@ -265,7 +291,18 @@ const fetchSettings = async () => {
     const data = await siteService.getSettings();
     form.name = data.name;
     form.address = data.address;
-    form.urbanization_details = data.urbanization_details;
+    form.max_bookings_per_month = data.max_bookings_per_month || 2;
+    form.urbanization_details = data.urbanization_details || `REGLAMENTO DE USO - SALÓN SOCIAL (ACUERDO JUNTA 15/04/2026):
+
+1. HORARIO: 09:00h a 23:59h. Cerrado 24, 25, 31 Dic y 1, 5, 6 Ene.
+2. AFORO MÁXIMO: 50 personas. Prohibido acceso al gimnasio.
+3. RESERVAS: Máximo 2 al mes natural por propietario. Intransferibles.
+4. LIMPIEZA: El salón debe quedar recogido y limpio. Basura depositada en contenedores externos.
+5. PROHIBICIONES: Fumar/vapear, actividades ilegales, ruidos excesivos, fijar objetos en paredes o pintar.
+6. FIANZA: Obligatoria de 50€. Se devolverá tras comprobar el estado.
+7. RESPONSABILIDAD: El titular de la reserva responde por daños y comportamiento de invitados.
+
+El incumplimiento conlleva sanciones de 1 a 6 meses de suspensión o definitiva según gravedad.`;
   } catch (err) {
     console.error("Error al cargar ajustes:", err);
   }

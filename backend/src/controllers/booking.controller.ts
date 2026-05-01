@@ -43,23 +43,28 @@ export const createBookingPaymentIntent = async (req: Request, res: Response) =>
     const { roomId, bookingDate, startTime, endTime } = req.body;
     const userId = (req as any).user.id;
 
-    // 1. Verificar límite de reservas por propietario (Máximo 2 al mes según acta)
-    const firstDayOfMonth = new Date();
-    firstDayOfMonth.setDate(1);
-    firstDayOfMonth.setHours(0,0,0,0);
+    // 0. Obtener configuración dinámica
+    const { data: settings } = await supabase.from('site_settings').select('max_bookings_per_month').single();
+    const MAX_LIMIT = settings?.max_bookings_per_month || 2;
+
+    // 1. Verificar límite de reservas por propietario (Máximo X al mes natural según acta)
+    const targetDate = new Date(bookingDate);
+    const firstDayOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+    const lastDayOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0);
 
     const { count, error: countError } = await supabase
       .from('bookings')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
-      .gte('booking_date', firstDayOfMonth.toISOString().split('T')[0]);
+      .gte('booking_date', firstDayOfMonth.toISOString().split('T')[0])
+      .lte('booking_date', lastDayOfMonth.toISOString().split('T')[0]);
 
     if (countError) throw countError;
 
-    if (count !== null && count >= 2) {
+    if (count !== null && count >= MAX_LIMIT) {
       return res.status(403).json({ 
         error: 'Límite mensual alcanzado', 
-        message: 'Según las normas de la comunidad (Punto 4 del acta), el máximo es de 2 reservas al mes por propietario.' 
+        message: `Para el mes de ${targetDate.toLocaleString('es-ES', { month: 'long' })}, ya has alcanzado el máximo de ${MAX_LIMIT} reservas permitido por propietario.` 
       });
     }
 
