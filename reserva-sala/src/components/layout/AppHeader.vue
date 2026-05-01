@@ -1,11 +1,19 @@
 <template>
   <v-app-bar flat class="header-premium px-6" height="70">
-    <v-app-bar-nav-icon v-if="!$vuetify.display.mobile" @click="$emit('toggle-drawer')" class="icon-btn-refined" />
-    
+    <v-app-bar-nav-icon
+      v-if="!$vuetify.display.mobile"
+      @click="$emit('toggle-drawer')"
+      class="icon-btn-refined"
+    />
+
     <!-- Mobile Brand Identity -->
     <div v-if="$vuetify.display.mobile" class="d-flex align-center">
       <div class="mobile-brand-mark me-3 d-flex align-center justify-center">
-        <v-icon icon="mdi-shield-crown-outline" color="amber-darken-1" size="18" />
+        <v-icon
+          icon="mdi-shield-crown-outline"
+          color="amber-darken-1"
+          size="18"
+        />
       </div>
       <div class="d-flex flex-column">
         <span class="mobile-brand-top">RESIDENCIAL</span>
@@ -14,35 +22,117 @@
     </div>
 
     <v-spacer />
-    
+
     <div class="d-flex align-center ga-3">
-      <v-btn icon="mdi-bell-outline" variant="text" size="small" class="icon-btn-refined" />
-      
-      <v-menu location="bottom end" transition="slide-y-transition">
+      <v-btn
+        icon="mdi-bell-outline"
+        variant="text"
+        size="small"
+        class="icon-btn-refined"
+      />
+
+      <v-menu location="bottom end" transition="slide-y-transition" offset="15">
         <template v-slot:activator="{ props }">
-          <div v-bind="props" class="d-flex align-center cursor-pointer profile-trigger ms-2">
+          <div
+            v-bind="props"
+            class="d-flex align-center cursor-pointer profile-trigger ms-2"
+          >
             <div class="text-right me-3 d-none d-sm-block">
-              <div class="text-subtitle-2 font-weight-black text-white-op leading-tight">{{ userName }}</div>
-              <div class="text-caption font-weight-bold text-amber-op text-uppercase letter-spacing-lg">{{ userRole }}</div>
+              <div
+                class="text-subtitle-2 font-weight-black text-white-op leading-tight"
+              >
+                {{ userName }}
+              </div>
+              <div
+                class="text-caption font-weight-bold text-amber-op text-uppercase letter-spacing-lg"
+              >
+                {{ userRole }}
+              </div>
             </div>
-            <v-avatar v-if="avatarUrl" :size="$vuetify.display.mobile ? 34 : 38" class="elevation-4 border-2 border-white">
+            <v-avatar
+              v-if="avatarUrl"
+              :size="$vuetify.display.mobile ? 34 : 38"
+              class="elevation-4 border-2 border-white"
+            >
               <v-img :src="avatarUrl" cover />
             </v-avatar>
-            <v-avatar v-else :size="$vuetify.display.mobile ? 34 : 38" class="elevation-4 premium-avatar border-2 border-white">
+            <v-avatar
+              v-else
+              :size="$vuetify.display.mobile ? 34 : 38"
+              class="elevation-4 premium-avatar border-2 border-white"
+            >
               <span>{{ initials }}</span>
             </v-avatar>
+            <v-icon
+              icon="mdi-chevron-down"
+              size="14"
+              color="rgba(255,255,255,0.3)"
+              class="ms-1"
+            />
           </div>
         </template>
-        <v-list rounded="24" class="mt-4 pa-2 glass-panel" width="240">
-          <v-list-item prepend-icon="mdi-account-circle-outline" title="Mi Perfil" to="/settings" rounded="xl" class="py-3 font-weight-bold" />
-          <v-divider class="my-2 opacity-5" />
-          <v-list-item 
-            prepend-icon="mdi-logout" 
-            title="Cerrar Sesión" 
-            rounded="xl" 
-            class="py-3 font-weight-bold logout-menu-item" 
-            @click="$emit('logout')" 
-          />
+
+        <v-list class="dropdown-premium pa-0" width="280">
+          <!-- User Profile Header in Dropdown -->
+          <div class="pa-5 dropdown-header">
+            <div class="d-flex align-center mb-1">
+              <div class="elite-gold-marker-header me-3"></div>
+              <span class="text-overline text-amber-op">Cuenta Premium</span>
+            </div>
+            <div class="text-h6 text-playfair text-white mb-0">
+              {{ userName }}
+            </div>
+            <div class="text-caption text-slate-400">{{ userRole }}</div>
+          </div>
+
+          <v-divider class="border-white-op" />
+
+          <div class="pa-2">
+            <v-list-item
+              prepend-icon="mdi-account-outline"
+              title="Mi Perfil"
+              to="/settings"
+              class="menu-item-premium py-3"
+              rounded="lg"
+            >
+              <template v-slot:append>
+                <v-icon icon="mdi-chevron-right" size="14" class="opacity-30" />
+              </template>
+            </v-list-item>
+
+            <v-list-item
+              prepend-icon="mdi-calendar-clock"
+              title="Mis Reservas"
+              to="/my-bookings"
+              class="menu-item-premium py-3"
+              rounded="lg"
+            >
+              <template v-slot:append>
+                <v-icon icon="mdi-chevron-right" size="14" class="opacity-30" />
+              </template>
+            </v-list-item>
+
+            <v-divider class="my-2 border-white-op" />
+
+            <v-list-item
+              prepend-icon="mdi-logout-variant"
+              title="Cerrar Sesión"
+              class="menu-item-premium py-3 logout-item"
+              rounded="lg"
+              @click="$emit('logout')"
+            >
+              <template v-slot:append>
+                <v-icon icon="mdi-power" size="14" class="opacity-50" />
+              </template>
+            </v-list-item>
+          </div>
+
+          <div class="dropdown-footer pa-3 text-center">
+            <span
+              class="text-tiny text-slate-500 text-uppercase letter-spacing-lg"
+              >Residencial Campus Elite</span
+            >
+          </div>
         </v-list>
       </v-menu>
     </div>
@@ -51,13 +141,13 @@
 
 <script setup lang="ts">
 defineProps<{
-  userName?: string
-  userRole?: string
-  avatarUrl?: string
-  initials: string
-}>()
+  userName?: string;
+  userRole?: string;
+  avatarUrl?: string;
+  initials: string;
+}>();
 
-defineEmits(['toggle-drawer', 'logout'])
+defineEmits(["toggle-drawer", "logout"]);
 </script>
 
 <style scoped>
@@ -103,7 +193,8 @@ defineEmits(['toggle-drawer', 'logout'])
 }
 
 .mobile-brand-mark {
-  width: 32px; height: 32px;
+  width: 32px;
+  height: 32px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 215, 0, 0.15);
   border-radius: 8px;
@@ -122,7 +213,7 @@ defineEmits(['toggle-drawer', 'logout'])
   font-weight: 400;
   letter-spacing: 1px;
   color: #ffffff;
-  font-family: 'Playfair Display', serif;
+  font-family: "Playfair Display", serif;
   line-height: 1.1;
 }
 
@@ -154,7 +245,7 @@ defineEmits(['toggle-drawer', 'logout'])
     height: 60px !important;
     padding: 0 12px !important;
   }
-  
+
   :deep(.v-toolbar__content) {
     height: 60px !important;
     padding: 0 12px !important;
@@ -165,5 +256,93 @@ defineEmits(['toggle-drawer', 'logout'])
     background: transparent !important;
     border: none !important;
   }
+}
+
+/* Dropdown Premium Styles */
+.dropdown-premium {
+  background: rgba(15, 23, 42, 0.95) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+  color: white !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.dropdown-header {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.03),
+    transparent
+  );
+}
+
+.elite-gold-marker-header {
+  width: 12px;
+  height: 2px;
+  background: #d4af37;
+  border-radius: 2px;
+}
+
+.border-white-op {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.menu-item-premium {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-family: "Outfit", sans-serif;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-item-premium :deep(.v-list-item-title) {
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+}
+
+.menu-item-premium:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: white !important;
+  transform: translateX(4px);
+}
+
+.menu-item-premium :deep(.v-icon) {
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.3s ease;
+}
+
+.menu-item-premium:hover :deep(.v-icon) {
+  color: #fbbf24;
+}
+
+.logout-item:hover {
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #ef4444 !important;
+}
+
+.logout-item:hover :deep(.v-icon) {
+  color: #ef4444;
+}
+
+.dropdown-footer {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.text-tiny {
+  font-size: 0.6rem;
+  font-weight: 800;
+}
+
+.text-slate-400 {
+  color: #94a3b8;
+}
+.text-slate-500 {
+  color: #64748b;
+}
+.opacity-30 {
+  opacity: 0.3;
+}
+.opacity-50 {
+  opacity: 0.5;
 }
 </style>

@@ -135,3 +135,55 @@ body {
 .hero-image-container:hover img {
   transform: scale(1.1);
 }
+
+/* Global Premium Dropdowns (Vuetify Overlays) */
+.v-overlay__content > .v-list,
+.v-overlay__content > .v-sheet {
+  background: rgba(15, 23, 42, 0.98) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 12px !important;
+  padding: 8px !important;
+  color: white !important;
+}
+
+.v-overlay__content .v-list-item {
+  border-radius: 8px !important;
+  margin-bottom: 4px !important;
+  transition: all 0.2s ease !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.v-overlay__content .v-list-item:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #fbbf24 !important;
+  transform: translateX(4px);
+}
+
+.v-overlay__content .v-list-item--active {
+  background: rgba(251, 191, 36, 0.1) !important;
+  color: #fbbf24 !important;
+}
+
+.v-overlay__content .v-list-item--active .v-list-item__overlay {
+  display: none !important;
+}
+
+.v-overlay__content .v-divider {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  margin: 8px 0 !important;
+}
+
+/* Custom Select Premium Look */
+.v-select .v-field--variant-outlined {
+  border-radius: 12px !important;
+  background: white !important;
+  transition: all 0.3s ease !important;
+}
+
+.v-select .v-field--focused {
+  border-color: #d4af37 !important;
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1) !important;
+}
