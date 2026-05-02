@@ -405,12 +405,31 @@ const timeSlots = computed(() => {
   const start = siteSettings.value?.start_hour || '09:00'
   const end = siteSettings.value?.end_hour || '23:59'
   
-  return [
-    { label: 'Mañana', range: `${start} - 14:00`, value: 'MORNING', icon: 'mdi-weather-sunny' },
+  const baseSlots = [
+    { label: 'Mañana', range: `${start} - 15:00`, value: 'MORNING', icon: 'mdi-weather-sunny' },
     { label: 'Tarde', range: `15:00 - ${end}`, value: 'AFTERNOON', icon: 'mdi-weather-sunset' },
     { label: 'Día Completo', range: `${start} - ${end}`, value: 'FULL_DAY', icon: 'mdi-white-balance-sunny' }
   ]
+
+  if (!selectedDate.value) return []
+  
+  const dateStr = new Date(selectedDate.value).toISOString().split('T')[0]
+  const dayBookings = roomBookings.value.filter(b => b.booking_date === dateStr)
+
+  return baseSlots.filter(slot => {
+    if (slot.value === 'MORNING') {
+      return !dayBookings.some(b => b.start_time < '12:00')
+    }
+    if (slot.value === 'AFTERNOON') {
+      return !dayBookings.some(b => b.start_time >= '15:00')
+    }
+    if (slot.value === 'FULL_DAY') {
+      return dayBookings.length === 0
+    }
+    return true
+  })
 })
+
 
 const meetingRules = computed(() => [
   `Máximo ${siteSettings.value?.max_bookings_per_month || 2} reservas al mes natural por propietario.`,
