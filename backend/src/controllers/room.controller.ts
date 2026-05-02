@@ -1,14 +1,9 @@
 import { Request, Response } from 'express';
-import { supabase } from '../lib/supabase.js';
+import { roomService } from '../services/room.service';
 
 export const getAllRooms = async (req: Request, res: Response) => {
   try {
-    const { data: rooms, error } = await supabase
-      .from('rooms')
-      .select('*')
-      .order('name', { ascending: true });
-    
-    if (error) throw error;
+    const rooms = await roomService.getAllRooms();
     res.json(rooms);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener salas' });
@@ -16,15 +11,8 @@ export const getAllRooms = async (req: Request, res: Response) => {
 };
 
 export const createRoom = async (req: Request, res: Response) => {
-  const { name, capacity, description, image, is_active, deposit_amount } = req.body;
   try {
-    const { data: room, error } = await supabase
-      .from('rooms')
-      .insert([{ name, capacity, description, image, is_active, deposit_amount }])
-      .select()
-      .single();
-
-    if (error) throw error;
+    const room = await roomService.createRoom(req.body);
     res.status(201).json(room);
   } catch (error) {
     res.status(500).json({ error: 'Error al crear sala' });
@@ -33,16 +21,8 @@ export const createRoom = async (req: Request, res: Response) => {
 
 export const updateRoom = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { name, capacity, description, image, is_active, deposit_amount } = req.body;
   try {
-    const { data: room, error } = await supabase
-      .from('rooms')
-      .update({ name, capacity, description, image, is_active, deposit_amount })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
+    const room = await roomService.updateRoom(id, req.body);
     res.json(room);
   } catch (error) {
     res.status(500).json({ error: 'Error al actualizar sala' });
@@ -52,8 +32,7 @@ export const updateRoom = async (req: Request, res: Response) => {
 export const deleteRoom = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const { error } = await supabase.from('rooms').delete().eq('id', id);
-    if (error) throw error;
+    await roomService.deleteRoom(id);
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: 'Error al eliminar sala' });
@@ -64,13 +43,7 @@ export const deleteRoom = async (req: Request, res: Response) => {
 export const getRoomSchedules = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const { data, error } = await supabase
-      .from('room_schedules')
-      .select('*')
-      .eq('room_id', id)
-      .order('day_of_week', { ascending: true })
-      .order('start_time', { ascending: true });
-    if (error) throw error;
+    const data = await roomService.getRoomSchedules(id);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener horarios' });
@@ -79,14 +52,8 @@ export const getRoomSchedules = async (req: Request, res: Response) => {
 
 export const addRoomSchedule = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { day_of_week, start_time, end_time } = req.body;
   try {
-    const { data, error } = await supabase
-      .from('room_schedules')
-      .insert([{ room_id: id, day_of_week, start_time, end_time }])
-      .select()
-      .single();
-    if (error) throw error;
+    const data = await roomService.addRoomSchedule(id, req.body);
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ error: 'Error al añadir horario' });
@@ -96,8 +63,7 @@ export const addRoomSchedule = async (req: Request, res: Response) => {
 export const deleteRoomSchedule = async (req: Request, res: Response) => {
   const { slotId } = req.params;
   try {
-    const { error } = await supabase.from('room_schedules').delete().eq('id', slotId);
-    if (error) throw error;
+    await roomService.deleteRoomSchedule(slotId);
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: 'Error al eliminar horario' });
@@ -108,12 +74,7 @@ export const deleteRoomSchedule = async (req: Request, res: Response) => {
 export const getRoomExceptions = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const { data, error } = await supabase
-      .from('room_exceptions')
-      .select('*')
-      .eq('room_id', id)
-      .order('exception_date', { ascending: true });
-    if (error) throw error;
+    const data = await roomService.getRoomExceptions(id);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener excepciones' });
@@ -122,14 +83,8 @@ export const getRoomExceptions = async (req: Request, res: Response) => {
 
 export const addRoomException = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { exception_date, reason } = req.body;
   try {
-    const { data, error } = await supabase
-      .from('room_exceptions')
-      .insert([{ room_id: id, exception_date, reason }])
-      .select()
-      .single();
-    if (error) throw error;
+    const data = await roomService.addRoomException(id, req.body);
     res.status(201).json(data);
   } catch (error) {
     res.status(500).json({ error: 'Error al añadir excepción' });
@@ -139,10 +94,10 @@ export const addRoomException = async (req: Request, res: Response) => {
 export const deleteRoomException = async (req: Request, res: Response) => {
   const { excId } = req.params;
   try {
-    const { error } = await supabase.from('room_exceptions').delete().eq('id', excId);
-    if (error) throw error;
+    await roomService.deleteRoomException(excId);
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: 'Error al eliminar excepción' });
   }
 };
+

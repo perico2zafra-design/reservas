@@ -88,117 +88,47 @@
       </div>
     </v-container>
 
-    <!-- Diálogo de Bloqueo Temporal (Sancionar) -->
-    <v-dialog v-model="blockDialog" max-width="440" transition="dialog-bottom-transition">
-      <v-card rounded="xl" class="elite-dark-modal overflow-hidden">
-        <div class="elite-modal-glow bg-amber"></div>
-        <div class="pa-8">
-          <div class="text-center mb-8">
-            <div class="icon-ring bg-amber-op mb-4">
-              <v-icon icon="mdi-shield-alert" color="amber" size="32" />
-            </div>
-            <h3 class="modal-title-white">Aplicar Sanción</h3>
-            <p class="modal-subtitle-silver mt-2">Se restringirá el acceso a las instalaciones</p>
-          </div>
-          
-          <v-select
-            v-model="blockDuration"
-            :items="blockOptions"
-            label="Periodo de restricción"
-            variant="solo"
-            rounded="lg"
-            bg-color="rgba(255,255,255,0.05)"
-            class="mb-8 select-dark-elite"
-            hide-details
-          />
+    <!-- Modals -->
+    <UserBlockModal
+      v-model="blockDialog"
+      :loading="loading"
+      @confirm="applyBlock"
+    />
 
-          <div class="d-flex flex-column ga-3">
-            <v-btn color="#fbbf24" height="54" rounded="lg" block class="btn-elite-gold" @click="applyBlock">
-              CONFIRMAR SANCIÓN
-            </v-btn>
-            <v-btn variant="text" color="grey-lighten-1" height="44" rounded="lg" block class="btn-elite-cancel" @click="blockDialog = false">
-              Cancelar y volver
-            </v-btn>
-          </div>
-        </div>
-      </v-card>
-    </v-dialog>
+    <UserConfirmModal
+      v-model="confirmDialog"
+      :user-name="selectedUser?.first_name"
+      :loading="loading"
+      @confirm="executeConfirmedAction"
+    />
 
-    <!-- Diálogo de Confirmación General (Admitir/Rehabilitar) -->
-    <v-dialog v-model="confirmDialog" max-width="440" transition="dialog-bottom-transition">
-      <v-card rounded="xl" class="elite-dark-modal overflow-hidden">
-        <div class="elite-modal-glow bg-gold"></div>
-        <div class="pa-8">
-          <div class="text-center mb-8">
-            <div class="icon-ring bg-white-op mb-4">
-              <v-icon icon="mdi-shield-check" color="white" size="32" />
-            </div>
-            <h3 class="modal-title-white">Confirmar Acción</h3>
-            <p class="modal-subtitle-silver mt-2">¿Autorizar acceso a {{ selectedUser?.first_name }}?</p>
-          </div>
-
-          <div class="d-flex flex-column ga-3">
-            <v-btn color="#fbbf24" height="54" rounded="lg" block class="btn-elite-gold" @click="executeConfirmedAction">
-              AUTORIZAR ACCESO
-            </v-btn>
-            <v-btn variant="text" color="grey-lighten-1" height="44" rounded="lg" block class="btn-elite-cancel" @click="confirmDialog = false">
-              Cerrar
-            </v-btn>
-          </div>
-        </div>
-      </v-card>
-    </v-dialog>
-
-    <!-- Diálogo de Eliminación (Danger Zone) -->
-    <v-dialog v-model="deleteDialog" max-width="440" transition="dialog-bottom-transition">
-      <v-card rounded="xl" class="elite-dark-modal overflow-hidden">
-        <div class="elite-modal-glow bg-error"></div>
-        <div class="pa-8">
-          <div class="text-center mb-8">
-            <div class="icon-ring bg-error-op mb-4">
-              <v-icon icon="mdi-alert-octagon" color="error" size="32" />
-            </div>
-            <h3 class="modal-title-white">Eliminar Vecino</h3>
-            <p class="modal-subtitle-silver mt-2">Esta acción eliminará todos los datos de forma permanente.</p>
-          </div>
-
-          <div class="d-flex flex-column ga-3">
-            <v-btn color="#ef4444" height="54" rounded="lg" block class="btn-elite-danger-v2" @click="executeDelete">
-              ELIMINAR DEFINITIVAMENTE
-            </v-btn>
-            <v-btn variant="text" color="grey-lighten-1" height="44" rounded="lg" block class="btn-elite-cancel" @click="deleteDialog = false">
-              Volver atrás
-            </v-btn>
-          </div>
-        </div>
-      </v-card>
-    </v-dialog>
+    <UserDeleteModal
+      v-model="deleteDialog"
+      :loading="loading"
+      @confirm="executeDelete"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import api from '@/services/api'
+import { userService } from '@/services/user.service'
+import type { User, UserStatus } from '@/types'
 import UserListItem from '@/components/admin/UserListItem.vue'
+import UserBlockModal from '@/components/admin/modals/UserBlockModal.vue'
+import UserConfirmModal from '@/components/admin/modals/UserConfirmModal.vue'
+import UserDeleteModal from '@/components/admin/modals/UserDeleteModal.vue'
 
-const users = ref<any[]>([])
-const activeStatus = ref('PENDING')
+const users = ref<User[]>([])
+const activeStatus = ref<UserStatus>('PENDING')
 const search = ref('')
-const showSearch = ref(false)
+const loading = ref(false)
+
 const blockDialog = ref(false)
 const confirmDialog = ref(false)
 const deleteDialog = ref(false)
-const selectedUser = ref<any>(null)
-const blockDuration = ref(7)
-const pendingAction = ref<{ type: string, userId: string, status: string } | null>(null)
-
-const blockOptions = [
-  { title: '1 Semana', value: 7 },
-  { title: '15 Días', value: 15 },
-  { title: '1 Mes', value: 30 },
-  { title: '3 Meses', value: 90 },
-  { title: 'Indefinido', value: 3650 }
-]
+const selectedUser = ref<User | null>(null)
+const pendingAction = ref<{ type: string, userId: string, status: UserStatus } | null>(null)
 
 const pendingCount = computed(() => users.value.filter(u => u.status === 'PENDING').length)
 
@@ -213,63 +143,77 @@ const filteredUsers = computed(() => {
   })
 })
 
-const getTabLabel = (status: string) => {
-  switch(status) {
-    case 'PENDING': return 'Solicitudes'
-    case 'APPROVED': return 'Activos'
-    case 'BLOCKED': return 'Sancionados'
-    default: return status
+const fetchUsers = async () => {
+  try {
+    users.value = await userService.getAll()
+  } catch (error) {
+    console.error('Error fetching users:', error)
   }
 }
 
-const fetchUsers = async () => {
-  const res = await api.get('/users')
-  users.value = res.data
-}
-
-const updateStatus = (userId: string, status: string) => {
+const updateStatus = (userId: string, status: UserStatus) => {
   const user = users.value.find(u => u.id === userId)
-  selectedUser.value = user
+  selectedUser.value = user || null
   pendingAction.value = { type: 'status', userId, status }
   confirmDialog.value = true
 }
 
 const executeConfirmedAction = async () => {
   if (pendingAction.value) {
-    await api.patch(`/users/${pendingAction.value.userId}/status`, { status: pendingAction.value.status })
-    fetchUsers()
+    loading.value = true
+    try {
+      await userService.updateStatus(pendingAction.value.userId, pendingAction.value.status)
+      await fetchUsers()
+      confirmDialog.value = false
+      pendingAction.value = null
+    } catch (error) {
+      console.error('Error updating status:', error)
+    } finally {
+      loading.value = false
+    }
   }
-  confirmDialog.value = false
-  pendingAction.value = null
 }
 
-const openBlockDialog = (user: any) => {
+const openBlockDialog = (user: User) => {
   selectedUser.value = user
   blockDialog.value = true
 }
 
-const applyBlock = async () => {
-  const date = new Date()
-  date.setDate(date.getDate() + blockDuration.value)
-  await api.patch(`/users/${selectedUser.value.id}/status`, { 
-    status: 'BLOCKED', 
-    blocked_until: date.toISOString() 
-  })
-  fetchUsers()
-  blockDialog.value = false
+const applyBlock = async (days: number) => {
+  if (!selectedUser.value) return
+  
+  loading.value = true
+  try {
+    const date = new Date()
+    date.setDate(date.getDate() + days)
+    await userService.updateStatus(selectedUser.value.id, 'BLOCKED', date.toISOString())
+    await fetchUsers()
+    blockDialog.value = false
+  } catch (error) {
+    console.error('Error applying block:', error)
+  } finally {
+    loading.value = false
+  }
 }
 
-const confirmDelete = (user: any) => {
+const confirmDelete = (user: User) => {
   selectedUser.value = user
   deleteDialog.value = true
 }
 
 const executeDelete = async () => {
   if (selectedUser.value) {
-    await api.delete(`/users/${selectedUser.value.id}`)
-    fetchUsers()
+    loading.value = true
+    try {
+      await userService.delete(selectedUser.value.id)
+      await fetchUsers()
+      deleteDialog.value = false
+    } catch (error) {
+      console.error('Error deleting user:', error)
+    } finally {
+      loading.value = false
+    }
   }
-  deleteDialog.value = false
 }
 
 onMounted(fetchUsers)
@@ -382,85 +326,10 @@ onMounted(fetchUsers)
   text-align: center;
 }
 
-/* DIALOGS ELITE DARK */
-.elite-dark-modal {
-  background: #0f172a !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7) !important;
-}
-
-.elite-modal-glow {
-  height: 2px;
-  width: 100%;
-}
-
-.icon-ring {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-}
-
-.bg-amber-op { background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.2); }
-.bg-white-op { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); }
-.bg-error-op { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); }
-
-.modal-title-white {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.85rem;
-  font-weight: 700;
-  color: white;
-  letter-spacing: -0.5px;
-}
-
-.modal-subtitle-silver {
-  font-size: 0.95rem;
-  color: #94a3b8;
-  font-weight: 500;
-}
-
-.btn-elite-gold {
-  font-weight: 900 !important;
-  letter-spacing: 1.5px !important;
-  color: #0f172a !important;
-  text-transform: uppercase !important;
-  box-shadow: 0 10px 20px rgba(251, 191, 36, 0.3) !important;
-}
-
-.btn-elite-gold:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 30px rgba(251, 191, 36, 0.4) !important;
-}
-
-.btn-elite-danger-v2 {
-  font-weight: 900 !important;
-  letter-spacing: 1px !important;
-  text-transform: uppercase !important;
-}
-
-.btn-elite-cancel {
-  font-weight: 800 !important;
-  letter-spacing: 0.5px !important;
-  text-transform: none !important;
-  color: rgba(255,255,255,0.5) !important;
-}
-
-.select-dark-elite :deep(.v-field) {
-  border-radius: 12px !important;
-  color: white !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
-}
-
-.select-dark-elite :deep(.v-field__input) {
-  color: white !important;
-}
-
 @media (max-width: 600px) {
   .page-title-elite {
     font-size: 1.75rem;
   }
 }
 </style>
+

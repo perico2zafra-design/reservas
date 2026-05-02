@@ -48,273 +48,53 @@
 
       <!-- Main Layout -->
       <v-row>
-        <!-- Info Card: Glassmorphism style -->
         <v-col cols="12" lg="8">
-          <div
-            class="elite-glass-card pa-6 pa-md-8 position-relative overflow-hidden mb-8"
-          >
-            <div class="glass-shine"></div>
-
-            <div class="d-flex align-center mb-12">
-              <div class="icon-box-elite me-4">
-                <v-icon icon="mdi-bank-outline" color="amber-darken-2" />
-              </div>
-              <h2 class="text-h5 font-weight-black text-slate-800">
-                Información del Complejo
-              </h2>
-            </div>
-
-            <v-row class="ga-y-8">
-              <v-col cols="12">
-                <div class="info-group-ultimate">
-                  <label>NOMBRE DE LA MANCOMUNIDAD</label>
-                  <div class="info-content text-playfair">
-                    {{ form.name || "Residencial Campus" }}
-                  </div>
-                  <div class="gold-line-under"></div>
-                </div>
-              </v-col>
-
-              <v-col cols="12">
-                <div class="info-group-ultimate">
-                  <label>DIRECCIÓN ESTRATÉGICA</label>
-                  <div class="info-content d-flex align-center">
-                    <v-icon
-                      icon="mdi-map-marker-path"
-                      size="20"
-                      class="me-3 text-amber-darken-1"
-                    />
-                    {{ form.address || "Ubicación Premium" }}
-                  </div>
-                  <div class="gold-line-under"></div>
-                </div>
-              </v-col>
-
-              <v-col cols="12">
-                <div class="info-group-ultimate">
-                  <label>LÍMITE DE RESERVAS POR VECINO</label>
-                  <div class="info-content d-flex align-center">
-                    <v-icon icon="mdi-calendar-check" size="24" class="me-3 text-amber-darken-1" />
-                    {{ form.max_bookings_per_month }} reservas / mes natural
-                  </div>
-                  <div class="gold-line-under"></div>
-                </div>
-              </v-col>
-
-              <v-col cols="12">
-                <v-divider class="my-6 opacity-10" />
-                <div class="info-group-ultimate">
-                  <label>NORMATIVA Y GOBERNANZA</label>
-                  <div class="info-text-box mt-4">
-                    {{
-                      form.urbanization_details ||
-                      "Los estatutos de la comunidad definen un entorno de convivencia exclusiva y respetuosa."
-                    }}
-                  </div>
-                </div>
-              </v-col>
-            </v-row>
-          </div>
+          <SiteInfoCard :settings="settings" />
         </v-col>
 
-        <!-- Sidebar: Premium Insights -->
         <v-col cols="12" lg="4">
-          <div class="sidebar-elite-container">
-            <!-- Superadmin Badge -->
-            <div class="elite-badge-card pa-6 mb-6">
-              <div class="d-flex align-center mb-3">
-                <v-icon
-                  icon="mdi-shield-crown-outline"
-                  color="amber"
-                  class="me-3"
-                />
-                <span
-                  class="text-caption font-weight-black letter-spacing-lg text-white"
-                  >NIVEL SUPERADMIN</span
-                >
-              </div>
-              <p class="text-caption text-slate-400 mb-0">
-                Control total sobre los activos digitales y la normativa pública
-                de la mancomunidad.
-              </p>
-            </div>
-
-            <!-- Neighbor Preview (Truly Premium) -->
-            <div class="preview-elite-v3">
-              <div class="preview-inner">
-                <div class="preview-label mb-6">PREVISUALIZACIÓN VECINO</div>
-                <div class="preview-brand-box">
-                  <h3 class="text-playfair mb-1">
-                    {{ form.name || "Elite Residential" }}
-                  </h3>
-                  <div class="d-flex align-center opacity-60">
-                    <v-icon icon="mdi-map-marker" size="12" class="me-1" />
-                    <span class="text-caption truncate">{{
-                      form.address || "España"
-                    }}</span>
-                  </div>
-                </div>
-                <v-divider class="my-4 opacity-10" />
-                <div class="preview-footer-dots">
-                  <span></span><span></span><span></span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <SitePreviewCard :settings="settings" />
         </v-col>
       </v-row>
     </v-container>
 
-    <!-- PREMIUM EDIT MODAL (Improved) -->
-    <v-dialog
+    <!-- PREMIUM EDIT MODAL -->
+    <SiteSettingsModal
       v-model="editModal"
-      max-width="650"
-      transition="dialog-bottom-transition"
-    >
-      <v-card rounded="xl" class="elite-dark-modal-v2 overflow-hidden">
-        <div class="elite-modal-header-accent"></div>
-
-        <div class="pa-10">
-          <div class="d-flex align-start justify-space-between mb-10">
-            <div>
-              <h2 class="modal-title-ultimate text-playfair text-white">
-                Ajustes del Portal
-              </h2>
-              <p
-                class="text-caption text-amber font-weight-bold uppercase-track"
-              >
-                Configuración de Alto Nivel
-              </p>
-            </div>
-            <v-btn
-              icon="mdi-close"
-              variant="tonal"
-              color="white"
-              density="comfortable"
-              @click="editModal = false"
-            />
-          </div>
-
-          <v-form @submit.prevent="saveSettings">
-            <v-row class="ga-y-4">
-              <v-col cols="12">
-                <label class="dark-input-label">Identidad Mancomunidad</label>
-                <v-text-field
-                  v-model="form.name"
-                  variant="solo"
-                  flat
-                  bg-color="rgba(255,255,255,0.05)"
-                  class="elite-input-field"
-                  rounded="lg"
-                  placeholder="Ej: Residencial Campus Elite"
-                />
-              </v-col>
-
-              <v-col cols="12">
-                <label class="dark-input-label">Dirección del Complejo</label>
-                <v-text-field
-                  v-model="form.address"
-                  variant="solo"
-                  flat
-                  bg-color="rgba(255,255,255,0.05)"
-                  class="elite-input-field"
-                  rounded="lg"
-                  placeholder="Calle, Número, Ciudad"
-                  prepend-inner-icon="mdi-map-marker-outline"
-                />
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <div class="dark-input-label">Límite Reservas / Mes</div>
-                <v-text-field
-                  v-model.number="form.max_bookings_per_month"
-                  type="number"
-                  variant="solo"
-                  flat
-                  bg-color="rgba(255,255,255,0.03)"
-                  class="elite-input-field"
-                  rounded="lg"
-                  min="1"
-                  max="30"
-                  prepend-inner-icon="mdi-counter"
-                />
-              </v-col>
-
-              <v-col cols="12">
-                <label class="dark-input-label">Estatutos y Normativa</label>
-                <v-textarea
-                  v-model="form.urbanization_details"
-                  variant="solo"
-                  flat
-                  bg-color="rgba(255,255,255,0.05)"
-                  class="elite-input-field"
-                  rounded="lg"
-                  rows="4"
-                  placeholder="Redacta aquí las normas de convivencia..."
-                />
-              </v-col>
-            </v-row>
-
-            <v-btn
-              color="amber-darken-2"
-              block
-              height="60"
-              rounded="xl"
-              class="mt-10 font-weight-black text-slate-900 elite-save-btn"
-              type="submit"
-              :loading="loading"
-            >
-              GUARDAR CONFIGURACIÓN
-            </v-btn>
-          </v-form>
-        </div>
-      </v-card>
-    </v-dialog>
+      :settings="settings"
+      :loading="loading"
+      @save="saveSettings"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { siteService } from "@/services/site.service";
 import { useAppStore } from "@/stores/app";
+import type { SiteSettings } from "@/types";
+import SiteSettingsModal from "@/components/admin/modals/SiteSettingsModal.vue";
+import SiteInfoCard from "@/components/admin/SiteInfoCard.vue";
+import SitePreviewCard from "@/components/admin/SitePreviewCard.vue";
 
 const appStore = useAppStore();
 const loading = ref(false);
 const editModal = ref(false);
-
-const form = reactive({
-  name: "",
-  address: "",
-  urbanization_details: "",
-  max_bookings_per_month: 2,
-});
+const settings = ref<Partial<SiteSettings>>({});
 
 const fetchSettings = async () => {
   try {
-    const data = await siteService.getSettings();
-    form.name = data.name;
-    form.address = data.address;
-    form.max_bookings_per_month = data.max_bookings_per_month || 2;
-    form.urbanization_details = data.urbanization_details || `REGLAMENTO DE USO - SALÓN SOCIAL (ACUERDO JUNTA 15/04/2026):
-
-1. HORARIO: 09:00h a 23:59h. Cerrado 24, 25, 31 Dic y 1, 5, 6 Ene.
-2. AFORO MÁXIMO: 50 personas. Prohibido acceso al gimnasio.
-3. RESERVAS: Máximo 2 al mes natural por propietario. Intransferibles.
-4. LIMPIEZA: El salón debe quedar recogido y limpio. Basura depositada en contenedores externos.
-5. PROHIBICIONES: Fumar/vapear, actividades ilegales, ruidos excesivos, fijar objetos en paredes o pintar.
-6. FIANZA: Obligatoria de 50€. Se devolverá tras comprobar el estado.
-7. RESPONSABILIDAD: El titular de la reserva responde por daños y comportamiento de invitados.
-
-El incumplimiento conlleva sanciones de 1 a 6 meses de suspensión o definitiva según gravedad.`;
+    settings.value = await siteService.getSettings();
   } catch (err) {
     console.error("Error al cargar ajustes:", err);
   }
 };
 
-const saveSettings = async () => {
+const saveSettings = async (formData: Partial<SiteSettings>) => {
   loading.value = true;
   try {
-    await siteService.updateSettings(form);
+    await siteService.updateSettings(formData);
+    await fetchSettings();
     appStore.showSnackbar("Configuración del portal actualizada", "success");
     editModal.value = false;
   } catch (err) {
@@ -331,7 +111,7 @@ onMounted(fetchSettings);
 .admin-settings-page-ultimate {
   background-color: #f8fafc;
   position: relative;
-  overflow: hidden; /* Prevent unwanted scrolls */
+  overflow: hidden;
 }
 
 .elite-mesh-background {
@@ -389,143 +169,15 @@ onMounted(fetchSettings);
   box-shadow: 0 15px 30px -10px rgba(212, 175, 55, 0.4) !important;
 }
 
-/* GLASS CARD INFO */
-.elite-glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
-  border-radius: 24px !important;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02) !important;
-}
-
-.glass-shine {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.4) 0%,
-    transparent 50%
-  );
-  pointer-events: none;
-}
-
-.icon-box-elite {
-  width: 54px;
-  height: 54px;
-  background: white;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
-}
-
-.info-group-ultimate label {
-  font-size: 0.65rem;
-  font-weight: 900;
-  color: #94a3b8;
-  letter-spacing: 1.5px;
-  margin-bottom: 8px;
-  display: block;
-}
-
-.info-content {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1.2;
-}
-
-.gold-line-under {
-  width: 40px;
-  height: 3px;
-  background: #fbbf24;
-  margin-top: 12px;
-  border-radius: 2px;
-  opacity: 0.3;
-}
-
-.info-text-box {
-  font-size: 1.1rem;
-  color: #475569;
-  line-height: 1.8;
-  padding-left: 20px;
-  border-left: 1px solid #e2e8f0;
-}
-
-/* SIDEBAR ELITE */
-.elite-badge-card {
-  background: #0f172a;
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
-}
-
-.preview-elite-v3 {
-  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-  border: 1px solid #e2e8f0;
-  border-radius: 24px;
-  padding: 30px;
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
-}
-
-.preview-label {
-  font-size: 0.6rem;
-  font-weight: 900;
-  color: #cbd5e1;
-  letter-spacing: 2px;
-}
-
-.preview-footer-dots {
-  display: flex;
-  gap: 6px;
-}
-.preview-footer-dots span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #e2e8f0;
-}
-
-/* MODAL ULTIMATE */
-.elite-dark-modal-v2 {
-  background: #0f172a !important;
-}
-
-.elite-modal-header-accent {
-  height: 6px;
-  background: linear-gradient(to right, #d4af37, #fbbf24);
-}
-
-.dark-input-label {
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: #94a3b8;
-  text-transform: uppercase;
+.uppercase-track {
   letter-spacing: 1px;
-  margin-bottom: 8px;
-  display: block;
-}
-
-.elite-input-field :deep(.v-field__input) {
-  color: white !important;
-}
-
-.elite-save-btn {
-  box-shadow: 0 15px 30px rgba(212, 175, 55, 0.3) !important;
+  text-transform: uppercase;
 }
 
 @media (max-width: 600px) {
   .page-title-ultimate {
     font-size: 1.75rem;
   }
-  .info-content {
-    font-size: 1.1rem;
-  }
-  .elite-glass-card {
-    padding: 20px !important;
-  }
 }
 </style>
+
