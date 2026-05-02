@@ -152,53 +152,9 @@
                   />
                 </div>
 
-                <!-- Notificación de Cupo Agotado -->
-                <v-expand-transition>
-                  <div
-                    v-if="
-                      userBookingsCount >=
-                      (siteSettings?.max_bookings_per_month || 2)
-                    "
-                    class="quota-warning-panel mt-6"
-                  >
-                    <div class="d-flex align-start ga-4">
-                      <v-icon
-                        icon="mdi-information-outline"
-                        color="#b45309"
-                        size="24"
-                        class="mt-1"
-                      />
-                      <div>
-                        <h4
-                          class="text-subtitle-1 font-weight-black text-amber-900 mb-1"
-                        >
-                          Cupo de Reservas Alcanzado
-                        </h4>
-                        <p class="text-body-2 text-amber-800 mb-0 opacity-80">
-                          Estimado residente, le informamos que ha completado el
-                          límite máximo de
-                          <strong
-                            >{{
-                              siteSettings?.max_bookings_per_month || 2
-                            }}
-                            reservas mensuales</strong
-                          >
-                          establecido por la normativa vigente.
-                        </p>
-                        <div class="mt-4 d-flex ga-4">
-                          <v-btn
-                            variant="text"
-                            size="small"
-                            class="text-amber-900 font-weight-bold px-0"
-                            to="/my-bookings"
-                          >
-                            Gestionar mis reservas
-                          </v-btn>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </v-expand-transition>
+                <!-- Notificación de Cupo Agotado Premium eliminada de aquí -->
+
+
 
                 <!-- Leyenda del Calendario -->
                 <div class="d-flex justify-center ga-6 mt-4 opacity-70">
@@ -420,7 +376,30 @@
                   </div>
 
                   <div class="checkout-footer pa-8 bg-white">
+                    <!-- Panel de Estado de Cupo Premium -->
+                    <v-expand-transition>
+                      <div v-if="userBookingsCount >= (siteSettings?.max_bookings_per_month || 2)" class="elite-usage-panel mb-8">
+                        <div class="d-flex justify-space-between align-center mb-2">
+                          <span class="usage-title">CUPO MENSUAL</span>
+                          <span class="usage-stat">{{ userBookingsCount }} / {{ siteSettings?.max_bookings_per_month || 2 }}</span>
+                        </div>
+                        <v-progress-linear
+                          :model-value="(userBookingsCount / (siteSettings?.max_bookings_per_month || 2)) * 100"
+                          color="#d97706"
+                          height="6"
+                          rounded
+                          class="usage-bar mb-3"
+                        />
+                        <div class="d-flex align-center ga-2">
+                          <v-icon icon="mdi-shield-alert-outline" size="16" color="#92400e" />
+                          <span class="usage-hint">Límite alcanzado para este periodo</span>
+                        </div>
+                      </div>
+                    </v-expand-transition>
+
                     <div class="d-flex justify-space-between align-end mb-10">
+
+
                       <div>
                         <div
                           class="text-caption font-weight-black text-slate-400 letter-spacing-lg mb-1"
@@ -450,23 +429,26 @@
                       </div>
                     </div>
 
-                    <v-btn
-                      block
-                      height="72"
-                      color="#0f172a"
-                      rounded="xl"
-                      class="elite-action-btn shadow-elite-btn"
-                      :disabled="!isReadyToBook"
-                      @click="startPayment"
-                    >
-                      <span class="btn-text" v-if="isReadyToBook"
-                        >CONFIRMAR RESERVA</span
-                      >
-                      <span class="btn-text text-grey-darken-1" v-else
-                        >COMPLETA LOS DATOS</span
-                      >
-                      <v-icon icon="mdi-arrow-right" class="ms-4 btn-icon" />
-                    </v-btn>
+                     <v-btn
+                       block
+                       height="72"
+                       color="#0f172a"
+                       rounded="xl"
+                       class="elite-action-btn shadow-elite-btn"
+                       :disabled="!isReadyToBook || userBookingsCount >= (siteSettings?.max_bookings_per_month || 2)"
+                       @click="startPayment"
+                     >
+                       <template v-if="userBookingsCount >= (siteSettings?.max_bookings_per_month || 2)">
+                         <span class="btn-text text-amber-darken-4">CUPO COMPLETADO</span>
+                         <v-icon icon="mdi-lock-outline" class="ms-4 btn-icon" color="amber-darken-4" />
+                       </template>
+                       <template v-else>
+                         <span class="btn-text" v-if="isReadyToBook">CONFIRMAR RESERVA</span>
+                         <span class="btn-text text-grey-darken-1" v-else>COMPLETA LOS DATOS</span>
+                         <v-icon icon="mdi-arrow-right" class="ms-4 btn-icon" />
+                       </template>
+                     </v-btn>
+
 
                     <div
                       class="secure-badges mt-8 d-flex justify-center ga-6 opacity-30"
@@ -1461,4 +1443,77 @@ export default {
   height: 100%;
   background: #d97706;
 }
+.elite-quota-alert {
+  background: rgba(255, 251, 235, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 20px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(180, 83, 9, 0.05);
+}
+
+.alert-icon-wrapper {
+  background: #fef3c7;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: inset 0 2px 4px rgba(180, 83, 9, 0.1);
+}
+
+.elite-quota-alert::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, #d97706, #fbbf24);
+}
+.elite-usage-panel {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid rgba(217, 119, 6, 0.2);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(180, 83, 9, 0.05);
+}
+
+.usage-title {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #92400e;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.usage-stat {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #1e293b;
+  font-family: 'Inter', sans-serif;
+}
+
+.usage-hint {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #92400e;
+  opacity: 0.8;
+}
+
+.usage-bar {
+  background: rgba(217, 119, 6, 0.1) !important;
+}
+
+.uppercase-track {
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
 </style>
+
+
+
