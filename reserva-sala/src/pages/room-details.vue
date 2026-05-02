@@ -170,16 +170,18 @@
               <v-window v-model="currentStep" class="elite-window-container overflow-visible">
                 
                 <!-- PASO 1: RESERVAR (CALENDARIO) -->
-                <v-window-item :value="1">
-                   <BookingStepCalendar 
-                     v-model="selectedDate"
-                     :bookings="roomBookings"
-                     :closed-dates="closedDates"
-                     :min-date="minDate"
-                     :max-date="maxDate"
-                     @update:model-value="currentStep = 2"
-                   />
-                </v-window-item>
+                 <v-window-item :value="1">
+                    <BookingStepCalendar 
+                      v-model="selectedDate"
+                      :bookings="roomBookings"
+                      :user-bookings="userBookings"
+                      :max-limit="Number(siteSettings?.max_bookings_per_month || 2)"
+                      :closed-dates="closedDates"
+                      :min-date="minDate"
+                      :max-date="maxDate"
+                      @update:model-value="currentStep = 2"
+                    />
+                 </v-window-item>
 
                 <!-- PASO 2: HORARIO -->
                 <v-window-item :value="2">
@@ -209,6 +211,7 @@
                      :deposit-amount="room?.deposit_amount || 0"
                      :loading="processing"
                      @confirm="confirmPayment"
+                     @simulate="simulateSuccess"
                      @back="currentStep = 3"
                    />
                 </v-window-item>
@@ -239,6 +242,7 @@ import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useBookingStore } from "@/stores/booking";
 import { useAppStore } from "@/stores/app";
+import { useAuthStore } from "@/stores/auth";
 import BookingStepCalendar from '@/components/booking/BookingStepCalendar.vue';
 import BookingStepTime from '@/components/booking/BookingStepTime.vue';
 import BookingStepSummary from '@/components/booking/BookingStepSummary.vue';
@@ -254,11 +258,13 @@ const route = useRoute();
 const router = useRouter();
 const bookingStore = useBookingStore();
 const appStore = useAppStore();
+const authStore = useAuthStore();
 
 const room = computed(() =>
   bookingStore.rooms.find((r) => r.id === Number(route.params.id)),
 );
 const roomBookings = ref<any[]>([]);
+const userBookings = ref<any[]>([]);
 const siteSettings = ref<Partial<SiteSettings>>({});
 const selectedDate = ref<Date | null>(null);
 const selectedSlot = ref(null);
@@ -383,7 +389,7 @@ const goToPayment = async () => {
 
 const initStripeInStep = async () => {
   if (!stripe) {
-    stripe = await loadStripe('pk_test_51P7qbtL1W5R8C6zC4V7V8V9V0V1V2V3V4V5V6V7V8V9V0V');
+    stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
   }
   
   elements = stripe.elements();
@@ -418,6 +424,7 @@ const fetchRoomBookings = async () => {
     ]);
 
     roomBookings.value = bookingsRes.data;
+    userBookings.value = userBookingsRes.data;
 
     const referenceDate = selectedDate.value
       ? new Date(selectedDate.value)
@@ -425,7 +432,7 @@ const fetchRoomBookings = async () => {
     const currentMonth = referenceDate.getMonth();
     const currentYear = referenceDate.getFullYear();
 
-    userBookingsCount.value = userBookingsRes.data.filter((b: any) => {
+    userBookingsCount.value = userBookings.value.filter((b: any) => {
       const d = new Date(b.booking_date);
       return (
         d.getMonth() === currentMonth &&
@@ -438,26 +445,72 @@ const fetchRoomBookings = async () => {
   }
 };
 
+const simulateSuccess = async () => {
+  processing.value = true;
+  try {
+    // Simulamos un retraso de red
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    await bookingStore.createBooking({
+      roomId: room.value!.id,
+      bookingDate: selectedDate.value!.toISOString().split('T')[0],
+      startTime: selectedSlot.value === 'MORNING' ? '10:00' : (selectedSlot.value === 'AFTERNOON' ? '15:00' : '10:00'),
+      endTime: selectedSlot.value === 'MORNING' ? '15:00' : (selectedSlot.value === 'AFTERNOON' ? '22:00' : '22:00'),
+      paymentIntentId: 'pi_simulated_success_' + Date.now()
+    });
+
+    currentStep.value = 5;
+    appStore.showSuccess('¡SIMULACIÓN: Reserva confirmada!');
+  } catch (error: any) {
+    appStore.showError(error.response?.data?.message || error.message || 'Error en la simulación');
+  } finally {
+    processing.value = false;
+  }
+};
+
 const confirmPayment = async () => {
   if (!stripe || !card) return;
   
   processing.value = true;
   try {
-    const { token, error } = await stripe.createToken(card);
+    const bookingDate = selectedDate.value!.toISOString().split('T')[0];
+    const startTime = selectedSlot.value === 'MORNING' ? '10:00' : (selectedSlot.value === 'AFTERNOON' ? '15:00' : '10:00');
+    const endTime = selectedSlot.value === 'MORNING' ? '15:00' : (selectedSlot.value === 'AFTERNOON' ? '22:00' : '22:00');
+
+    // 1. Crear el Payment Intent en el backend
+    const { clientSecret } = await bookingService.createPaymentIntent({
+      roomId: room.value!.id,
+      bookingDate,
+      startTime,
+      endTime
+    });
+
+    // 2. Confirmar el pago en Stripe
+    const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: card,
+        billing_details: {
+          name: authStore.user?.name || 'Cliente Elite'
+        }
+      }
+    });
+
     if (error) throw error;
 
+    // 3. Confirmar la reserva en nuestra DB
     await bookingStore.createBooking({
-      room_id: room.value!.id,
-      booking_date: selectedDate.value!.toISOString().split('T')[0],
-      start_time: selectedSlot.value === 'MORNING' ? '10:00' : (selectedSlot.value === 'AFTERNOON' ? '15:00' : '10:00'),
-      end_time: selectedSlot.value === 'MORNING' ? '15:00' : (selectedSlot.value === 'AFTERNOON' ? '22:00' : '22:00'),
-      stripe_token: token.id
+      roomId: room.value!.id,
+      bookingDate,
+      startTime,
+      endTime,
+      paymentIntentId: paymentIntent.id
     });
 
     currentStep.value = 5;
     appStore.showSuccess('¡Reserva confirmada con éxito!');
   } catch (error: any) {
-    appStore.showError(error.message || 'Error al procesar el pago');
+    console.error('Payment Error:', error);
+    appStore.showError(error.response?.data?.message || error.message || 'Error al procesar el pago');
   } finally {
     processing.value = false;
   }

@@ -46,7 +46,7 @@ export const bookingService = {
     return response.data;
   },
 
-  async confirmBookingWithPayment(bookingData: any): Promise<Booking> {
+  async createBooking(bookingData: CreateBookingDTO): Promise<Booking> {
     const response = await api.post<Booking>('/bookings/confirm', bookingData);
     return response.data;
   },

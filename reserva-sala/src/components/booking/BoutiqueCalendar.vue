@@ -23,8 +23,9 @@
       }"
     >
       <v-date-picker
-
         v-model="internalDate"
+        v-model:month="viewMonth"
+        v-model:year="viewYear"
         color="#0f172a"
         elevation="0"
         class="w-100 boutique-picker"
@@ -62,6 +63,8 @@ import { ref, watch } from "vue";
 const props = defineProps<{
   modelValue: Date | null;
   bookings: any[];
+  userBookings: any[];
+  maxLimit: number;
   closedDates: string[];
   minDate: string;
   maxDate?: string;
@@ -69,9 +72,15 @@ const props = defineProps<{
 
 
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "view-change"]);
 
 const internalDate = ref(props.modelValue);
+const viewMonth = ref(new Date().getMonth());
+const viewYear = ref(new Date().getFullYear());
+
+watch([viewMonth, viewYear], ([m, y]) => {
+  emit("view-change", { month: m, year: y });
+});
 
 watch(
   () => props.modelValue,
@@ -100,11 +109,20 @@ const isAllowedDate = (date: any) => {
     max.setHours(23, 59, 59, 999)
     if (d > max) return false
   }
-  
-  const month = String(d.getMonth() + 1).padStart(2, '0')
 
-  const day = String(d.getDate()).padStart(2, '0')
-  const monthDay = `${month}-${day}`
+  // LÍMITE MENSUAL POR USUARIO
+  const m = d.getMonth()
+  const y = d.getFullYear()
+  const userCount = props.userBookings.filter(b => {
+    const bd = new Date(b.booking_date)
+    return bd.getMonth() === m && bd.getFullYear() === y && b.status !== 'CANCELLED'
+  }).length
+
+  if (userCount >= props.maxLimit) return false
+  
+  const monthStr = String(d.getMonth() + 1).padStart(2, '0')
+  const dayStr = String(d.getDate()).padStart(2, '0')
+  const monthDay = `${monthStr}-${dayStr}`
   
   // No permitir inhábiles
   if (props.closedDates.includes(monthDay)) return false
@@ -147,6 +165,15 @@ const getDayStatus = (date: any) => {
     if (props.closedDates.includes(monthDay)) return 'status-disabled'
 
     const dateStr = d.toISOString().split('T')[0]
+    
+    // VERIFICAR LÍMITE DE USUARIO PARA EL ESTADO VISUAL
+    const userCountInMonth = props.userBookings.filter(b => {
+      const bd = new Date(b.booking_date)
+      return bd.getMonth() === d.getMonth() && bd.getFullYear() === d.getFullYear() && b.status !== 'CANCELLED'
+    }).length
+
+    if (userCountInMonth >= props.maxLimit) return 'status-limit'
+
     const dayBookings = props.bookings.filter(b => b.booking_date === dateStr)
     
     // Log para depuración de estados
@@ -243,6 +270,14 @@ const getDayStatus = (date: any) => {
 
 .status-partial { background-color: #fffbeb !important; border: 1px solid #fef3c7 !important; }
 .status-partial .status-dot { background-color: #f59e0b; }
+
+.status-limit {
+  background-color: #fff7ed !important;
+  border: 1px solid #ffedd5 !important;
+  cursor: not-allowed !important;
+}
+.status-limit .day-number { color: #f97316 !important; opacity: 0.6; }
+.status-limit .status-dot { background-color: #fb923c; }
 
 .status-disabled { 
   background-color: #f8fafc !important; 

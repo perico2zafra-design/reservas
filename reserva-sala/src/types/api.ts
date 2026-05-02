@@ -22,9 +22,10 @@ export interface Booking {
 
 export interface CreateBookingDTO {
   roomId: number;
-  userName: string;
+  bookingDate: string;
   startTime: string;
   endTime: string;
+  paymentIntentId: string;
 }
 
 export interface CreateRoomDTO {

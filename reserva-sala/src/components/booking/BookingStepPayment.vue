@@ -24,7 +24,22 @@
       >
         AUTORIZAR {{ depositAmount }}€
       </v-btn>
-      <v-btn block variant="text" color="slate-400" class="mt-4" @click="$emit('back')">VOLVER AL RESUMEN</v-btn>
+
+      <!-- BOTÓN DE TEST SOLO EN LOCAL -->
+      <v-btn 
+        v-if="isLocal"
+        block 
+        variant="outlined"
+        color="success"
+        height="50"
+        class="mt-4 font-weight-black"
+        @click="$emit('simulate')"
+      >
+        <v-icon icon="mdi-flask-outline" class="me-2" />
+        MODO TEST: SIMULAR ÉXITO
+      </v-btn>
+
+      <v-btn block variant="text" color="slate-400" class="mt-2" @click="$emit('back')">VOLVER AL RESUMEN</v-btn>
     </v-card>
 
     <!-- Mobile -->
@@ -50,6 +65,20 @@
         >
           CONFIRMAR PAGO
         </v-btn>
+        
+        <v-btn 
+          v-if="isLocal"
+          block 
+          variant="tonal"
+          color="success"
+          height="50"
+          rounded="xl"
+          class="mt-4 font-weight-black"
+          @click="$emit('simulate')"
+        >
+          MODO TEST: SIMULAR PAGO
+        </v-btn>
+
         <v-btn block variant="text" color="#94a3b8" class="mt-2" @click="$emit('back')">ATRÁS</v-btn>
       </div>
     </div>
@@ -57,13 +86,20 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 defineProps<{
   depositAmount: number;
   loading: boolean;
 }>();
 
-defineEmits(['confirm', 'back']);
+const emit = defineEmits(['confirm', 'back', 'simulate']);
+
+const isLocal = computed(() => {
+  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+});
 </script>
+
 
 <style scoped>
 .elite-step-card {
