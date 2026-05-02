@@ -200,6 +200,45 @@
                       hide-details
                     />
                   </v-col>
+
+                  <v-col cols="6" class="mb-4">
+                    <v-text-field
+                      v-model.number="roomForm.max_bookings_per_month"
+                      label="Máx Reservas/Mes"
+                      type="number"
+                      variant="solo"
+                      rounded="lg"
+                      bg-color="rgba(255,255,255,0.03)"
+                      class="select-dark-elite-v2"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="6" class="mb-4">
+                    <v-text-field
+                      v-model.number="roomForm.booking_horizon_months"
+                      label="Horizonte (Meses)"
+                      type="number"
+                      variant="solo"
+                      rounded="lg"
+                      bg-color="rgba(255,255,255,0.03)"
+                      class="select-dark-elite-v2"
+                      hide-details
+                    />
+                  </v-col>
+
+                  <v-col cols="12" class="mb-4">
+                    <v-textarea
+                      v-model="roomForm.rules"
+                      label="Reglas específicas (Opcional)"
+                      variant="solo"
+                      rounded="lg"
+                      bg-color="rgba(255,255,255,0.03)"
+                      rows="2"
+                      class="select-dark-elite-v2"
+                      hide-details
+                      placeholder="Ej: Prohibido música alta después de las 22h"
+                    />
+                  </v-col>
                 </v-row>
 
                 <div class="d-flex ga-3">
@@ -485,6 +524,9 @@ const roomForm = reactive({
   deposit_amount: 50,
   image: "",
   is_active: true,
+  max_bookings_per_month: 2,
+  booking_horizon_months: 1,
+  rules: "",
 });
 
 const roomConfig = reactive({
@@ -563,7 +605,9 @@ const openRoomDialog = async (room?: Room) => {
       capacity: 50,
       deposit_amount: 50,
       image: "",
-      is_active: true,
+      max_bookings_per_month: 2,
+      booking_horizon_months: 1,
+      rules: "",
     });
     Object.assign(roomConfig, {
       startTime: "09:00",

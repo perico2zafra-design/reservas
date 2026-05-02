@@ -38,17 +38,6 @@
       </v-col>
 
       <v-col cols="12">
-        <div class="info-group-ultimate">
-          <label>LÍMITE DE RESERVAS POR VECINO</label>
-          <div class="info-content d-flex align-center">
-            <v-icon icon="mdi-calendar-check" size="24" class="me-3 text-amber-darken-1" />
-            {{ settings.max_bookings_per_month }} reservas / mes natural
-          </div>
-          <div class="gold-line-under"></div>
-        </div>
-      </v-col>
-
-      <v-col cols="12">
         <v-divider class="my-6 opacity-10" />
         <div class="info-group-ultimate">
           <label>NORMATIVA Y GOBERNANZA</label>

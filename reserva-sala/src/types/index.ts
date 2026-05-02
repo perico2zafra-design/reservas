@@ -28,6 +28,8 @@ export interface Room {
   image: string;
   is_active: boolean;
   deposit_amount: number;
+  max_bookings_per_month?: number;
+  booking_horizon_months?: number;
 }
 
 export interface Booking {
@@ -52,10 +54,6 @@ export interface SiteSettings {
   name: string;
   address: string;
   urbanization_details: string;
-  max_bookings_per_month: number;
-  booking_horizon_months: number;
-  start_hour: string;
-  end_hour: string;
   updated_at: string;
 }
 

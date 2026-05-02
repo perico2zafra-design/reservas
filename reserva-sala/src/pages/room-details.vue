@@ -175,7 +175,7 @@
                       v-model="selectedDate"
                       :bookings="roomBookings"
                       :user-bookings="userBookings"
-                      :max-limit="Number(siteSettings?.max_bookings_per_month || 2)"
+                      :max-limit="Number(room?.max_bookings_per_month || siteSettings?.max_bookings_per_month || 2)"
                       :closed-dates="closedDates"
                       :min-date="minDate"
                       :max-date="maxDate"
@@ -278,7 +278,7 @@ const today = new Date();
 
 const minDate = today.toISOString().split("T")[0];
 const maxDate = computed(() => {
-  const horizon = Number(siteSettings.value?.booking_horizon_months || 1);
+  const horizon = Number(room.value?.booking_horizon_months || siteSettings.value?.booking_horizon_months || 1);
   const target = new Date();
   const currentDay = target.getDate();
 
@@ -349,15 +349,24 @@ const timeSlots = computed(() => {
   });
 });
 
-const meetingRules = computed(() => [
-  `Máximo ${siteSettings.value?.max_bookings_per_month || 2} reservas al mes natural por propietario.`,
-  "El titular es responsable del comportamiento de los invitados.",
-  "Obligatorio recoger basura y depositarla en contenedores externos.",
-  "Prohibido fumar, vapear y actividades con ruidos excesivos.",
-  "Prohibido colocar globos o carteles pegados en las paredes.",
-  "Apagar luces y climatización al finalizar.",
-  "La fianza se devuelve tras comprobar el estado de limpieza y orden.",
-]);
+const meetingRules = computed(() => {
+  const baseRules = [
+    `Máximo ${room.value?.max_bookings_per_month || siteSettings.value?.max_bookings_per_month || 2} reservas al mes natural por propietario.`,
+    "El titular es responsable del comportamiento de los invitados.",
+    "Obligatorio recoger basura y depositarla en contenedores externos.",
+    "Prohibido fumar, vapear y actividades con ruidos excesivos.",
+    "Prohibido colocar globos o carteles pegados en las paredes.",
+    "Apagar luces y climatización al finalizar.",
+    "La fianza se devuelve tras comprobar el estado de limpieza y orden.",
+  ];
+  
+  if (room.value?.rules) {
+    const specificRules = room.value.rules.split('\n').filter(r => r.trim());
+    return [...specificRules, ...baseRules.slice(1)]; // Mantener las básicas pero añadir las específicas al inicio
+  }
+  
+  return baseRules;
+});
 
 const enrichedRules = computed(() => {
   const icons = [

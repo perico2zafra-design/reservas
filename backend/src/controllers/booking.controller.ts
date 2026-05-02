@@ -60,9 +60,11 @@ export const createBookingPaymentIntent = async (req: Request, res: Response) =>
     const { roomId, bookingDate, startTime, endTime } = req.body;
     const userId = (req as any).user.id;
 
-    // 0. Obtener configuración dinámica
+    // 0. Obtener configuración dinámica (Prioridad a la sala, luego global)
+    const { data: roomInfo } = await supabase.from('rooms').select('max_bookings_per_month, deposit_amount').eq('id', roomId).single();
     const { data: settings } = await supabase.from('site_settings').select('max_bookings_per_month').single();
-    const MAX_LIMIT = settings?.max_bookings_per_month || 2;
+    
+    const MAX_LIMIT = roomInfo?.max_bookings_per_month || settings?.max_bookings_per_month || 2;
 
     // 1. Verificar límite de reservas por propietario (Máximo X al mes natural según acta)
     const targetDate = new Date(bookingDate);
@@ -131,9 +133,11 @@ export const confirmBooking = async (req: Request, res: Response) => {
     const { roomId, bookingDate, startTime, endTime, paymentIntentId } = req.body;
     const userId = (req as any).user.id;
     
-    // 0. Obtener configuración dinámica y verificar límites (Duplicado de seguridad)
+    // 0. Obtener configuración dinámica y verificar límites (Prioridad a la sala)
+    const { data: roomInfo } = await supabase.from('rooms').select('max_bookings_per_month, deposit_amount').eq('id', roomId).single();
     const { data: settings } = await supabase.from('site_settings').select('max_bookings_per_month').single();
-    const MAX_LIMIT = settings?.max_bookings_per_month || 2;
+    
+    const MAX_LIMIT = roomInfo?.max_bookings_per_month || settings?.max_bookings_per_month || 2;
 
     const targetDate = new Date(bookingDate);
     const firstDayOfMonth = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);

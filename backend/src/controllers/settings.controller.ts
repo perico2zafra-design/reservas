@@ -21,10 +21,6 @@ export const updateSettings = async (req: Request, res: Response) => {
       name, 
       address, 
       urbanization_details, 
-      max_bookings_per_month, 
-      booking_horizon_months,
-      start_hour, 
-      end_hour 
     } = req.body;
 
     const { data, error } = await supabase
@@ -33,10 +29,6 @@ export const updateSettings = async (req: Request, res: Response) => {
         name, 
         address, 
         urbanization_details, 
-        max_bookings_per_month,
-        booking_horizon_months,
-        start_hour,
-        end_hour,
         updated_at: new Date() 
       })
 
