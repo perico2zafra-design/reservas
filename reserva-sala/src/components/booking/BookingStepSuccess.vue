@@ -19,6 +19,20 @@
         Tu espacio en <strong>{{ roomName }}</strong> ha sido reservado con
         éxito.
       </p>
+
+      <!-- SMART LOCK CODE DISPLAY -->
+      <div v-if="accessCode" class="access-code-container mb-8">
+        <div class="code-box pa-6">
+          <v-icon icon="mdi-lock-clock" color="#fbbf24" size="32" class="mb-2" />
+          <div class="text-overline text-white opacity-60 mb-1">CÓDIGO DE ACCESO TEMPORAL</div>
+          <div class="text-h2 font-weight-black text-amber-accent-2 tracking-widest">{{ accessCode }}</div>
+          <p class="text-caption text-blue-grey-lighten-3 mt-4 mb-0">
+            Este código solo será válido el día <strong>{{ formattedDate }}</strong> <br>
+            de <strong>{{ timeLabel }}</strong>.
+          </p>
+        </div>
+      </div>
+
       <div class="pa-4 rounded-xl bg-success-light mb-8 max-w-500 mx-auto">
         <p class="text-subtitle-2 text-success font-weight-black mb-0">
           <v-icon icon="mdi-shield-check" class="me-2" />
@@ -55,6 +69,7 @@ defineProps<{
   roomName: string;
   formattedDate: string;
   timeLabel: string;
+  accessCode?: string | null;
 }>();
 </script>
 
@@ -113,6 +128,31 @@ defineProps<{
     padding: 40px 24px !important;
     border: none !important;
     box-shadow: none !important;
+  }
+}
+.access-code-container {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.code-box {
+  background: #0f172a;
+  border-radius: 24px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.text-amber-accent-2 {
+  color: #fbbf24 !important;
+}
+
+.tracking-widest {
+  letter-spacing: 0.25em !important;
+}
+
+@media (max-width: 600px) {
+  .code-box {
+    padding: 24px 12px !important;
   }
 }
 </style>

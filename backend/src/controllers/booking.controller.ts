@@ -161,23 +161,28 @@ export const confirmBooking = async (req: Request, res: Response) => {
       .eq('id', roomId)
       .single();
 
-    const { data: booking, error } = await supabase
+    // 4. Generar Código de Acceso Único (Cerradura Inteligente)
+    const accessCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // 5. Insertar en Supabase
+    const { data: booking, error: insertError } = await supabase
       .from('bookings')
-      .insert([{
+      .insert({
         room_id: roomId,
         user_id: userId,
         booking_date: bookingDate,
         start_time: startTime,
         end_time: endTime,
-        status: 'CONFIRMED',
-        deposit_status: 'PAID',
         stripe_payment_intent_id: paymentIntentId,
-        deposit_amount: room?.deposit_amount || 50
-      }])
-      .select()
+        deposit_amount: room?.deposit_amount || 50,
+        deposit_status: 'PAID', // Con Setup Intents lo marcamos como PAID/Garantizado
+        access_code: accessCode,
+        status: 'CONFIRMED'
+      })
+      .select('*, room:rooms(*)')
       .single();
 
-    if (error) throw error;
+    if (insertError) throw insertError;
     res.status(201).json(booking);
   } catch (error) {
     res.status(500).json({ error: 'Error al confirmar la reserva' });

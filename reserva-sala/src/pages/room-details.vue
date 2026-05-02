@@ -221,8 +221,9 @@
                 <v-window-item :value="5">
                    <BookingStepSuccess 
                      :room-name="room?.name || ''"
-                     :formatted-date="formatDate(selectedDate)"
-                     :time-label="getTimeLabel(selectedSlot)"
+                     :formatted-date="formatDate(selectedDate!)"
+                     :time-label="selectedSlot === 'MORNING' ? '10:00 - 15:00' : '15:00 - 22:00'"
+                     :access-code="confirmedAccessCode"
                    />
                 </v-window-item>
 
@@ -268,6 +269,8 @@ const room = computed(() =>
 const roomBookings = ref<any[]>([]);
 const userBookings = ref<any[]>([]);
 const siteSettings = ref<Partial<SiteSettings>>({});
+const confirmedBookingId = ref<number | null>(null);
+const confirmedAccessCode = ref<string | null>(null);
 const selectedDate = ref<Date | null>(null);
 const selectedSlot = ref(null);
 const currentStep = ref(1);
@@ -526,13 +529,17 @@ const confirmPayment = async () => {
     if (error) throw error;
 
     // 3. Confirmar la reserva en nuestra DB
-    await bookingStore.createBooking({
+    const newBooking = await bookingStore.createBooking({
       roomId: room.value!.id,
       bookingDate,
       startTime,
       endTime,
       paymentIntentId: setupIntent.payment_method as string // Guardamos el método de pago para futuros cargos
     });
+
+    if (newBooking && newBooking.access_code) {
+      confirmedAccessCode.value = newBooking.access_code;
+    }
 
     currentStep.value = 5;
     appStore.showSuccess('¡Reserva confirmada con éxito!');

@@ -12,11 +12,17 @@ export interface Room {
 
 export interface Booking {
   id: number;
-  roomId: number;
-  userName: string;
-  startTime: string;
-  endTime: string;
-  createdAt: string;
+  room_id: number;
+  user_id: string;
+  booking_date: string;
+  start_time: string;
+  end_time: string;
+  status: string;
+  deposit_amount: number;
+  deposit_status: string;
+  stripe_payment_intent_id?: string;
+  access_code?: string;
+  created_at: string;
   room?: Room;
 }
 

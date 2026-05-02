@@ -33,6 +33,17 @@
                 <span>{{ formatTime(booking.start_time) }} — {{ formatTime(booking.end_time) }}</span>
               </div>
             </div>
+
+            <!-- CÓDIGO DE ACCESO (SMART LOCK) -->
+            <div v-if="booking.access_code && booking.status === 'CONFIRMED'" class="access-code-badge-premium mt-4">
+              <v-icon icon="mdi-lock-open-variant-outline" size="18" class="me-3" />
+              <div class="d-flex flex-column">
+                <span class="code-label">CÓDIGO DE ACCESO</span>
+                <span class="code-value">{{ booking.access_code }}</span>
+              </div>
+              <v-spacer />
+              <v-icon icon="mdi-keyboard-outline" opacity="0.3" size="24" />
+            </div>
           </div>
         </v-col>
 
@@ -201,5 +212,32 @@ defineProps<{
   .price-display-v2 .amount {
     font-size: 1.25rem;
   }
+}
+
+.access-code-badge-premium {
+  background: #0f172a;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.code-label {
+  font-size: 0.6rem;
+  font-weight: 900;
+  color: #94a3b8;
+  letter-spacing: 1px;
+}
+
+.code-value {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #fbbf24;
+  letter-spacing: 4px;
+  line-height: 1;
+  margin-top: 2px;
 }
 </style>
