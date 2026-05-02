@@ -113,55 +113,55 @@
                 </div>
               </v-col>
             </v-row>
-          </v-card>
-
-
-          <!-- MOBILE PREMIUM INFO BAR (NO CARD) -->
-
-          <div class="d-md-none mobile-info-bar-elite mb-8 mt-n8">
-            <div class="d-flex align-center justify-space-between px-6 py-4 bg-white rounded-xl shadow-sm border">
-               <div class="d-flex align-center ga-4">
+          </v-card>          <!-- MOBILE PREMIUM INFO BAR (NO CARD) -->
+          <div class="d-md-none mobile-info-bar-elite mb-10 mt-n10">
+            <div class="info-bar-glass d-flex align-center justify-space-between px-6 py-4">
+               <div class="d-flex align-center ga-6">
                   <div class="d-flex align-center">
-                    <v-icon icon="mdi-account-group" size="18" class="me-1 text-slate-400" />
-                    <span class="text-caption font-weight-black text-slate-700">{{ room?.capacity }}</span>
+                    <div class="icon-bg-mini me-2">
+                      <v-icon icon="mdi-account-group" size="14" color="slate-600" />
+                    </div>
+                    <span class="text-caption font-weight-black text-slate-800">{{ room?.capacity }}</span>
                   </div>
-                  <v-divider vertical class="mx-0" style="height: 12px; align-self: center;" />
                   <div class="d-flex align-center">
-                    <v-icon icon="mdi-check-decagram" size="18" class="me-1 text-success" />
-                    <span class="text-caption font-weight-black text-success">LISTO</span>
+                    <div class="icon-bg-mini me-2 success">
+                      <v-icon icon="mdi-check-decagram" size="14" color="success" />
+                    </div>
+                    <span class="text-caption font-weight-black text-success">OK</span>
                   </div>
                </div>
-               <div class="mobile-price-tag-elite py-1 px-4 rounded-pill">
+               <div class="mobile-price-tag-premium py-1.5 px-5">
                   <span class="text-caption font-weight-black text-white">€{{ room?.deposit_amount }}</span>
                </div>
             </div>
           </div>
 
           <!-- PASO A PASO INCREMENTAL BOUTIQUE (5 PASOS) -->
-          <div class="elite-stepper-header mb-8 mb-md-12">
-            <div class="stepper-track">
+          <div class="elite-stepper-container mb-12">
+            <div class="stepper-track-premium">
               <div
                 v-for="n in 5"
                 :key="n"
-                class="stepper-node"
+                class="stepper-node-premium"
                 :class="{
-                  'node-active': currentStep >= n,
-                  'node-completed': currentStep > n,
+                  'active': currentStep >= n,
+                  'completed': currentStep > n,
                 }"
               >
-                <div class="node-circle">
-                  <v-icon v-if="currentStep > n" icon="mdi-check" size="14" color="white" />
+                <div class="node-circle-premium">
+                  <v-icon v-if="currentStep > n" icon="mdi-check" size="12" color="white" />
                   <span v-else>{{ n }}</span>
                 </div>
-                <div class="node-label">
+                <div class="node-label-premium">
                   {{ ['Día', 'Hora', 'Resumen', 'Pago', 'Listo'][n-1] }}
                 </div>
               </div>
-              <div class="stepper-line"></div>
-              <div 
-                class="stepper-line-active" 
-                :style="{ width: ((currentStep - 1) / 4) * 100 + '%' }"
-              ></div>
+              <div class="stepper-line-premium">
+                <div 
+                  class="stepper-line-progress" 
+                  :style="{ width: ((currentStep - 1) / 4) * 100 + '%' }"
+                ></div>
+              </div>
             </div>
           </div>
 
@@ -210,6 +210,7 @@
                    <BookingStepPayment 
                      :deposit-amount="room?.deposit_amount || 0"
                      :loading="processing"
+                     :disabled="!isCardComplete"
                      @confirm="confirmPayment"
                      @simulate="simulateSuccess"
                      @back="currentStep = 3"
@@ -249,6 +250,7 @@ import BookingStepSummary from '@/components/booking/BookingStepSummary.vue';
 import BookingStepPayment from '@/components/booking/BookingStepPayment.vue';
 import BookingStepSuccess from '@/components/booking/BookingStepSuccess.vue';
 import { loadStripe } from '@stripe/stripe-js';
+import { bookingService } from "@/services/booking.service";
 import { siteService } from "@/services/site.service";
 import { formatDate } from "@/utils/formatters";
 import api from "@/services/api";
@@ -380,7 +382,15 @@ const isReadyToBook = computed(() => selectedDate.value && selectedSlot.value);
 // Stripe state
 let stripe: any = null;
 let elements: any = null;
-let card: any = null;
+let cardNumber: any = null;
+let cardExpiry: any = null;
+let cardCvc: any = null;
+const isCardComplete = ref(false);
+const cardErrors = ref<Record<string, boolean>>({
+  number: true,
+  expiry: true,
+  cvc: true
+});
 
 const goToPayment = async () => {
   currentStep.value = 4;
@@ -393,22 +403,40 @@ const initStripeInStep = async () => {
   }
   
   elements = stripe.elements();
-  card = elements.create('card', {
-    style: {
-      base: {
-        fontSize: '16px',
-        color: '#0f172a',
-        fontFamily: '"Inter", sans-serif',
-        '::placeholder': { color: '#94a3b8' }
-      }
-    }
-  });
-
-  const desktopEl = document.getElementById('step-card-element');
-  const mobileEl = document.getElementById('mobile-card-element');
   
-  if (desktopEl) card.mount('#step-card-element');
-  if (mobileEl) card.mount('#mobile-card-element');
+  const elementStyles = {
+    base: {
+      fontSize: '16px',
+      color: '#0f172a',
+      fontFamily: '"Inter", sans-serif',
+      '::placeholder': { color: '#94a3b8' }
+    },
+    invalid: {
+      color: '#ef4444'
+    }
+  };
+
+  cardNumber = elements.create('cardNumber', { style: elementStyles });
+  cardExpiry = elements.create('cardExpiry', { style: elementStyles });
+  cardCvc = elements.create('cardCvc', { style: elementStyles });
+
+  const checkCompletion = () => {
+    isCardComplete.value = !cardErrors.value.number && !cardErrors.value.expiry && !cardErrors.value.cvc;
+  };
+
+  [
+    { el: cardNumber, key: 'number', id: 'card-number-element' },
+    { el: cardExpiry, key: 'expiry', id: 'card-expiry-element' },
+    { el: cardCvc, key: 'cvc', id: 'card-cvc-element' }
+  ].forEach(item => {
+    const el = document.getElementById(item.id);
+    if (el) item.el.mount('#' + item.id);
+
+    item.el.on('change', (event: any) => {
+      cardErrors.value[item.key] = event.error || !event.complete;
+      checkCompletion();
+    });
+  });
 };
 
 watch(selectedDate, () => {
@@ -469,7 +497,7 @@ const simulateSuccess = async () => {
 };
 
 const confirmPayment = async () => {
-  if (!stripe || !card) return;
+  if (!stripe || !cardNumber) return;
   
   processing.value = true;
   try {
@@ -488,7 +516,7 @@ const confirmPayment = async () => {
     // 2. Confirmar el pago en Stripe
     const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
-        card: card,
+        card: cardNumber,
         billing_details: {
           name: authStore.user?.name || 'Cliente Elite'
         }
@@ -696,6 +724,115 @@ export default {
   font-weight: 900;
   line-height: 1;
 }
+
+/* MOBILE PREMIUM UI */
+.info-bar-glass {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid rgba(15, 23, 42, 0.05);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
+}
+
+.icon-bg-mini {
+  width: 28px;
+  height: 28px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-bg-mini.success {
+  background: #ecfdf5;
+}
+
+.mobile-price-tag-premium {
+  background: #0f172a;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.15);
+}
+
+/* STEPPER PREMIUM */
+.elite-stepper-container {
+  padding: 0 10px;
+}
+
+.stepper-track-premium {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.stepper-line-premium {
+  position: absolute;
+  top: 14px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.stepper-line-progress {
+  height: 100%;
+  background: #0f172a;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stepper-node-premium {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  flex: 1;
+}
+
+.node-circle-premium {
+  width: 28px;
+  height: 28px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 900;
+  color: #94a3b8;
+  transition: all 0.3s ease;
+}
+
+.stepper-node-premium.active .node-circle-premium {
+  border-color: #0f172a;
+  color: #0f172a;
+  transform: scale(1.1);
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.05);
+}
+
+.stepper-node-premium.completed .node-circle-premium {
+  background: #0f172a;
+  border-color: #0f172a;
+  color: white;
+}
+
+.node-label-premium {
+  font-size: 10px;
+  font-weight: 800;
+  color: #94a3b8;
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.stepper-node-premium.active .node-label-premium {
+  color: #0f172a;
+}
+
 
 .text-caption-elite {
   font-size: 0.75rem;

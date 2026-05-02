@@ -98,6 +98,13 @@ export const createBookingPaymentIntent = async (req: Request, res: Response) =>
     const amountInCents = Math.round(room.deposit_amount * 100);
 
     // 3. Crear el Payment Intent en Stripe
+    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu_clave_secreta')) {
+      return res.status(500).json({ 
+        error: 'Error de configuración', 
+        message: 'No se ha configurado una clave de Stripe válida en el backend (.env).' 
+      });
+    }
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountInCents,
       currency: 'eur',
