@@ -258,7 +258,7 @@ export const deleteBooking = async (req: Request, res: Response) => {
       .from('bookings')
       .update({ 
         status: 'CANCELLED',
-        deposit_status: 'VOIDED' // O 'CANCELLED'
+        deposit_status: 'REFUNDED' 
       })
       .eq('id', id);
 
