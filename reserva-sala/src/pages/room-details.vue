@@ -4,19 +4,34 @@
     <div class="elite-hero-wrapper">
       <v-img 
         :src="room?.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200'" 
-        height="500" 
+        height="480" 
         cover 
         class="elite-hero-img"
       >
         <div class="elite-hero-overlay">
-          <v-container class="h-100 d-flex flex-column justify-start pt-10">
+          <v-container class="h-100 d-flex flex-column justify-end pb-16">
             <v-btn 
               icon="mdi-arrow-left" 
               color="white" 
               variant="tonal" 
-              class="back-btn-elite" 
+              class="back-btn-elite mb-6" 
               @click="$router.push('/')" 
             />
+            
+            <div class="elite-hero-content animate-fade-up">
+              <div class="d-flex align-center mb-4 ga-3">
+                <v-chip color="#fbbf24" variant="flat" size="small" class="text-slate-900 font-weight-black letter-spacing-lg">
+                  INSTALACIÓN EXCLUSIVA
+                </v-chip>
+                <v-chip v-if="room?.is_active" color="#ecfdf5" class="text-emerald-700 font-weight-black border-emerald" size="small">
+                  <v-icon icon="mdi-check-circle" start size="14" color="#059669" /> DISPONIBLE
+                </v-chip>
+
+              </div>
+
+              <h1 class="text-display-elite text-playfair text-white mb-4">{{ room?.name }}</h1>
+              <p class="text-h6 text-white opacity-80 font-weight-medium max-w-600 leading-relaxed">{{ room?.description }}</p>
+            </div>
           </v-container>
         </div>
       </v-img>
@@ -26,45 +41,41 @@
       <v-row justify="center">
         <v-col cols="12" lg="11" xl="10">
           
-          <!-- Floating Header Card (Ultra Premium) -->
-          <v-card class="elite-header-card pa-8 pa-md-12 mb-10 overflow-hidden mt-n16">
+          <!-- Floating Action Card (Ultra Premium) -->
+          <v-card class="elite-header-card pa-8 pa-md-10 mb-10 overflow-hidden mt-n16">
             <div class="card-accent-line"></div>
-            <v-row align="center">
-              <v-col cols="12" md="7">
-                <div class="d-flex align-center mb-4 ga-3">
-                  <v-chip color="#d4af37" variant="flat" size="small" class="text-white font-weight-black letter-spacing-lg">
-                    INSTALACIÓN EXCLUSIVA
-                  </v-chip>
-                  <v-chip v-if="room?.is_active" color="#ecfdf5" class="text-emerald-700 font-weight-black border-emerald" size="small">
-                    <v-icon icon="mdi-check-circle" start size="14" color="#059669" /> DISPONIBLE
-                  </v-chip>
-
+            <v-row align="center" justify="space-between">
+              <v-col cols="12" md="6">
+                <div class="d-flex align-center ga-6">
+                  <div class="info-item-elite">
+                    <span class="text-overline text-slate-400">CAPACIDAD</span>
+                    <div class="d-flex align-center mt-1">
+                      <v-icon icon="mdi-account-group-outline" color="slate-700" class="me-2" />
+                      <span class="text-h6 font-weight-black text-slate-800">{{ room?.capacity }} Pers.</span>
+                    </div>
+                  </div>
+                  <v-divider vertical class="mx-2" />
+                  <div class="info-item-elite">
+                    <span class="text-overline text-slate-400">ESTADO</span>
+                    <div class="d-flex align-center mt-1">
+                      <v-icon icon="mdi-shield-check-outline" color="success" class="me-2" />
+                      <span class="text-h6 font-weight-black text-success">Verificado</span>
+                    </div>
+                  </div>
                 </div>
-                <h1 class="text-display-elite text-playfair mb-6">{{ room?.name }}</h1>
-                <p class="text-body-elite mb-0">{{ room?.description }}</p>
               </v-col>
               <v-col cols="12" md="5" class="d-flex justify-md-end pt-6 pt-md-0">
-                <div class="elite-price-box pa-8 text-center">
-                  <div class="text-overline-elite mb-2">FIANZA DE GARANTÍA</div>
+                <div class="elite-price-box-mini pa-6 text-center">
+                  <div class="text-overline-elite mb-1">FIANZA DE GARANTÍA</div>
                   <div class="d-flex align-center justify-center">
                     <span class="currency-elite">€</span>
-                    <span class="amount-elite">{{ room?.deposit_amount }}</span>
-                  </div>
-                  <v-divider class="my-4 opacity-10" />
-                  <div class="d-flex align-center justify-center ga-4">
-                    <div class="d-flex align-center">
-                      <v-icon icon="mdi-account-group-outline" size="18" class="me-2 text-slate-400" />
-                      <span class="text-caption-elite">Máx. {{ room?.capacity }}</span>
-                    </div>
-                    <div class="d-flex align-center">
-                      <v-icon icon="mdi-shield-check-outline" size="18" class="me-2 text-slate-400" />
-                      <span class="text-caption-elite">Protegido</span>
-                    </div>
+                    <span class="amount-elite-mini">{{ room?.deposit_amount }}</span>
                   </div>
                 </div>
               </v-col>
             </v-row>
           </v-card>
+
 
           <v-row class="ga-y-8">
             <!-- Selector de Reserva (Columna Izquierda) -->
@@ -257,28 +268,41 @@
                   </div>
                 </v-card>
 
-                <!-- Aviso Legal Premium -->
-                <div class="elite-notice-card mt-6 pa-6">
-                  <div class="d-flex flex-column ga-4">
-                    <div class="d-flex align-start">
-                      <div class="icon-circle-amber me-4">
-                        <v-icon icon="mdi-camera-outline" color="amber-darken-3" size="18" />
+                <!-- Panel de Compromiso Elite (Boutique Style) -->
+                <div class="elite-guarantee-panel mt-8 pa-8">
+                  <div class="guarantee-glass-overlay"></div>
+                  
+                  <div class="d-flex flex-column ga-8 position-relative">
+                    <!-- Protocolo de Salida -->
+                    <div class="d-flex align-start ga-5">
+                      <div class="concierge-icon-wrapper amber-glow">
+                        <v-icon icon="mdi-camera-enhance-outline" color="#d4af37" size="20" />
                       </div>
-                      <p class="text-caption text-slate-500 mb-0 leading-relaxed">
-                        <strong>Protocolo de Salida:</strong> Recomendamos fotografiar la sala al terminar. Garantiza la devolución íntegra de tu fianza.
-                      </p>
+                      <div>
+                        <h4 class="text-caption font-weight-black text-slate-900 letter-spacing-lg mb-1">PROTOCOLO DIGITAL</h4>
+                        <p class="text-caption text-slate-500 mb-0 leading-relaxed">
+                          Recomendamos <strong>fotografiar la estancia</strong> al finalizar. Este sencillo paso garantiza la integridad de su fianza.
+                        </p>
+                      </div>
                     </div>
-                    <v-divider class="border-opacity-25" />
-                    <div class="d-flex align-start">
-                      <div class="icon-circle-blue me-4">
-                        <v-icon icon="mdi-clock-check-outline" color="blue-darken-3" size="18" />
+
+                    <v-divider class="guarantee-divider" />
+
+                    <!-- Garantía de Reembolso -->
+                    <div class="d-flex align-start ga-5">
+                      <div class="concierge-icon-wrapper blue-glow">
+                        <v-icon icon="mdi-shield-refresh-outline" color="#2563eb" size="20" />
                       </div>
-                      <p class="text-caption text-slate-500 mb-0 leading-relaxed">
-                        Inspección y reembolso automático en un máximo de 48h hábiles tras el evento.
-                      </p>
+                      <div>
+                        <h4 class="text-caption font-weight-black text-slate-900 letter-spacing-lg mb-1">GARANTÍA DE REEMBOLSO</h4>
+                        <p class="text-caption text-slate-500 mb-0 leading-relaxed">
+                          Inspección profesional y <strong>devolución automática</strong> en su cuenta en un máximo de 48h hábiles.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
+
 
               </div>
             </v-col>
@@ -475,11 +499,32 @@ export default {
 
 .elite-hero-overlay {
   height: 100%;
-  background: linear-gradient(to bottom, rgba(15, 23, 42, 0.4) 0%, rgba(248, 250, 252, 1) 100%);
+  background: linear-gradient(
+    to bottom, 
+    rgba(15, 23, 42, 0.3) 0%, 
+    rgba(15, 23, 42, 0.5) 60%, 
+    rgba(15, 23, 42, 0.8) 100%
+  );
 }
+
+.elite-hero-content {
+  text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.animate-fade-up {
+  animation: fadeUp 1s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.max-w-600 { max-width: 600px; }
 
 .back-btn-elite {
   backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   transition: all 0.3s ease;
 }
@@ -490,21 +535,35 @@ export default {
   transform: translateX(-5px);
 }
 
-/* CONTENT CONTAINER */
-.elite-content-container {
-  position: relative;
-  z-index: 10;
-}
-
-/* HEADER CARD */
+/* ACTION CARD */
 .elite-header-card {
-  background: rgba(255, 255, 255, 0.85) !important;
-  backdrop-filter: blur(20px);
+  background: white !important;
   border-radius: 40px !important;
-  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border: 1px solid #e2e8f0 !important;
   box-shadow: 0 40px 100px -20px rgba(15, 23, 42, 0.1) !important;
   position: relative;
+  z-index: 20;
 }
+
+.info-item-elite {
+  display: flex;
+  flex-direction: column;
+}
+
+.elite-price-box-mini {
+  background: #0f172a;
+  border-radius: 28px;
+  color: white;
+  min-width: 220px;
+  box-shadow: 0 15px 30px rgba(15, 23, 42, 0.2);
+}
+
+.amount-elite-mini {
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
 
 .card-accent-line {
   position: absolute;
@@ -516,12 +575,13 @@ export default {
 }
 
 .text-display-elite {
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-size: clamp(2.2rem, 5vw, 4rem);
   line-height: 1.1;
   font-weight: 900;
-  letter-spacing: -2px;
-  color: #0f172a;
+  letter-spacing: -1.5px;
+  color: white !important; /* Forzamos blanco para el Hero */
 }
+
 
 .text-playfair {
   font-family: 'Playfair Display', serif;
@@ -859,28 +919,55 @@ export default {
   transform: translateX(5px);
 }
 
-/* NOTICE CARD */
-.elite-notice-card {
-  background: white;
-  border: 1px solid #e2e8f0;
+/* GUARANTEE PANEL */
+.elite-guarantee-panel {
+  position: relative;
   border-radius: 32px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  overflow: hidden;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 10px 15px -3px rgba(0, 0, 0, 0.03);
 }
 
-.icon-circle-amber, .icon-circle-blue {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
+.guarantee-glass-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+}
+
+.concierge-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.03);
 }
 
-.icon-circle-amber { background: rgba(251, 191, 36, 0.1); }
-.icon-circle-blue { background: rgba(37, 99, 235, 0.1); }
+.amber-glow {
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.15);
+}
+
+.blue-glow {
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+}
+
+.guarantee-divider {
+  border-color: rgba(15, 23, 42, 0.05) !important;
+}
 
 /* UTILS */
+
 .text-emerald-700 { color: #047857 !important; }
 .border-emerald { border: 1px solid rgba(16, 185, 129, 0.3) !important; }
 
