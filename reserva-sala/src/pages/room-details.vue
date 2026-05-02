@@ -157,10 +157,13 @@
                       />
                     </div>
 
-                    <div class="d-flex justify-center ga-8 pt-4 border-t opacity-70">
+                    <div class="d-flex justify-center ga-6 pt-4 border-t opacity-70 flex-wrap">
                       <div class="d-flex align-center ga-2"><div class="dot-indicator bg-success"></div><span class="text-caption font-weight-bold">Libre</span></div>
+                      <div class="d-flex align-center ga-2"><div class="dot-indicator bg-warning"></div><span class="text-caption font-weight-bold">Parcial</span></div>
                       <div class="d-flex align-center ga-2"><div class="dot-indicator bg-error"></div><span class="text-caption font-weight-bold">Lleno</span></div>
+                      <div class="d-flex align-center ga-2"><div class="dot-indicator bg-grey-lighten-1"></div><span class="text-caption font-weight-bold">Inhábil</span></div>
                     </div>
+
                   </v-card>
                 </v-window-item>
 
