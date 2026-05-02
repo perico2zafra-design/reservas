@@ -17,7 +17,7 @@ export const getSettings = async (req: Request, res: Response) => {
 
 export const updateSettings = async (req: Request, res: Response) => {
   try {
-    const { name, address, urbanization_details, max_bookings_per_month } = req.body;
+    const { name, address, urbanization_details, max_bookings_per_month, start_hour, end_hour } = req.body;
 
     const { data, error } = await supabase
       .from('site_settings')
@@ -26,6 +26,8 @@ export const updateSettings = async (req: Request, res: Response) => {
         address, 
         urbanization_details, 
         max_bookings_per_month,
+        start_hour,
+        end_hour,
         updated_at: new Date() 
       })
       .eq('id', 1)
@@ -38,3 +40,4 @@ export const updateSettings = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error al actualizar configuración', error });
   }
 };
+

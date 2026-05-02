@@ -69,12 +69,13 @@ const internalModel = computed({
 const blockDuration = ref(7);
 
 const blockOptions = [
-  { title: '1 Semana', value: 7 },
-  { title: '15 Días', value: 15 },
-  { title: '1 Mes', value: 30 },
-  { title: '3 Meses', value: 90 },
-  { title: 'Indefinido', value: 3650 }
+  { title: 'Infracción Leve (1 Mes)', value: 30 },
+  { title: 'Infracción Grave (3 Meses)', value: 90 },
+  { title: 'Infracción Grave (6 Meses)', value: 180 },
+  { title: 'Muy Grave (1 Año)', value: 365 },
+  { title: 'Sanción Indefinida', value: 3650 }
 ];
+
 
 const confirm = () => {
   emit('confirm', blockDuration.value);
