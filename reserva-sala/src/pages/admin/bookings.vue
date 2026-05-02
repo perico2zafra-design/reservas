@@ -38,9 +38,13 @@
           hide-slider
           class="tabs-elite-full"
         >
-          <v-tab value="PAID" class="tab-item-elite text-none">
-            <v-icon start icon="mdi-wallet-outline" size="18" class="tab-icon" />
-            <span class="tab-label">Pendientes</span>
+          <v-tab value="TO_MANAGE" class="tab-item-elite text-none">
+            <v-icon start icon="mdi-alert-circle-outline" size="18" class="tab-icon" />
+            <span class="tab-label">Por Devolver</span>
+          </v-tab>
+          <v-tab value="UPCOMING" class="tab-item-elite text-none">
+            <v-icon start icon="mdi-clock-outline" size="18" class="tab-icon" />
+            <span class="tab-label">Próximas</span>
           </v-tab>
           <v-tab value="REFUNDED" class="tab-item-elite text-none">
             <v-icon start icon="mdi-cash-refund" size="18" class="tab-icon" />
@@ -215,7 +219,7 @@ import { useAppStore } from "@/stores/app";
 
 const bookingStore = useBookingStore();
 const appStore = useAppStore();
-const filterTab = ref("PAID");
+const filterTab = ref("TO_MANAGE");
 
 const refundDialog = ref(false);
 const captureDialog = ref(false);
@@ -223,9 +227,21 @@ const processing = ref(false);
 const selectedBooking = ref<Booking | null>(null);
 
 const filteredBookings = computed(() => {
-  return bookingStore.bookings.filter(
-    (b) => b.deposit_status === filterTab.value,
-  );
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  return bookingStore.bookings.filter((b) => {
+    const bDate = new Date(b.booking_date);
+    bDate.setHours(0, 0, 0, 0);
+
+    if (filterTab.value === "TO_MANAGE") {
+      return b.deposit_status === "PAID" && bDate < now;
+    }
+    if (filterTab.value === "UPCOMING") {
+      return b.deposit_status === "PAID" && bDate >= now;
+    }
+    return b.deposit_status === filterTab.value;
+  });
 });
 
 const openActionModal = (booking: Booking, action: "REFUND" | "CAPTURE") => {
