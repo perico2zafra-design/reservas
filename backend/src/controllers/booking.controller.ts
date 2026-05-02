@@ -97,7 +97,7 @@ export const createBookingPaymentIntent = async (req: Request, res: Response) =>
     
     const amountInCents = Math.round(room.deposit_amount * 100);
 
-    // 3. Crear el Payment Intent en Stripe
+    // 3. Crear el Setup Intent en Stripe (Valida y guarda la tarjeta sin cobrar)
     if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('tu_clave_secreta')) {
       return res.status(500).json({ 
         error: 'Error de configuración', 
@@ -105,18 +105,18 @@ export const createBookingPaymentIntent = async (req: Request, res: Response) =>
       });
     }
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amountInCents,
-      currency: 'eur',
+    const setupIntent = await stripe.setupIntents.create({
+      usage: 'off_session', // Permite cobros futuros sin que el cliente esté presente
       metadata: { 
         roomId, 
         userId,
-        bookingDate 
+        bookingDate,
+        type: 'registro_fianza_segura'
       }
     });
 
     res.json({
-      clientSecret: paymentIntent.client_secret,
+      clientSecret: setupIntent.client_secret,
       depositAmount: room.deposit_amount
     });
   } catch (error) {
@@ -228,6 +228,7 @@ export const manageDeposit = async (req: Request, res: Response) => {
   }
 };
 
+
 export const deleteBooking = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
@@ -242,3 +243,4 @@ export const deleteBooking = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error al eliminar reserva' });
   }
 };
+

@@ -9,8 +9,13 @@
         <div class="mobile-payment-icon mb-4 d-md-none">
           <v-icon icon="mdi-shield-check" color="#0f172a" size="20" />
         </div>
-        <h2 class="text-h5 text-md-h4 font-weight-black text-slate-900 mb-2">Pago Seguro</h2>
-        <p class="text-caption text-md-body-1 text-slate-500">Introduce los datos de tu tarjeta para autorizar la fianza</p>
+        <h2 class="text-h5 text-md-h4 font-weight-black text-slate-900 mb-2">Garantía de Reserva</h2>
+        <p class="text-caption text-md-body-1 text-slate-500 mb-4">Vincula tu tarjeta de forma segura. No se realizará ningún cargo ahora.</p>
+        
+        <div class="d-inline-flex align-center ga-2 pa-2 px-4 rounded-pill bg-success-light mb-2">
+          <v-icon icon="mdi-shield-check" color="success" size="16" />
+          <span class="text-caption font-weight-black text-success">VALIDACIÓN SIN CARGO (0,00€)</span>
+        </div>
       </div>
 
       <div class="elite-stripe-container mb-10">
@@ -45,7 +50,7 @@
           :disabled="disabled"
           @click="$emit('confirm')"
         >
-          CONFIRMAR Y AUTORIZAR
+          CONFIRMAR REGISTRO SEGURO
         </v-btn>
 
         <v-btn 

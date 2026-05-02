@@ -505,7 +505,7 @@ const confirmPayment = async () => {
     const startTime = selectedSlot.value === 'MORNING' ? '10:00' : (selectedSlot.value === 'AFTERNOON' ? '15:00' : '10:00');
     const endTime = selectedSlot.value === 'MORNING' ? '15:00' : (selectedSlot.value === 'AFTERNOON' ? '22:00' : '22:00');
 
-    // 1. Crear el Payment Intent en el backend
+    // 1. Crear el Setup Intent (Registro Seguro) en el backend
     const { clientSecret } = await bookingService.createPaymentIntent({
       roomId: room.value!.id,
       bookingDate,
@@ -513,8 +513,8 @@ const confirmPayment = async () => {
       endTime
     });
 
-    // 2. Confirmar el pago en Stripe
-    const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
+    // 2. Confirmar el registro en Stripe
+    const { setupIntent, error } = await stripe.confirmCardSetup(clientSecret, {
       payment_method: {
         card: cardNumber,
         billing_details: {
@@ -531,7 +531,7 @@ const confirmPayment = async () => {
       bookingDate,
       startTime,
       endTime,
-      paymentIntentId: paymentIntent.id
+      paymentIntentId: setupIntent.payment_method as string // Guardamos el método de pago para futuros cargos
     });
 
     currentStep.value = 5;

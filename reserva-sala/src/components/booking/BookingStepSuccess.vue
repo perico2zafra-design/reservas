@@ -8,9 +8,15 @@
       </div>
 
       <h2 class="text-h3 font-weight-black text-slate-900 mb-4 text-playfair">¡Reserva Confirmada!</h2>
-      <p class="text-h6 text-slate-500 mb-10 max-w-500 mx-auto leading-relaxed">
-        Tu espacio en <strong>{{ roomName }}</strong> ha sido reservado con éxito. Hemos enviado los detalles a tu correo electrónico.
+      <p class="text-h6 text-slate-500 mb-6 max-w-500 mx-auto leading-relaxed">
+        Tu espacio en <strong>{{ roomName }}</strong> ha sido reservado con éxito.
       </p>
+      <div class="pa-4 rounded-xl bg-success-light mb-8 max-w-500 mx-auto">
+        <p class="text-subtitle-2 text-success font-weight-black mb-0">
+          <v-icon icon="mdi-shield-check" class="me-2" />
+          TARJETA VINCULADA COMO GARANTÍA - SIN CARGO INMEDIATO
+        </p>
+      </div>
 
       <div class="success-summary-mini pa-8 mb-10">
         <div class="d-flex justify-space-between mb-4">
