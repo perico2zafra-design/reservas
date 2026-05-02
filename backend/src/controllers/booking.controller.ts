@@ -232,14 +232,40 @@ export const manageDeposit = async (req: Request, res: Response) => {
 export const deleteBooking = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
+    // 1. Obtener los datos de la reserva
+    const { data: booking, error: fetchError } = await supabase
+      .from('bookings')
+      .select('booking_date, start_time')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !booking) return res.status(404).json({ error: 'Reserva no encontrada' });
+
+    // 2. Validar regla de las 24 horas
+    const bookingDateTime = new Date(`${booking.booking_date}T${booking.start_time}`);
+    const now = new Date();
+    const diffInHours = (bookingDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    if (diffInHours < 24) {
+      return res.status(403).json({ 
+        error: 'Plazo de cancelación expirado',
+        message: 'No puedes cancelar una reserva con menos de 24 horas de antelación.' 
+      });
+    }
+
+    // 3. Cancelar (Soft delete) y limpiar estado de fianza
     const { error } = await supabase
       .from('bookings')
-      .update({ status: 'CANCELLED' })
+      .update({ 
+        status: 'CANCELLED',
+        deposit_status: 'VOIDED' // O 'CANCELLED'
+      })
       .eq('id', id);
 
     if (error) throw error;
     res.status(200).json({ message: 'Reserva cancelada correctamente' });
   } catch (error) {
+    console.error('Cancel Error:', error);
     res.status(500).json({ error: 'Error al cancelar la reserva' });
   }
 };

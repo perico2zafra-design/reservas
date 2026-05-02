@@ -102,8 +102,9 @@
                   prepend-icon="mdi-close"
                   class="font-weight-black btn-cancel-compact"
                   @click="openCancelModal(booking)"
+                  :disabled="!canCancel(booking)"
                 >
-                  Cancelar
+                  {{ canCancel(booking) ? 'Cancelar' : 'Plazo Expirado' }}
                 </v-btn>
               </template>
             </BookingCard>
@@ -176,6 +177,13 @@ const userBookings = computed(() => {
         new Date(b.booking_date).getTime() - new Date(a.booking_date).getTime(),
     );
 });
+
+const canCancel = (booking: any) => {
+  const bookingDateTime = new Date(`${booking.booking_date}T${booking.start_time}`).getTime();
+  const now = new Date().getTime();
+  const diffInHours = (bookingDateTime - now) / (1000 * 60 * 60);
+  return diffInHours >= 24;
+};
 
 const upcomingBookings = computed(() => {
   const today = new Date().setHours(0, 0, 0, 0);
