@@ -16,7 +16,7 @@ router.get('/my-bookings', authenticateToken, getMyBookings);
 router.post('/payment-intent', authenticateToken, createBookingPaymentIntent);
 
 router.post('/confirm', authenticateToken, confirmBooking);
-router.patch('/:id/deposit', authenticateToken, authorizeAdmin, manageDeposit);
+router.post('/:id/deposit', authenticateToken, authorizeAdmin, manageDeposit);
 router.delete('/:id', authenticateToken, deleteBooking);
 
 export default router;

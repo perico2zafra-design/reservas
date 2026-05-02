@@ -204,32 +204,49 @@ export const manageDeposit = async (req: Request, res: Response) => {
     if (fetchError || !booking) return res.status(404).json({ error: 'Reserva no encontrada' });
 
     if (action === 'REFUND') {
-      // Reembolsar en Stripe
-      await stripe.refunds.create({
-        payment_intent: booking.stripe_payment_intent_id,
-      });
-
+      // En el flujo de SetupIntent, no hay cargo inicial, así que solo marcamos como liberado en DB
       const { error: updateError } = await supabase
         .from('bookings')
         .update({ deposit_status: 'REFUNDED' })
         .eq('id', id);
 
       if (updateError) throw updateError;
-      res.json({ message: 'Fianza devuelta correctamente' });
+      res.json({ message: 'Fianza liberada correctamente (sin cargos)' });
+      
     } else if (action === 'CAPTURE') {
-      // En este flujo simplificado, el dinero ya está pagado. 
-      // CAPTURE aquí significa simplemente que el admin marca que se queda el dinero por daños.
+      // AQUÍ EJECUTAMOS EL CARGO REAL contra la tarjeta guardada
+      // stripe_payment_intent_id contiene en este flujo el PaymentMethod ID
+      const paymentMethodId = booking.stripe_payment_intent_id;
+      
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(booking.deposit_amount * 100),
+        currency: 'eur',
+        customer: booking.stripe_customer_id, // Si lo tuviéramos, si no usaremos el PM directamente
+        payment_method: paymentMethodId,
+        off_session: true,
+        confirm: true,
+        description: `Cargo por daños - Reserva #${id} - Sala Elite`,
+        // En un entorno real, necesitarías el customer_id o que el PM esté vinculado
+      });
+
       const { error: updateError } = await supabase
         .from('bookings')
-        .update({ deposit_status: 'CAPTURED' })
+        .update({ 
+          deposit_status: 'CAPTURED',
+          // Guardamos el ID del cargo real para referencia futura
+          stripe_payment_intent_id: paymentIntent.id 
+        })
         .eq('id', id);
 
       if (updateError) throw updateError;
-      res.json({ message: 'Fianza ejecutada (cobrada) por daños' });
+      res.json({ message: 'Fianza EJECUTADA correctamente. Se ha realizado el cargo en Stripe.' });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Deposit Management Error:', error);
-    res.status(500).json({ error: 'Error al gestionar la fianza' });
+    res.status(500).json({ 
+      error: 'Error al gestionar la fianza', 
+      details: error.message 
+    });
   }
 };
 
