@@ -67,54 +67,54 @@
     <v-container v-if="room" class="elite-content-container pb-16">
       <v-row justify="center">
         <v-col cols="12" lg="11" xl="10">
-
-          <!-- Desktop: Premium Header Card -->
-          <v-card class="d-none d-md-block elite-header-card pa-8 mb-10 overflow-hidden mt-n12">
+          <!-- Desktop: Premium Header Card Compact -->
+          <v-card class="d-none d-md-block elite-header-card py-4 px-8 mb-10 overflow-hidden mt-n12">
             <div class="card-accent-line"></div>
             <v-row align="center">
-              <v-col cols="12" md="7">
-                <div class="d-flex align-center ga-10">
+              <v-col cols="12" md="8">
+                <div class="d-flex align-center ga-8">
                   <!-- Capacidad -->
                   <div class="info-group-elite">
-                    <div class="d-flex align-center ga-4">
-                      <div class="icon-circle-elite">
-                        <v-icon icon="mdi-account-group" color="slate-700" size="20" />
+                    <div class="d-flex align-center ga-3">
+                      <div class="icon-circle-elite-sm">
+                        <v-icon icon="mdi-account-group" color="slate-600" size="18" />
                       </div>
                       <div>
-                        <span class="text-overline-elite d-block mb-1">CAPACIDAD</span>
-                        <span class="text-h6 font-weight-black text-slate-900 leading-none">{{ room?.capacity }} PERSONAS</span>
+                        <span class="text-overline-elite-xs d-block">CAPACIDAD</span>
+                        <span class="text-subtitle-1 font-weight-black text-slate-900 leading-none">{{ room?.capacity }} PERSONAS</span>
                       </div>
                     </div>
                   </div>
 
-                  <v-divider vertical class="mx-2 opacity-10" style="height: 40px; align-self: center;" />
+                  <v-divider vertical class="mx-2 opacity-10" style="height: 30px; align-self: center;" />
 
                   <!-- Estado -->
                   <div class="info-group-elite">
-                    <div class="d-flex align-center ga-4">
-                      <div class="icon-circle-elite success">
-                        <v-icon icon="mdi-shield-check" color="success" size="20" />
+                    <div class="d-flex align-center ga-3">
+                      <div class="icon-circle-elite-sm success">
+                        <v-icon icon="mdi-shield-check" color="success" size="18" />
                       </div>
                       <div>
-                        <span class="text-overline-elite d-block mb-1">ESTADO</span>
-                        <span class="text-h6 font-weight-black text-success leading-none">VERIFICADO</span>
+                        <span class="text-overline-elite-xs d-block">ESTADO</span>
+                        <span class="text-subtitle-1 font-weight-black text-success leading-none">VERIFICADO</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </v-col>
 
-              <v-col cols="12" md="5" class="d-flex justify-md-end">
-                <div class="elite-price-badge pa-4 px-8">
-                  <span class="text-overline-elite text-white opacity-60 d-block mb-1">FIANZA DE GARANTÍA</span>
-                  <div class="d-flex align-center justify-center ga-2">
-                    <span class="price-symbol-elite">€</span>
-                    <span class="price-amount-elite">{{ room?.deposit_amount }}</span>
+              <v-col cols="12" md="4" class="d-flex justify-md-end">
+                <div class="elite-price-badge-compact px-6 py-2">
+                  <span class="text-overline-elite-xs text-white opacity-60 d-block">FIANZA</span>
+                  <div class="d-flex align-center ga-2">
+                    <span class="price-symbol-elite-sm">€</span>
+                    <span class="price-amount-elite-sm">{{ room?.deposit_amount }}</span>
                   </div>
                 </div>
               </v-col>
             </v-row>
           </v-card>
+
 
           <!-- MOBILE PREMIUM INFO BAR (NO CARD) -->
 
@@ -1521,13 +1521,71 @@ export default {
   line-height: 1;
 }
 
-.text-overline-elite {
-  font-size: 0.65rem;
-  letter-spacing: 1.5px;
+.icon-circle-elite-sm {
+  width: 36px;
+  height: 36px;
+  background: #f8fafc;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #f1f5f9;
+}
+
+.icon-circle-elite-sm.success {
+  background: #f0fdf4;
+  border-color: #dcfce7;
+}
+
+.elite-price-badge-compact {
+  background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+  border-radius: 16px;
+  color: white;
+  text-align: center;
+  min-width: 130px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de brillo sutil en el borde */
+.elite-price-badge-compact::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
+.price-symbol-elite-sm {
+  font-size: 0.9rem;
   font-weight: 800;
-  color: #64748b;
+  color: #fbbf24;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+  margin-right: 2px;
+}
+
+.price-amount-elite-sm {
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -1px;
+  color: #ffffff;
+}
+
+.text-overline-elite-xs {
+  font-size: 0.55rem;
+  letter-spacing: 2px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
+  margin-bottom: 2px;
 }
 </style>
+
+
 
 
