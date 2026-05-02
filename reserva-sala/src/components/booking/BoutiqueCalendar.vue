@@ -1,37 +1,57 @@
 <template>
   <div class="boutique-calendar-wrapper">
-    <v-date-picker
-      v-model="internalDate"
-      color="#0f172a"
-      elevation="0"
-      class="w-100 boutique-picker"
-      :min="minDate"
-      :max="maxDate"
-      hide-header
-      locale="es"
-      first-day-of-week="1"
-      :allowed-dates="isAllowedDate"
+
+    <v-locale-provider 
+      locale="es" 
+      :messages="{ 
+        es: { 
+          datePicker: { 
+            header: 'Seleccionar fecha',
+            ariaLabel: { 
+              selectDate: 'Seleccionar fecha',
+              currentDate: 'Fecha actual',
+              selectYear: 'Seleccionar año',
+              selectMonth: 'Seleccionar mes',
+              previousMonth: 'Mes anterior',
+              nextMonth: 'Mes siguiente',
+              previousYear: 'Año anterior',
+              nextYear: 'Año siguiente'
+            } 
+          } 
+
+        } 
+      }"
     >
+      <v-date-picker
 
-
-      <template v-slot:day="slot">
-        <div 
-          v-bind="slot.props"
-          :class="[
-            'calendar-cell', 
-            slot.item?.date ? getDayStatus(slot.item.date) : '',
-            { 'is-selected': slot.item?.isSelected }
-          ]"
-        >
-          <span class="day-number">
-            {{ slot.item?.date ? new Date(slot.item.date).getDate() : '' }}
-          </span>
-          <div v-if="slot.item?.date" class="status-dot"></div>
-        </div>
-      </template>
-
-    </v-date-picker>
-
+        v-model="internalDate"
+        color="#0f172a"
+        elevation="0"
+        class="w-100 boutique-picker"
+        :min="minDate"
+        :max="maxDate"
+        hide-header
+        locale="es"
+        first-day-of-week="1"
+        :allowed-dates="isAllowedDate"
+      >
+        <template v-slot:day="slot">
+          <div 
+            v-bind="slot.props"
+            :class="[
+              'calendar-cell', 
+              slot.item?.date ? getDayStatus(slot.item.date) : '',
+              { 'is-selected': slot.item?.isSelected }
+            ]"
+          >
+            <span class="day-number">
+              {{ slot.item?.date ? new Date(slot.item.date).getDate() : '' }}
+            </span>
+            <div v-if="slot.item?.date" class="status-dot"></div>
+          </div>
+        </template>
+      </v-date-picker>
+    </v-locale-provider>
   </div>
 </template>
 

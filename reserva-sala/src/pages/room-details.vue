@@ -122,54 +122,129 @@
           <!-- PASO A PASO INCREMENTAL BOUTIQUE -->
           <div class="elite-stepper-header mb-12">
             <div class="stepper-track">
-              <div v-for="n in 3" :key="n" class="stepper-node" :class="{ 'node-active': currentStep >= n, 'node-completed': currentStep > n }">
+              <div
+                v-for="n in 3"
+                :key="n"
+                class="stepper-node"
+                :class="{
+                  'node-active': currentStep >= n,
+                  'node-completed': currentStep > n,
+                }"
+              >
                 <div class="node-circle">
-                  <v-icon v-if="currentStep > n" icon="mdi-check" size="14" color="white" />
+                  <v-icon
+                    v-if="currentStep > n"
+                    icon="mdi-check"
+                    size="14"
+                    color="white"
+                  />
                   <span v-else>{{ n }}</span>
                 </div>
-                <div class="node-label">{{ ['Fecha', 'Horario', 'Resumen'][n-1] }}</div>
+                <div class="node-label">
+                  {{ ["Reservar", "Horario", "Resumen"][n - 1] }}
+                </div>
+
               </div>
               <div class="stepper-line"></div>
-              <div class="stepper-line-active" :style="{ width: ((currentStep - 1) / 2) * 100 + '%' }"></div>
+              <div
+                class="stepper-line-active"
+                :style="{ width: ((currentStep - 1) / 2) * 100 + '%' }"
+              ></div>
             </div>
           </div>
 
           <v-row justify="center">
             <v-col cols="12" lg="9" xl="8" class="pa-0 pa-md-4">
-              <v-window v-model="currentStep" class="elite-window-container overflow-visible">
-                
+              <v-window
+                v-model="currentStep"
+                class="elite-window-container overflow-visible"
+              >
                 <!-- PASO 1: LA FECHA -->
                 <v-window-item :value="1">
                   <div class="elite-step-wrapper">
                     <!-- Desktop: Con Tarjeta -->
-                    <v-card class="d-none d-md-block elite-step-card pa-12 mb-8">
+                    <v-card
+                      class="d-none d-md-block elite-step-card pa-12 mb-8"
+                    >
                       <div class="text-center mb-10">
-                        <h2 class="text-h4 font-weight-black text-slate-900 mb-2">Selecciona la Fecha</h2>
-                        <p class="text-body-1 text-slate-400">Elige el día de tu evento en el calendario exclusivo.</p>
+                        <h2
+                          class="text-h4 font-weight-black text-slate-900 mb-2"
+                        >
+                          Reservar Sala
+                        </h2>
+                        <p class="text-body-1 text-slate-400">
+                          Elige el día de tu evento en el calendario exclusivo.
+                        </p>
                       </div>
                       <div class="elite-calendar-wrapper mb-10">
-                        <BoutiqueCalendar v-model="selectedDate" :bookings="roomBookings" :closed-dates="closedDates" :min-date="minDate" :max-date="maxDate" @update:model-value="currentStep = 2" />
+                        <BoutiqueCalendar
+                          v-model="selectedDate"
+                          :bookings="roomBookings"
+                          :closed-dates="closedDates"
+                          :min-date="minDate"
+                          :max-date="maxDate"
+                          @update:model-value="currentStep = 2"
+                        />
                       </div>
-                      <div class="d-flex justify-center ga-8 pt-4 border-t opacity-70">
-                        <div class="d-flex align-center ga-2"><div class="dot-indicator bg-success"></div><span class="text-caption font-weight-bold">Libre</span></div>
-                        <div class="d-flex align-center ga-2"><div class="dot-indicator bg-warning"></div><span class="text-caption font-weight-bold">Parcial</span></div>
-                        <div class="d-flex align-center ga-2"><div class="dot-indicator bg-error"></div><span class="text-caption font-weight-bold">Lleno</span></div>
+                      <div
+                        class="d-flex justify-center ga-8 pt-4 border-t opacity-70"
+                      >
+                        <div class="d-flex align-center ga-2">
+                          <div class="dot-indicator bg-success"></div>
+                          <span class="text-caption font-weight-bold"
+                            >Libre</span
+                          >
+                        </div>
+                        <div class="d-flex align-center ga-2">
+                          <div class="dot-indicator bg-warning"></div>
+                          <span class="text-caption font-weight-bold"
+                            >Parcial</span
+                          >
+                        </div>
+                        <div class="d-flex align-center ga-2">
+                          <div class="dot-indicator bg-error"></div>
+                          <span class="text-caption font-weight-bold"
+                            >Lleno</span
+                          >
+                        </div>
                       </div>
                     </v-card>
 
                     <!-- Mobile: Directo, sin Tarjeta -->
                     <div class="d-md-none pa-4">
                       <div class="text-center mb-6">
-                        <h2 class="text-h4 font-weight-black text-slate-900 mb-1">Selecciona Fecha</h2>
-                        <p class="text-body-2 text-slate-400">Día de tu evento exclusivo</p>
+                        <h2
+                          class="text-h4 font-weight-black text-slate-900 mb-1"
+                        >
+                          Reservar
+                        </h2>
+                        <p class="text-body-2 text-slate-400">
+                          Día de tu evento exclusivo
+                        </p>
                       </div>
                       <div class="mobile-calendar-container mb-8">
-                        <BoutiqueCalendar v-model="selectedDate" :bookings="roomBookings" :closed-dates="closedDates" :min-date="minDate" :max-date="maxDate" @update:model-value="currentStep = 2" />
+                        <BoutiqueCalendar
+                          v-model="selectedDate"
+                          :bookings="roomBookings"
+                          :closed-dates="closedDates"
+                          :min-date="minDate"
+                          :max-date="maxDate"
+                          @update:model-value="currentStep = 2"
+                        />
                       </div>
                       <div class="d-flex justify-center ga-4 opacity-70 pb-10">
-                        <div class="d-flex align-center ga-1"><div class="dot-indicator bg-success"></div><span class="text-caption">Libre</span></div>
-                        <div class="d-flex align-center ga-1"><div class="dot-indicator bg-warning"></div><span class="text-caption">Parcial</span></div>
-                        <div class="d-flex align-center ga-1"><div class="dot-indicator bg-error"></div><span class="text-caption">Lleno</span></div>
+                        <div class="d-flex align-center ga-1">
+                          <div class="dot-indicator bg-success"></div>
+                          <span class="text-caption">Libre</span>
+                        </div>
+                        <div class="d-flex align-center ga-1">
+                          <div class="dot-indicator bg-warning"></div>
+                          <span class="text-caption">Parcial</span>
+                        </div>
+                        <div class="d-flex align-center ga-1">
+                          <div class="dot-indicator bg-error"></div>
+                          <span class="text-caption">Lleno</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -180,31 +255,79 @@
                   <div class="elite-step-wrapper">
                     <!-- Desktop -->
                     <v-card class="d-none d-md-block elite-step-card pa-12">
-                      <div class="d-flex align-center justify-space-between mb-12">
-                        <h2 class="text-h4 font-weight-black text-slate-900">Elige el Horario</h2>
-                        <v-btn variant="text" color="slate-400" @click="currentStep = 1">VOLVER</v-btn>
+                      <div
+                        class="d-flex align-center justify-space-between mb-12"
+                      >
+                        <h2 class="text-h4 font-weight-black text-slate-900">
+                          Elige el Horario
+                        </h2>
+                        <v-btn
+                          variant="text"
+                          color="slate-400"
+                          @click="currentStep = 1"
+                          >VOLVER</v-btn
+                        >
                       </div>
                       <div class="elite-time-grid mb-10">
-                        <div v-for="slot in timeSlots" :key="slot.value" :class="['elite-time-card', { active: selectedSlot === slot.value }]" @click="() => { selectedSlot = slot.value; currentStep = 3 }">
+                        <div
+                          v-for="slot in timeSlots"
+                          :key="slot.value"
+                          :class="[
+                            'elite-time-card',
+                            { active: selectedSlot === slot.value },
+                          ]"
+                          @click="
+                            () => {
+                              selectedSlot = slot.value;
+                              currentStep = 3;
+                            }
+                          "
+                        >
                           <v-icon :icon="slot.icon" size="32" class="mb-4" />
-                          <div class="slot-name font-weight-black">{{ slot.label }}</div>
+                          <div class="slot-name font-weight-black">
+                            {{ slot.label }}
+                          </div>
                         </div>
                       </div>
                     </v-card>
 
                     <!-- Mobile -->
                     <div class="d-md-none pa-4">
-                      <div class="d-flex align-center justify-space-between mb-8">
-                        <h2 class="text-h4 font-weight-black text-slate-900">Horario</h2>
-                        <v-btn icon="mdi-calendar-edit" variant="text" color="slate-400" @click="currentStep = 1"></v-btn>
+                      <div
+                        class="d-flex align-center justify-space-between mb-8"
+                      >
+                        <h2 class="text-h4 font-weight-black text-slate-900">
+                          Horario
+                        </h2>
+                        <v-btn
+                          icon="mdi-calendar-edit"
+                          variant="text"
+                          color="slate-400"
+                          @click="currentStep = 1"
+                        ></v-btn>
                       </div>
                       <div class="mobile-time-selection">
-                        <div v-for="slot in timeSlots" :key="slot.value" class="mobile-time-strip pa-5 mb-4" :class="{ active: selectedSlot === slot.value }" @click="() => { selectedSlot = slot.value; currentStep = 3 }">
+                        <div
+                          v-for="slot in timeSlots"
+                          :key="slot.value"
+                          class="mobile-time-strip pa-5 mb-4"
+                          :class="{ active: selectedSlot === slot.value }"
+                          @click="
+                            () => {
+                              selectedSlot = slot.value;
+                              currentStep = 3;
+                            }
+                          "
+                        >
                           <div class="d-flex align-center">
                             <v-icon :icon="slot.icon" class="me-4" size="24" />
                             <div class="flex-grow-1">
-                              <div class="text-subtitle-1 font-weight-black">{{ slot.label }}</div>
-                              <div class="text-caption opacity-60">{{ slot.range }}</div>
+                              <div class="text-subtitle-1 font-weight-black">
+                                {{ slot.label }}
+                              </div>
+                              <div class="text-caption opacity-60">
+                                {{ slot.range }}
+                              </div>
                             </div>
                             <v-icon icon="mdi-chevron-right" />
                           </div>
@@ -219,48 +342,114 @@
                   <div class="elite-step-wrapper">
                     <!-- Desktop -->
                     <v-card class="d-none d-md-block elite-step-card pa-12">
-                      <h2 class="text-h4 font-weight-black text-slate-900 mb-10">Resumen de Reserva</h2>
+                      <h2
+                        class="text-h4 font-weight-black text-slate-900 mb-10"
+                      >
+                        Resumen de Reserva
+                      </h2>
                       <div class="elite-summary-box pa-8 mb-10">
-                        <div class="summary-row-premium"><span>Instalación</span><span class="value font-weight-black">{{ room?.name }}</span></div>
-                        <div class="summary-row-premium"><span>Fecha</span><span class="value font-weight-black">{{ formatDate(selectedDate) }}</span></div>
-                        <div class="summary-row-premium"><span>Horario</span><span class="value font-weight-black">{{ getTimeLabel(selectedSlot) }}</span></div>
+                        <div class="summary-row-premium">
+                          <span>Instalación</span
+                          ><span class="value font-weight-black">{{
+                            room?.name
+                          }}</span>
+                        </div>
+                        <div class="summary-row-premium">
+                          <span>Fecha</span
+                          ><span class="value font-weight-black">{{
+                            formatDate(selectedDate)
+                          }}</span>
+                        </div>
+                        <div class="summary-row-premium">
+                          <span>Horario</span
+                          ><span class="value font-weight-black">{{
+                            getTimeLabel(selectedSlot)
+                          }}</span>
+                        </div>
                         <v-divider class="my-6 opacity-10" />
-                        <div class="summary-row-premium total"><span>Fianza</span><span class="value gold-text">{{ room?.deposit_amount }}€</span></div>
+                        <div class="summary-row-premium total">
+                          <span>Fianza</span
+                          ><span class="value gold-text"
+                            >{{ room?.deposit_amount }}€</span
+                          >
+                        </div>
                       </div>
-                      <v-btn block height="72" color="slate-900" class="text-white font-weight-black" @click="startPayment">PAGAR {{ room?.deposit_amount }}€</v-btn>
+                      <v-btn
+                        block
+                        height="72"
+                        color="slate-900"
+                        class="text-white font-weight-black"
+                        @click="startPayment"
+                        >PAGAR {{ room?.deposit_amount }}€</v-btn
+                      >
                     </v-card>
 
                     <!-- Mobile -->
                     <div class="d-md-none pa-4">
-                      <h2 class="text-h4 font-weight-black text-slate-900 mb-8 text-center">Confirmación</h2>
+                      <h2
+                        class="text-h4 font-weight-black text-slate-900 mb-8 text-center"
+                      >
+                        Confirmación
+                      </h2>
                       <div class="mobile-summary-app-card pa-6 mb-10">
                         <div class="summary-item-mobile mb-6">
                           <v-icon icon="mdi-map-marker-radius" class="me-4" />
-                          <div><div class="text-overline">SALA</div><div class="font-weight-black">{{ room?.name }}</div></div>
+                          <div>
+                            <div class="text-overline">SALA</div>
+                            <div class="font-weight-black">
+                              {{ room?.name }}
+                            </div>
+                          </div>
                         </div>
                         <div class="summary-item-mobile mb-6">
                           <v-icon icon="mdi-calendar-check" class="me-4" />
-                          <div><div class="text-overline">CUÁNDO</div><div class="font-weight-black">{{ formatDate(selectedDate) }}</div><div class="text-caption">{{ getTimeLabel(selectedSlot) }}</div></div>
+                          <div>
+                            <div class="text-overline">CUÁNDO</div>
+                            <div class="font-weight-black">
+                              {{ formatDate(selectedDate) }}
+                            </div>
+                            <div class="text-caption">
+                              {{ getTimeLabel(selectedSlot) }}
+                            </div>
+                          </div>
                         </div>
                         <div class="summary-item-mobile">
                           <v-icon icon="mdi-credit-card-outline" class="me-4" />
-                          <div><div class="text-overline">FIANZA</div><div class="font-weight-black text-h5">{{ room?.deposit_amount }}€</div></div>
+                          <div>
+                            <div class="text-overline">FIANZA</div>
+                            <div class="font-weight-black text-h5">
+                              {{ room?.deposit_amount }}€
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      
+
                       <!-- Botón de Acción Fijo/Destacado -->
                       <div class="mobile-final-action">
-                        <v-btn block height="72" color="slate-900" rounded="xl" class="text-white font-weight-black" @click="startPayment">PAGAR Y RESERVAR</v-btn>
-                        <v-btn block variant="text" color="slate-400" class="mt-2" @click="currentStep = 2">MODIFICAR</v-btn>
+                        <v-btn
+                          block
+                          height="72"
+                          color="slate-900"
+                          rounded="xl"
+                          class="text-white font-weight-black"
+                          @click="startPayment"
+                          >PAGAR Y RESERVAR</v-btn
+                        >
+                        <v-btn
+                          block
+                          variant="text"
+                          color="slate-400"
+                          class="mt-2"
+                          @click="currentStep = 2"
+                          >MODIFICAR</v-btn
+                        >
                       </div>
                     </div>
                   </div>
                 </v-window-item>
               </v-window>
             </v-col>
-
           </v-row>
-
         </v-col>
       </v-row>
     </v-container>
@@ -469,10 +658,11 @@ const fetchRoomBookings = async () => {
     roomBookings.value = bookingsRes.data;
 
     // Contar reservas del usuario en el mes seleccionado (o el actual si no hay selección)
-    const referenceDate = selectedDate.value ? new Date(selectedDate.value) : new Date();
+    const referenceDate = selectedDate.value
+      ? new Date(selectedDate.value)
+      : new Date();
     const currentMonth = referenceDate.getMonth();
     const currentYear = referenceDate.getFullYear();
-
 
     userBookingsCount.value = userBookingsRes.data.filter((b: any) => {
       const d = new Date(b.booking_date);
@@ -1363,8 +1553,6 @@ export default {
   }
 }
 
-
-
 .summary-row-premium {
   display: flex;
   justify-content: space-between;
@@ -1459,7 +1647,6 @@ export default {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
-
 /* Ajustes de tipografía móvil */
 .text-overline {
   font-size: 0.65rem !important;
@@ -1467,6 +1654,3 @@ export default {
   opacity: 0.6;
 }
 </style>
-
-
-
