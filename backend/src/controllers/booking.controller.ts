@@ -37,6 +37,23 @@ export const getAllBookings = async (req: Request, res: Response) => {
   }
 };
 
+export const getMyBookings = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*, room:rooms!room_id(*)')
+      .eq('user_id', userId)
+      .order('booking_date', { ascending: false });
+
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener tus reservas' });
+  }
+};
+
+
 // Crear intención de pago para la fianza de 50€
 export const createBookingPaymentIntent = async (req: Request, res: Response) => {
   try {

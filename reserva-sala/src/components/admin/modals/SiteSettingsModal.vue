@@ -57,7 +57,7 @@
               />
             </v-col>
 
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="6">
               <div class="dark-input-label">Límite Reservas / Mes</div>
               <v-text-field
                 v-model.number="localForm.max_bookings_per_month"
@@ -73,7 +73,24 @@
               />
             </v-col>
 
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="6">
+              <div class="dark-input-label">Horizonte Reserva (Meses)</div>
+              <v-text-field
+                v-model.number="localForm.booking_horizon_months"
+                type="number"
+                variant="solo"
+                flat
+                bg-color="rgba(255,255,255,0.03)"
+                class="elite-input-field"
+                rounded="lg"
+                min="1"
+                max="12"
+                prepend-inner-icon="mdi-calendar-clock"
+              />
+            </v-col>
+
+            <v-col cols="12" md="6">
+
               <div class="dark-input-label">Hora Apertura</div>
               <v-text-field
                 v-model="localForm.start_hour"
@@ -155,9 +172,11 @@ const localForm = reactive({
   address: "",
   urbanization_details: "",
   max_bookings_per_month: 0,
+  booking_horizon_months: 1,
   start_hour: "",
   end_hour: "",
 });
+
 
 watch(() => props.settings, (newSettings) => {
   if (newSettings && Object.keys(newSettings).length > 0) {
@@ -165,9 +184,11 @@ watch(() => props.settings, (newSettings) => {
     localForm.address = newSettings.address || "";
     localForm.urbanization_details = newSettings.urbanization_details || "";
     localForm.max_bookings_per_month = newSettings.max_bookings_per_month ?? 2;
+    localForm.booking_horizon_months = newSettings.booking_horizon_months ?? 1;
     localForm.start_hour = newSettings.start_hour || "09:00";
     localForm.end_hour = newSettings.end_hour || "23:59";
   }
+
 }, { immediate: true, deep: true });
 
 

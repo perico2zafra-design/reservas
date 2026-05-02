@@ -53,7 +53,9 @@ export interface SiteSettings {
   address: string;
   urbanization_details: string;
   max_bookings_per_month: number;
+  booking_horizon_months: number;
   start_hour: string;
   end_hour: string;
   updated_at: string;
 }
+

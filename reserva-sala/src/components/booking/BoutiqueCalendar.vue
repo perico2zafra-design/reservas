@@ -6,11 +6,13 @@
       elevation="0"
       class="w-100 boutique-picker"
       :min="minDate"
+      :max="maxDate"
       hide-header
       locale="es"
       first-day-of-week="1"
       :allowed-dates="isAllowedDate"
     >
+
 
       <template v-slot:day="slot">
         <div 
@@ -42,7 +44,9 @@ const props = defineProps<{
   bookings: any[];
   closedDates: string[];
   minDate: string;
+  maxDate?: string;
 }>();
+
 
 const emit = defineEmits(["update:modelValue"]);
 
@@ -68,8 +72,16 @@ const isAllowedDate = (date: any) => {
   
   // No permitir días pasados
   if (d < today) return false
+
+  // Límite de 1 mes (horizonte de reserva)
+  if (props.maxDate) {
+    const max = new Date(props.maxDate)
+    max.setHours(23, 59, 59, 999)
+    if (d > max) return false
+  }
   
   const month = String(d.getMonth() + 1).padStart(2, '0')
+
   const day = String(d.getDate()).padStart(2, '0')
   const monthDay = `${month}-${day}`
   
@@ -97,10 +109,17 @@ const getDayStatus = (date: any) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
-    // Estado para días pasados
+    // Estado para días pasados o fuera del límite
     if (d < today) return 'status-disabled'
+    
+    if (props.maxDate) {
+      const max = new Date(props.maxDate)
+      max.setHours(23, 59, 59, 999)
+      if (d > max) return 'status-disabled'
+    }
 
     const month = String(d.getMonth() + 1).padStart(2, '0')
+
     const day = String(d.getDate()).padStart(2, '0')
     const monthDay = `${month}-${day}`
     
