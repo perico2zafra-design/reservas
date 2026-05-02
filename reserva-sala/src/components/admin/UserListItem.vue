@@ -11,13 +11,13 @@ defineEmits(['update-status', 'open-block', 'confirm-delete'])
 <template>
   <v-card 
     rounded="xl" 
-    class="mb-6 border-0 luxury-clean-card elevation-1"
+    class="mb-6 border-0 luxury-clean-card elevation-1 d-flex flex-column h-100"
   >
     <!-- Subtle Gold Top Accents -->
     <div class="luxury-accent-line"></div>
 
-    <div class="pa-6">
-      <div class="d-flex align-center mb-6">
+    <div class="pa-6 d-flex flex-column flex-grow-1">
+      <div class="d-flex align-center mb-6 identity-section">
         <div class="avatar-luxury me-5">
           <InitialAvatar :name="user.first_name" :url="user.avatar_url" size="68" />
           <div v-if="user.status === 'APPROVED'" class="status-indicator-gold"></div>
@@ -36,8 +36,10 @@ defineEmits(['update-status', 'open-block', 'confirm-delete'])
         </div>
       </div>
 
+      <v-spacer />
+
       <!-- VISIBLE ACTIONS - CLEAN LUXURY -->
-      <div class="luxury-actions-wrapper">
+      <div class="luxury-actions-wrapper mt-2">
         <template v-if="user.status === 'PENDING'">
           <v-btn 
             block 
@@ -107,6 +109,11 @@ defineEmits(['update-status', 'open-block', 'confirm-delete'])
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
   position: relative;
+  min-height: 240px;
+}
+
+.identity-section {
+  min-height: 60px;
 }
 
 .luxury-accent-line {
