@@ -93,17 +93,34 @@
                 </div>
                 
                 <div class="elite-calendar-wrapper">
-                  <v-date-picker
+                  <BoutiqueCalendar
                     v-model="selectedDate"
-                    :key="`calendar-${room.id}`"
-                    color="#0f172a"
-                    elevation="0"
-                    class="w-100 elite-picker"
-                    :min="minDate"
-                    :allowed-dates="allowedDates"
-                    hide-header
+                    :bookings="roomBookings"
+                    :closed-dates="closedDates"
+                    :min-date="minDate"
                   />
                 </div>
+
+                <!-- Leyenda del Calendario -->
+                <div class="d-flex justify-center ga-6 mt-4 opacity-70">
+                  <div class="d-flex align-center ga-2">
+                    <div class="dot-indicator bg-success"></div>
+                    <span class="text-caption font-weight-bold">Libre</span>
+                  </div>
+                  <div class="d-flex align-center ga-2">
+                    <div class="dot-indicator bg-warning"></div>
+                    <span class="text-caption font-weight-bold">Parcial</span>
+                  </div>
+                  <div class="d-flex align-center ga-2">
+                    <div class="dot-indicator bg-error"></div>
+                    <span class="text-caption font-weight-bold">Lleno</span>
+                  </div>
+                  <div class="d-flex align-center ga-2">
+                    <div class="dot-indicator bg-grey-lighten-1"></div>
+                    <span class="text-caption font-weight-bold">Inhábil</span>
+                  </div>
+                </div>
+
 
                 <div class="mt-12">
                   <div class="d-flex align-center mb-8">
@@ -362,6 +379,7 @@
 import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBookingStore } from '@/stores/booking'
+import BoutiqueCalendar from '@/components/booking/BoutiqueCalendar.vue'
 import { siteService } from '@/services/site.service'
 import { formatDate } from '@/utils/formatters'
 import api from '@/services/api'
@@ -372,12 +390,16 @@ const router = useRouter()
 const bookingStore = useBookingStore()
 
 const room = computed(() => bookingStore.rooms.find(r => r.id === Number(route.params.id)))
+const roomBookings = ref<any[]>([])
 const siteSettings = ref<Partial<SiteSettings>>({})
 const selectedDate = ref(new Date())
 const selectedSlot = ref(null)
 const minDate = new Date().toISOString().split('T')[0]
 const showPayment = ref(false)
 const processing = ref(false)
+
+
+
 
 const timeSlots = computed(() => {
   const start = siteSettings.value?.start_hour || '09:00'
@@ -420,20 +442,20 @@ const closedDates = [
 ]
 
 
-const allowedDates = (val: unknown) => {
-  if (!val) return true;
-  const date = val instanceof Date ? val : new Date(val as string);
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const monthDay = `${month}-${day}`;
-  return !closedDates.includes(monthDay);
-}
-
-
 const getTimeLabel = (val: string | null) => timeSlots.value.find(s => s.value === val)?.label || 'Pendiente'
 const isReadyToBook = computed(() => selectedDate.value && selectedSlot.value)
 
 const startPayment = () => { showPayment.value = true }
+
+const fetchRoomBookings = async () => {
+  if (!room.value) return
+  try {
+    const response = await api.get(`/bookings?roomId=${room.value.id}`)
+    roomBookings.value = response.data
+  } catch (err) {
+    console.error('Error fetching room bookings:', err)
+  }
+}
 
 const confirmPayment = async () => {
   processing.value = true
@@ -457,7 +479,8 @@ const confirmPayment = async () => {
 }
 
 onMounted(async () => {
-  if (bookingStore.rooms.length === 0) bookingStore.fetchRooms()
+  if (bookingStore.rooms.length === 0) await bookingStore.fetchRooms()
+  await fetchRoomBookings()
   try {
     siteSettings.value = await siteService.getSettings()
   } catch (err) {
@@ -918,6 +941,89 @@ export default {
 .elite-action-btn:hover .btn-icon {
   transform: translateX(5px);
 }
+
+/* CALENDAR BOUTIQUE REDESIGN */
+.calendar-day-elite {
+  width: 44px !important;
+  height: 44px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 14px !important;
+  margin: 4px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  cursor: pointer !important;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+.calendar-day-elite:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+  z-index: 5;
+}
+
+.day-number-elite {
+  font-weight: 900 !important;
+  font-size: 1.1rem !important;
+  color: #000000 !important; /* Negro absoluto para visibilidad */
+  line-height: 1 !important;
+  z-index: 2 !important;
+}
+
+.status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin-top: 5px;
+  background: transparent;
+}
+
+/* ESTADOS SEMÁFORO ELITE */
+.status-free {
+  background-color: #f0fdf4 !important; /* Esmeralda suave */
+  border: 1px solid rgba(34, 197, 94, 0.15) !important;
+}
+.status-free .status-dot { background-color: #22c55e; }
+
+.status-busy {
+  background-color: #fef2f2 !important; /* Rosa suave */
+  border: 1px solid rgba(239, 68, 68, 0.15) !important;
+}
+.status-busy .status-dot { background-color: #ef4444; }
+
+.status-partial {
+  background-color: #fffbeb !important; /* Ámbar suave */
+  border: 1px solid rgba(245, 158, 11, 0.15) !important;
+}
+.status-partial .status-dot { background-color: #f59e0b; }
+
+.status-disabled {
+  background-color: #f8fafc !important;
+  opacity: 0.3 !important;
+  pointer-events: none !important;
+}
+.status-disabled .day-number-elite { color: #94a3b8 !important; }
+
+/* Selección Activa */
+.calendar-day-elite[aria-selected="true"] {
+  background: #0f172a !important;
+  border: 2px solid #d4af37 !important;
+  transform: scale(1.1);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2) !important;
+}
+.calendar-day-elite[aria-selected="true"] .day-number-elite {
+  color: white !important;
+}
+.calendar-day-elite[aria-selected="true"] .status-dot {
+  background: #d4af37 !important;
+}
+
+
+
+
 
 /* GUARANTEE PANEL */
 .elite-guarantee-panel {
