@@ -40,12 +40,13 @@
 import { ref, watch } from "vue";
 
 const props = defineProps<{
-  modelValue: Date;
+  modelValue: Date | null;
   bookings: any[];
   closedDates: string[];
   minDate: string;
   maxDate?: string;
 }>();
+
 
 
 const emit = defineEmits(["update:modelValue"]);

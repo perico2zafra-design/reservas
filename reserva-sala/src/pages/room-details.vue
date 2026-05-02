@@ -123,74 +123,76 @@
             <!-- Selector de Reserva (Columna Izquierda) -->
             <v-col cols="12" lg="7">
               <v-card class="elite-step-card pa-8 mb-8">
-                <div class="step-number">01</div>
                 <div class="d-flex align-center mb-8">
-                  <div class="step-icon-wrapper me-5">
+                  <div
+                    class="step-icon-wrapper me-5"
+                    :class="{ 'step-active': currentStep >= 1 }"
+                  >
                     <v-icon
-                      icon="mdi-calendar-month-outline"
-                      color="primary"
-                      size="28"
+                      :icon="
+                        currentStep > 1
+                          ? 'mdi-check'
+                          : 'mdi-calendar-month-outline'
+                      "
+                      :color="currentStep >= 1 ? 'white' : 'primary'"
+                      size="24"
                     />
                   </div>
                   <div>
                     <h2 class="text-h5 font-weight-black text-slate-900">
-                      Agenda tu Estancia
+                      1. Fecha del Evento
                     </h2>
                     <p class="text-caption text-slate-400 mb-0">
-                      Selecciona el día de tu evento
+                      {{
+                        selectedDate
+                          ? "Día seleccionado: " + formatDate(selectedDate)
+                          : "Selecciona el día de tu estancia"
+                      }}
                     </p>
                   </div>
                 </div>
 
-                <div class="elite-calendar-wrapper">
+                <div class="elite-calendar-wrapper mb-6">
                   <BoutiqueCalendar
                     v-model="selectedDate"
                     :bookings="roomBookings"
                     :closed-dates="closedDates"
                     :min-date="minDate"
                     :max-date="maxDate"
+                    @update:model-value="currentStep = 2"
                   />
                 </div>
+              </v-card>
 
-                <!-- Notificación de Cupo Agotado Premium eliminada de aquí -->
-
-
-
-                <!-- Leyenda del Calendario -->
-                <div class="d-flex justify-center ga-6 mt-4 opacity-70">
-                  <div class="d-flex align-center ga-2">
-                    <div class="dot-indicator bg-success"></div>
-                    <span class="text-caption font-weight-bold">Libre</span>
-                  </div>
-                  <div class="d-flex align-center ga-2">
-                    <div class="dot-indicator bg-warning"></div>
-                    <span class="text-caption font-weight-bold">Parcial</span>
-                  </div>
-                  <div class="d-flex align-center ga-2">
-                    <div class="dot-indicator bg-error"></div>
-                    <span class="text-caption font-weight-bold">Lleno</span>
-                  </div>
-                  <div class="d-flex align-center ga-2">
-                    <div class="dot-indicator bg-grey-lighten-1"></div>
-                    <span class="text-caption font-weight-bold">Inhábil</span>
-                  </div>
-                </div>
-
-                <div class="mt-12">
+              <!-- Paso 2: Horario (Solo si hay fecha) -->
+              <v-expand-transition>
+                <v-card
+                  v-if="currentStep >= 2"
+                  class="elite-step-card pa-8 mb-8 animate-fade-in"
+                >
                   <div class="d-flex align-center mb-8">
-                    <div class="step-icon-wrapper me-5">
+                    <div
+                      class="step-icon-wrapper me-5"
+                      :class="{ 'step-active': currentStep >= 2 }"
+                    >
                       <v-icon
-                        icon="mdi-clock-outline"
-                        color="primary"
-                        size="28"
+                        :icon="
+                          currentStep > 2 ? 'mdi-check' : 'mdi-clock-outline'
+                        "
+                        :color="currentStep >= 2 ? 'white' : 'primary'"
+                        size="24"
                       />
                     </div>
                     <div>
                       <h2 class="text-h5 font-weight-black text-slate-900">
-                        Horario Disponible
+                        2. Tramo Horario
                       </h2>
                       <p class="text-caption text-slate-400 mb-0">
-                        Elige el tramo que mejor se adapte (09:00 - 23:59)
+                        {{
+                          selectedSlot
+                            ? "Horario reservado"
+                            : "Elige el tramo que mejor se adapte"
+                        }}
                       </p>
                     </div>
                   </div>
@@ -203,31 +205,36 @@
                         'elite-time-card',
                         { active: selectedSlot === slot.value },
                       ]"
-                      @click="selectedSlot = slot.value"
+                      @click="
+                        () => {
+                          selectedSlot = slot.value;
+                          currentStep = 3;
+                        }
+                      "
                     >
-                      <div class="time-card-content">
-                        <v-icon
-                          :icon="slot.icon"
-                          class="mb-4 slot-icon"
-                          size="32"
-                        />
-                        <div class="slot-name">{{ slot.label }}</div>
-                        <div class="slot-range">{{ slot.range }}</div>
-                      </div>
-                      <div class="active-indicator">
+                      <v-icon
+                        :icon="slot.icon"
+                        size="32"
+                        class="mb-4 slot-icon"
+                      />
+                      <div class="slot-name">{{ slot.label }}</div>
+                      <div class="slot-range">{{ slot.range }}</div>
+                      <div
+                        class="active-indicator"
+                        v-if="selectedSlot === slot.value"
+                      >
                         <v-icon icon="mdi-check" size="14" color="white" />
                       </div>
                     </div>
                   </div>
-                </div>
-              </v-card>
+                </v-card>
+              </v-expand-transition>
 
-              <!-- Sección de Normativa Vigente (Boutique Style) -->
+              <!-- NORMATIVA -->
               <v-card
                 class="elite-rules-card pa-8 pa-md-10 overflow-hidden mt-8"
               >
                 <div class="rules-accent-glow"></div>
-
                 <div class="d-flex align-center mb-10">
                   <div class="rules-icon-header me-5">
                     <v-icon icon="mdi-gavel" color="#d4af37" size="28" />
@@ -238,19 +245,7 @@
                     >
                       Normativa Vigente
                     </h3>
-                    <div class="d-flex align-center ga-2">
-                      <v-chip
-                        size="x-small"
-                        color="slate-900"
-                        variant="flat"
-                        class="text-white px-3"
-                        >ACTA 15/04/2026</v-chip
-                      >
-                      <span
-                        class="text-caption text-slate-400 font-weight-bold letter-spacing-sm"
-                        >CUMPLIMIENTO OBLIGATORIO</span
-                      >
-                    </div>
+                    <div class="d-flex align-center ga-2">></div>
                   </div>
                 </div>
 
@@ -378,28 +373,49 @@
                   <div class="checkout-footer pa-8 bg-white">
                     <!-- Panel de Estado de Cupo Premium -->
                     <v-expand-transition>
-                      <div v-if="userBookingsCount >= (siteSettings?.max_bookings_per_month || 2)" class="elite-usage-panel mb-8">
-                        <div class="d-flex justify-space-between align-center mb-2">
+                      <div
+                        v-if="
+                          userBookingsCount >=
+                          (siteSettings?.max_bookings_per_month || 2)
+                        "
+                        class="elite-usage-panel mb-8"
+                      >
+                        <div
+                          class="d-flex justify-space-between align-center mb-2"
+                        >
                           <span class="usage-title">CUPO MENSUAL</span>
-                          <span class="usage-stat">{{ userBookingsCount }} / {{ siteSettings?.max_bookings_per_month || 2 }}</span>
+                          <span class="usage-stat"
+                            >{{ userBookingsCount }} /
+                            {{
+                              siteSettings?.max_bookings_per_month || 2
+                            }}</span
+                          >
                         </div>
                         <v-progress-linear
-                          :model-value="(userBookingsCount / (siteSettings?.max_bookings_per_month || 2)) * 100"
+                          :model-value="
+                            (userBookingsCount /
+                              (siteSettings?.max_bookings_per_month || 2)) *
+                            100
+                          "
                           color="#d97706"
                           height="6"
                           rounded
                           class="usage-bar mb-3"
                         />
                         <div class="d-flex align-center ga-2">
-                          <v-icon icon="mdi-shield-alert-outline" size="16" color="#92400e" />
-                          <span class="usage-hint">Límite alcanzado para este periodo</span>
+                          <v-icon
+                            icon="mdi-shield-alert-outline"
+                            size="16"
+                            color="#92400e"
+                          />
+                          <span class="usage-hint"
+                            >Límite alcanzado para este periodo</span
+                          >
                         </div>
                       </div>
                     </v-expand-transition>
 
                     <div class="d-flex justify-space-between align-end mb-10">
-
-
                       <div>
                         <div
                           class="text-caption font-weight-black text-slate-400 letter-spacing-lg mb-1"
@@ -429,26 +445,44 @@
                       </div>
                     </div>
 
-                     <v-btn
-                       block
-                       height="72"
-                       color="#0f172a"
-                       rounded="xl"
-                       class="elite-action-btn shadow-elite-btn"
-                       :disabled="!isReadyToBook || userBookingsCount >= (siteSettings?.max_bookings_per_month || 2)"
-                       @click="startPayment"
-                     >
-                       <template v-if="userBookingsCount >= (siteSettings?.max_bookings_per_month || 2)">
-                         <span class="btn-text text-amber-darken-4">CUPO COMPLETADO</span>
-                         <v-icon icon="mdi-lock-outline" class="ms-4 btn-icon" color="amber-darken-4" />
-                       </template>
-                       <template v-else>
-                         <span class="btn-text" v-if="isReadyToBook">CONFIRMAR RESERVA</span>
-                         <span class="btn-text text-grey-darken-1" v-else>COMPLETA LOS DATOS</span>
-                         <v-icon icon="mdi-arrow-right" class="ms-4 btn-icon" />
-                       </template>
-                     </v-btn>
-
+                    <v-btn
+                      block
+                      height="72"
+                      color="#0f172a"
+                      rounded="xl"
+                      class="elite-action-btn shadow-elite-btn"
+                      :disabled="
+                        !isReadyToBook ||
+                        userBookingsCount >=
+                          (siteSettings?.max_bookings_per_month || 2)
+                      "
+                      @click="startPayment"
+                    >
+                      <template
+                        v-if="
+                          userBookingsCount >=
+                          (siteSettings?.max_bookings_per_month || 2)
+                        "
+                      >
+                        <span class="btn-text text-amber-darken-4"
+                          >CUPO COMPLETADO</span
+                        >
+                        <v-icon
+                          icon="mdi-lock-outline"
+                          class="ms-4 btn-icon"
+                          color="amber-darken-4"
+                        />
+                      </template>
+                      <template v-else>
+                        <span class="btn-text" v-if="isReadyToBook"
+                          >CONFIRMAR RESERVA</span
+                        >
+                        <span class="btn-text text-grey-darken-1" v-else
+                          >COMPLETA LOS DATOS</span
+                        >
+                        <v-icon icon="mdi-arrow-right" class="ms-4 btn-icon" />
+                      </template>
+                    </v-btn>
 
                     <div
                       class="secure-badges mt-8 d-flex justify-center ga-6 opacity-30"
@@ -600,9 +634,11 @@ const room = computed(() =>
 );
 const roomBookings = ref<any[]>([]);
 const siteSettings = ref<Partial<SiteSettings>>({});
-const selectedDate = ref(new Date());
+const selectedDate = ref<Date | null>(null);
 const selectedSlot = ref(null);
+const currentStep = ref(1);
 const today = new Date();
+
 const minDate = today.toISOString().split("T")[0];
 const maxDate = computed(() => {
   const horizon = Number(siteSettings.value?.booking_horizon_months || 1);
@@ -625,8 +661,6 @@ const maxDate = computed(() => {
   console.log("Fecha máxima permitida:", result);
   return result;
 });
-
-
 
 const showPayment = ref(false);
 const processing = ref(false);
@@ -729,9 +763,11 @@ const fetchRoomBookings = async () => {
 
     roomBookings.value = bookingsRes.data;
 
-    // Contar reservas del usuario en el mes seleccionado
-    const currentMonth = new Date(selectedDate.value).getMonth();
-    const currentYear = new Date(selectedDate.value).getFullYear();
+    // Contar reservas del usuario en el mes seleccionado (o el actual si no hay selección)
+    const referenceDate = selectedDate.value ? new Date(selectedDate.value) : new Date();
+    const currentMonth = referenceDate.getMonth();
+    const currentYear = referenceDate.getFullYear();
+
 
     userBookingsCount.value = userBookingsRes.data.filter((b: any) => {
       const d = new Date(b.booking_date);
@@ -1467,7 +1503,7 @@ export default {
 }
 
 .elite-quota-alert::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -1495,7 +1531,7 @@ export default {
   font-size: 0.85rem;
   font-weight: 900;
   color: #1e293b;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .usage-hint {
@@ -1514,6 +1550,3 @@ export default {
   text-transform: uppercase;
 }
 </style>
-
-
-
