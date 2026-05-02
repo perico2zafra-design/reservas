@@ -137,11 +137,11 @@
             </div>
           </div>
 
-          <!-- PASO A PASO INCREMENTAL BOUTIQUE -->
+          <!-- PASO A PASO INCREMENTAL BOUTIQUE (5 PASOS) -->
           <div class="elite-stepper-header mb-8 mb-md-12">
             <div class="stepper-track">
               <div
-                v-for="n in 3"
+                v-for="n in 5"
                 :key="n"
                 class="stepper-node"
                 :class="{
@@ -153,10 +153,15 @@
                   <v-icon v-if="currentStep > n" icon="mdi-check" size="14" color="white" />
                   <span v-else>{{ n }}</span>
                 </div>
-                <div class="node-label">{{ ['Reservar', 'Horario', 'Resumen'][n-1] }}</div>
+                <div class="node-label">
+                  {{ ['Día', 'Hora', 'Resumen', 'Pago', 'Listo'][n-1] }}
+                </div>
               </div>
               <div class="stepper-line"></div>
-              <div class="stepper-line-active" :style="{ width: ((currentStep - 1) / 2) * 100 + '%' }"></div>
+              <div 
+                class="stepper-line-active" 
+                :style="{ width: ((currentStep - 1) / 4) * 100 + '%' }"
+              ></div>
             </div>
           </div>
 
@@ -193,8 +198,27 @@
                      :formatted-date="formatDate(selectedDate)"
                      :time-label="getTimeLabel(selectedSlot)"
                      :deposit-amount="room?.deposit_amount || 0"
-                     @confirm="startPayment"
+                     @confirm="goToPayment"
                      @back="currentStep = 2"
+                   />
+                </v-window-item>
+
+                <!-- PASO 4: PAGO -->
+                <v-window-item :value="4">
+                   <BookingStepPayment 
+                     :deposit-amount="room?.deposit_amount || 0"
+                     :loading="processing"
+                     @confirm="confirmPayment"
+                     @back="currentStep = 3"
+                   />
+                </v-window-item>
+
+                <!-- PASO 5: ÉXITO -->
+                <v-window-item :value="5">
+                   <BookingStepSuccess 
+                     :room-name="room?.name || ''"
+                     :formatted-date="formatDate(selectedDate)"
+                     :time-label="getTimeLabel(selectedSlot)"
                    />
                 </v-window-item>
 
@@ -205,58 +229,8 @@
       </v-row>
     </v-container>
 
-    <!-- Payment Modal (Refined) -->
-    <v-dialog
-      v-if="room"
-      v-model="showPayment"
-      max-width="500"
-      transition="dialog-bottom-transition"
-      :key="`payment-dialog-${room.id}`"
-    >
-      <v-card class="elite-modal-card pa-8 pa-md-10 overflow-hidden">
-        <div class="modal-glow"></div>
-        <div class="text-center mb-10">
-          <div class="modal-icon-ring mb-4">
-            <v-icon
-              icon="mdi-credit-card-lock-outline"
-              color="#0f172a"
-              size="32"
-            />
-          </div>
-          <h2 class="text-h4 font-weight-black text-playfair mb-2">
-            Pasarela de Pago
-          </h2>
-          <p class="text-body-2 text-slate-500">
-            Introduce los detalles de tu tarjeta premium
-          </p>
-        </div>
 
-        <div class="elite-stripe-box mb-8">
-          <div id="card-element"></div>
-        </div>
-
-        <v-btn
-          block
-          height="64"
-          color="#0f172a"
-          rounded="xl"
-          class="font-weight-black text-white"
-          :loading="processing"
-          @click="confirmPayment"
-        >
-          AUTORIZAR {{ room?.deposit_amount }}€
-        </v-btn>
-        <v-btn
-          block
-          variant="text"
-          color="slate-400"
-          class="mt-4 font-weight-bold"
-          @click="showPayment = false"
-        >
-          Cancelar Transacción
-        </v-btn>
-      </v-card>
-    </v-dialog>
+    <!-- Los diálogos se han eliminado para integrar el pago en el stepper -->
   </div>
 </template>
 
@@ -264,9 +238,13 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useBookingStore } from "@/stores/booking";
+import { useAppStore } from "@/stores/app";
 import BookingStepCalendar from '@/components/booking/BookingStepCalendar.vue';
 import BookingStepTime from '@/components/booking/BookingStepTime.vue';
 import BookingStepSummary from '@/components/booking/BookingStepSummary.vue';
+import BookingStepPayment from '@/components/booking/BookingStepPayment.vue';
+import BookingStepSuccess from '@/components/booking/BookingStepSuccess.vue';
+import { loadStripe } from '@stripe/stripe-js';
 import { siteService } from "@/services/site.service";
 import { formatDate } from "@/utils/formatters";
 import api from "@/services/api";
@@ -275,6 +253,7 @@ import type { SiteSettings } from "@/types";
 const route = useRoute();
 const router = useRouter();
 const bookingStore = useBookingStore();
+const appStore = useAppStore();
 
 const room = computed(() =>
   bookingStore.rooms.find((r) => r.id === Number(route.params.id)),
@@ -392,8 +371,38 @@ const getTimeLabel = (val: string | null) =>
   timeSlots.value.find((s) => s.value === val)?.label || "Pendiente";
 const isReadyToBook = computed(() => selectedDate.value && selectedSlot.value);
 
-const startPayment = () => {
-  showPayment.value = true;
+// Stripe state
+let stripe: any = null;
+let elements: any = null;
+let card: any = null;
+
+const goToPayment = async () => {
+  currentStep.value = 4;
+  setTimeout(initStripeInStep, 100);
+};
+
+const initStripeInStep = async () => {
+  if (!stripe) {
+    stripe = await loadStripe('pk_test_51P7qbtL1W5R8C6zC4V7V8V9V0V1V2V3V4V5V6V7V8V9V0V');
+  }
+  
+  elements = stripe.elements();
+  card = elements.create('card', {
+    style: {
+      base: {
+        fontSize: '16px',
+        color: '#0f172a',
+        fontFamily: '"Inter", sans-serif',
+        '::placeholder': { color: '#94a3b8' }
+      }
+    }
+  });
+
+  const desktopEl = document.getElementById('step-card-element');
+  const mobileEl = document.getElementById('mobile-card-element');
+  
+  if (desktopEl) card.mount('#step-card-element');
+  if (mobileEl) card.mount('#mobile-card-element');
 };
 
 watch(selectedDate, () => {
@@ -410,7 +419,6 @@ const fetchRoomBookings = async () => {
 
     roomBookings.value = bookingsRes.data;
 
-    // Contar reservas del usuario en el mes seleccionado (o el actual si no hay selección)
     const referenceDate = selectedDate.value
       ? new Date(selectedDate.value)
       : new Date();
@@ -431,21 +439,25 @@ const fetchRoomBookings = async () => {
 };
 
 const confirmPayment = async () => {
+  if (!stripe || !card) return;
+  
   processing.value = true;
   try {
-    const slot = timeSlots.value.find((s) => s.value === selectedSlot.value);
-    const [start, end] = slot?.range.split(" - ") || ["09:00", "23:59"];
+    const { token, error } = await stripe.createToken(card);
+    if (error) throw error;
 
-    await api.post("/bookings/confirm", {
-      roomId: room.value?.id,
-      bookingDate: selectedDate.value.toISOString().split("T")[0],
-      startTime: start,
-      endTime: end,
-      paymentIntentId: "pi_mock_" + Date.now(),
+    await bookingStore.createBooking({
+      room_id: room.value!.id,
+      booking_date: selectedDate.value!.toISOString().split('T')[0],
+      start_time: selectedSlot.value === 'MORNING' ? '10:00' : (selectedSlot.value === 'AFTERNOON' ? '15:00' : '10:00'),
+      end_time: selectedSlot.value === 'MORNING' ? '15:00' : (selectedSlot.value === 'AFTERNOON' ? '22:00' : '22:00'),
+      stripe_token: token.id
     });
-    router.push("/my-bookings");
-  } catch (err) {
-    console.error(err);
+
+    currentStep.value = 5;
+    appStore.showSuccess('¡Reserva confirmada con éxito!');
+  } catch (error: any) {
+    appStore.showError(error.message || 'Error al procesar el pago');
   } finally {
     processing.value = false;
   }
