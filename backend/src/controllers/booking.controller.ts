@@ -234,13 +234,13 @@ export const deleteBooking = async (req: Request, res: Response) => {
   try {
     const { error } = await supabase
       .from('bookings')
-      .delete()
+      .update({ status: 'CANCELLED' })
       .eq('id', id);
 
     if (error) throw error;
-    res.status(204).send();
+    res.status(200).json({ message: 'Reserva cancelada correctamente' });
   } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar reserva' });
+    res.status(500).json({ error: 'Error al cancelar la reserva' });
   }
 };
 

@@ -2,14 +2,22 @@
   <div class="booking-step-success">
     <v-card class="elite-success-card pa-12 text-center overflow-hidden">
       <div class="success-glow"></div>
-      
+
       <div class="success-icon-wrapper mb-8">
-        <v-icon icon="mdi-check-decagram" color="#10b981" size="80" class="animate-bounce-subtle" />
+        <v-icon
+          icon="mdi-check-decagram"
+          color="#10b981"
+          size="80"
+          class="animate-bounce-subtle"
+        />
       </div>
 
-      <h2 class="text-h3 font-weight-black text-slate-900 mb-4 text-playfair">¡Reserva Confirmada!</h2>
+      <h2 class="text-h3 font-weight-black text-slate-900 mb-4 text-playfair">
+        ¡Reserva Confirmada!
+      </h2>
       <p class="text-h6 text-slate-500 mb-6 max-w-500 mx-auto leading-relaxed">
-        Tu espacio en <strong>{{ roomName }}</strong> ha sido reservado con éxito.
+        Tu espacio en <strong>{{ roomName }}</strong> ha sido reservado con
+        éxito.
       </p>
       <div class="pa-4 rounded-xl bg-success-light mb-8 max-w-500 mx-auto">
         <p class="text-subtitle-2 text-success font-weight-black mb-0">
@@ -29,11 +37,11 @@
         </div>
       </div>
 
-      <v-btn 
-        height="64" 
-        color="#0f172a" 
-        rounded="xl" 
-        class="px-12 text-white font-weight-black" 
+      <v-btn
+        height="64"
+        color="#0f172a"
+        rounded="xl"
+        class="px-12 text-white font-weight-black"
         @click="$router.push('/my-bookings')"
       >
         GESTIONAR MIS RESERVAS
@@ -65,7 +73,11 @@ defineProps<{
   transform: translateX(-50%);
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(16, 185, 129, 0.1) 0%,
+    transparent 70%
+  );
   pointer-events: none;
 }
 
@@ -87,8 +99,13 @@ defineProps<{
 }
 
 @keyframes bounce-subtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @media (max-width: 600px) {

@@ -83,5 +83,9 @@ export const bookingService = {
 
   async deleteRoomException(excId: number): Promise<void> {
     await api.delete(`/rooms/exceptions/${excId}`);
+  },
+  
+  async cancelBooking(id: number): Promise<void> {
+    await api.delete(`/bookings/${id}`);
   }
 };

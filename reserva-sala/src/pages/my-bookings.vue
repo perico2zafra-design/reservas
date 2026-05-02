@@ -101,7 +101,7 @@
                   variant="tonal"
                   prepend-icon="mdi-close"
                   class="font-weight-black btn-cancel-compact"
-                  @click="cancelBooking(booking.id)"
+                  @click="openCancelModal(booking)"
                 >
                   Cancelar
                 </v-btn>
@@ -128,6 +128,16 @@
         </v-window-item>
       </v-window>
     </v-container>
+
+    <!-- MODAL PREMIUM DE CANCELACIÓN -->
+    <CancelBookingModal
+      v-model="cancelDialog"
+      :room-name="selectedBooking?.room?.name || 'Sala'"
+      :date="selectedBooking ? formatDate(selectedBooking.booking_date) : ''"
+      :time="selectedBooking ? `${selectedBooking.start_time} - ${selectedBooking.end_time}` : ''"
+      :loading="cancelling"
+      @confirm="handleConfirmCancel"
+    />
   </div>
 </template>
 
@@ -136,12 +146,27 @@ import { onMounted, computed, ref } from "vue";
 import { useBookingStore } from "@/stores/booking";
 import { useAuthStore } from "@/stores/auth";
 import { useAppStore } from "@/stores/app";
+import api from "@/services/api";
 import BookingCard from "@/components/common/BookingCard.vue";
+import CancelBookingModal from "@/components/booking/CancelBookingModal.vue";
 
 const bookingStore = useBookingStore();
 const authStore = useAuthStore();
 const appStore = useAppStore();
 const activeTab = ref("upcoming");
+
+// Logic for Premium Cancel Modal
+const cancelDialog = ref(false);
+const cancelling = ref(false);
+const selectedBooking = ref<any>(null);
+
+const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleDateString("es-ES", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+};
 
 const userBookings = computed(() => {
   return bookingStore.bookings
@@ -168,17 +193,24 @@ const pastBookings = computed(() => {
   });
 });
 
-const cancelBooking = async (id: number) => {
-  if (confirm("¿Estás seguro de que quieres cancelar esta reserva?")) {
-    try {
-      appStore.setLoading(true);
-      await bookingStore.cancelBooking(id);
-      appStore.showSuccess("Reserva cancelada correctamente");
-    } catch (error) {
-      appStore.showError("Error al cancelar la reserva");
-    } finally {
-      appStore.setLoading(false);
-    }
+const openCancelModal = (booking: any) => {
+  selectedBooking.value = booking;
+  cancelDialog.value = true;
+};
+
+const handleConfirmCancel = async () => {
+  if (!selectedBooking.value) return;
+  
+  try {
+    cancelling.value = true;
+    await bookingStore.cancelBooking(selectedBooking.value.id);
+    cancelDialog.value = false;
+    appStore.showSuccess("Reserva cancelada correctamente");
+  } catch (error) {
+    appStore.showError("Error al cancelar la reserva");
+  } finally {
+    cancelling.value = false;
+    selectedBooking.value = null;
   }
 };
 
