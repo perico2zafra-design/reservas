@@ -119,443 +119,128 @@
             </v-row>
           </v-card>
 
-          <v-row class="ga-y-8">
-            <!-- Selector de Reserva (Columna Izquierda) -->
-            <v-col cols="12" lg="7">
-              <v-card class="elite-step-card pa-8 mb-8">
-                <div class="d-flex align-center mb-8">
-                  <div
-                    class="step-icon-wrapper me-5"
-                    :class="{ 'step-active': currentStep >= 1 }"
-                  >
-                    <v-icon
-                      :icon="
-                        currentStep > 1
-                          ? 'mdi-check'
-                          : 'mdi-calendar-month-outline'
-                      "
-                      :color="currentStep >= 1 ? 'white' : 'primary'"
-                      size="24"
-                    />
-                  </div>
-                  <div>
-                    <h2 class="text-h5 font-weight-black text-slate-900">
-                      1. Fecha del Evento
-                    </h2>
-                    <p class="text-caption text-slate-400 mb-0">
-                      {{
-                        selectedDate
-                          ? "Día seleccionado: " + formatDate(selectedDate)
-                          : "Selecciona el día de tu estancia"
-                      }}
-                    </p>
-                  </div>
+          <!-- PASO A PASO INCREMENTAL BOUTIQUE -->
+          <div class="elite-stepper-header mb-12">
+            <div class="stepper-track">
+              <div v-for="n in 3" :key="n" class="stepper-node" :class="{ 'node-active': currentStep >= n, 'node-completed': currentStep > n }">
+                <div class="node-circle">
+                  <v-icon v-if="currentStep > n" icon="mdi-check" size="14" color="white" />
+                  <span v-else>{{ n }}</span>
                 </div>
+                <div class="node-label">{{ ['Fecha', 'Horario', 'Resumen'][n-1] }}</div>
+              </div>
+              <div class="stepper-line"></div>
+              <div class="stepper-line-active" :style="{ width: ((currentStep - 1) / 2) * 100 + '%' }"></div>
+            </div>
+          </div>
 
-                <div class="elite-calendar-wrapper mb-6">
-                  <BoutiqueCalendar
-                    v-model="selectedDate"
-                    :bookings="roomBookings"
-                    :closed-dates="closedDates"
-                    :min-date="minDate"
-                    :max-date="maxDate"
-                    @update:model-value="currentStep = 2"
-                  />
-                </div>
-              </v-card>
-
-              <!-- Paso 2: Horario (Solo si hay fecha) -->
-              <v-expand-transition>
-                <v-card
-                  v-if="currentStep >= 2"
-                  class="elite-step-card pa-8 mb-8 animate-fade-in"
-                >
-                  <div class="d-flex align-center mb-8">
-                    <div
-                      class="step-icon-wrapper me-5"
-                      :class="{ 'step-active': currentStep >= 2 }"
-                    >
-                      <v-icon
-                        :icon="
-                          currentStep > 2 ? 'mdi-check' : 'mdi-clock-outline'
-                        "
-                        :color="currentStep >= 2 ? 'white' : 'primary'"
-                        size="24"
+          <v-row justify="center">
+            <v-col cols="12" lg="9" xl="8">
+              <v-window v-model="currentStep" class="elite-window-container overflow-visible">
+                
+                <!-- PASO 1: LA FECHA -->
+                <v-window-item :value="1">
+                  <v-card class="elite-step-card pa-6 pa-md-12">
+                    <div class="text-center mb-10">
+                      <h2 class="text-h4 font-weight-black text-slate-900 mb-2">Selecciona la Fecha</h2>
+                      <p class="text-body-1 text-slate-400">Elige el día de tu evento en el calendario exclusivo.</p>
+                    </div>
+                    
+                    <div class="elite-calendar-wrapper mb-10">
+                      <BoutiqueCalendar
+                        v-model="selectedDate"
+                        :bookings="roomBookings"
+                        :closed-dates="closedDates"
+                        :min-date="minDate"
+                        :max-date="maxDate"
+                        @update:model-value="currentStep = 2"
                       />
                     </div>
-                    <div>
-                      <h2 class="text-h5 font-weight-black text-slate-900">
-                        2. Tramo Horario
-                      </h2>
-                      <p class="text-caption text-slate-400 mb-0">
-                        {{
-                          selectedSlot
-                            ? "Horario reservado"
-                            : "Elige el tramo que mejor se adapte"
-                        }}
-                      </p>
-                    </div>
-                  </div>
 
-                  <div class="elite-time-grid">
-                    <div
-                      v-for="slot in timeSlots"
-                      :key="slot.value"
-                      :class="[
-                        'elite-time-card',
-                        { active: selectedSlot === slot.value },
-                      ]"
-                      @click="
-                        () => {
-                          selectedSlot = slot.value;
-                          currentStep = 3;
-                        }
-                      "
-                    >
-                      <v-icon
-                        :icon="slot.icon"
-                        size="32"
-                        class="mb-4 slot-icon"
-                      />
-                      <div class="slot-name">{{ slot.label }}</div>
-                      <div class="slot-range">{{ slot.range }}</div>
+                    <div class="d-flex justify-center ga-8 pt-4 border-t opacity-70">
+                      <div class="d-flex align-center ga-2"><div class="dot-indicator bg-success"></div><span class="text-caption font-weight-bold">Libre</span></div>
+                      <div class="d-flex align-center ga-2"><div class="dot-indicator bg-error"></div><span class="text-caption font-weight-bold">Lleno</span></div>
+                    </div>
+                  </v-card>
+                </v-window-item>
+
+                <!-- PASO 2: EL HORARIO -->
+                <v-window-item :value="2">
+                  <v-card class="elite-step-card pa-6 pa-md-12">
+                    <div class="d-flex align-center justify-space-between mb-12">
+                      <div>
+                        <h2 class="text-h4 font-weight-black text-slate-900 mb-2">Elige el Horario</h2>
+                        <p class="text-body-1 text-primary font-weight-black mb-0">
+                          <v-icon icon="mdi-calendar-check" size="20" class="me-2" />
+                          {{ formatDate(selectedDate) }}
+                        </p>
+                      </div>
+                      <v-btn variant="text" color="slate-400" @click="currentStep = 1" class="font-weight-black">
+                        <v-icon icon="mdi-chevron-left" class="me-1" /> VOLVER
+                      </v-btn>
+                    </div>
+
+                    <div class="elite-time-grid mb-10">
                       <div
-                        class="active-indicator"
-                        v-if="selectedSlot === slot.value"
+                        v-for="slot in timeSlots"
+                        :key="slot.value"
+                        :class="['elite-time-card', { active: selectedSlot === slot.value }]"
+                        @click="() => { selectedSlot = slot.value; currentStep = 3 }"
                       >
-                        <v-icon icon="mdi-check" size="14" color="white" />
+                        <v-icon :icon="slot.icon" size="32" class="mb-4 slot-icon" />
+                        <div class="slot-name">{{ slot.label }}</div>
+                        <div class="slot-range">{{ slot.range }}</div>
                       </div>
                     </div>
-                  </div>
-                </v-card>
-              </v-expand-transition>
+                  </v-card>
+                </v-window-item>
 
-              <!-- NORMATIVA -->
-              <v-card
-                class="elite-rules-card pa-8 pa-md-10 overflow-hidden mt-8"
-              >
-                <div class="rules-accent-glow"></div>
-                <div class="d-flex align-center mb-10">
-                  <div class="rules-icon-header me-5">
-                    <v-icon icon="mdi-gavel" color="#d4af37" size="28" />
-                  </div>
-                  <div>
-                    <h3
-                      class="text-h5 font-weight-black text-slate-900 text-playfair mb-1"
-                    >
-                      Normativa Vigente
-                    </h3>
-                    <div class="d-flex align-center ga-2">></div>
-                  </div>
-                </div>
-
-                <v-row class="ga-y-6">
-                  <v-col
-                    v-for="(rule, idx) in enrichedRules"
-                    :key="idx"
-                    cols="12"
-                    md="6"
-                  >
-                    <div class="rule-premium-item">
-                      <div class="rule-icon-box me-4">
-                        <v-icon :icon="rule.icon" size="20" color="#d4af37" />
+                <!-- PASO 3: CONFIRMACIÓN -->
+                <v-window-item :value="3">
+                  <v-card class="elite-step-card pa-6 pa-md-12 overflow-hidden">
+                    <h2 class="text-h4 font-weight-black text-slate-900 mb-10">Resumen de tu Estancia</h2>
+                    
+                    <div class="elite-summary-box pa-8 mb-10">
+                      <div class="summary-row-premium">
+                        <span class="label">Instalación</span>
+                        <span class="value font-weight-black">{{ room?.name }}</span>
                       </div>
-                      <div class="rule-text">
-                        <span
-                          class="text-body-2 font-weight-medium text-slate-600"
-                          >{{ rule.text }}</span
-                        >
+                      <div class="summary-row-premium">
+                        <span class="label">Fecha</span>
+                        <span class="value font-weight-black">{{ formatDate(selectedDate) }}</span>
+                      </div>
+                      <div class="summary-row-premium">
+                        <span class="label">Horario</span>
+                        <span class="value font-weight-black">{{ getTimeLabel(selectedSlot) }}</span>
+                      </div>
+                      <v-divider class="my-6 opacity-10" />
+                      <div class="summary-row-premium total">
+                        <span class="label">Fianza</span>
+                        <span class="value gold-text">{{ room?.deposit_amount }}€</span>
                       </div>
                     </div>
-                  </v-col>
-                </v-row>
 
-                <!-- Aviso Crítico (Security Grade) -->
-                <div class="mt-12 elite-security-alert pa-6">
-                  <div class="d-flex align-start ga-5">
-                    <div class="alert-pulse-icon">
-                      <v-icon icon="mdi-shield-alert" color="white" size="24" />
-                    </div>
-                    <div>
-                      <h4
-                        class="text-subtitle-1 font-weight-black text-error-darken-4 mb-1"
-                      >
-                        RESTRICCIÓN DE ACCESO CRÍTICA
-                      </h4>
-                      <p
-                        class="text-body-2 text-error-darken-2 mb-0 leading-relaxed font-weight-medium"
-                      >
-                        Queda terminantemente prohibido el acceso al
-                        <strong>GIMNASIO</strong> durante el uso del salón
-                        social. Este incumplimiento se tipifica como
-                        <strong>falta muy grave</strong> con sanción inmediata
-                        según acta.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </v-card>
-            </v-col>
-
-            <!-- Resumen y Pago (Columna Derecha) -->
-            <v-col cols="12" lg="5">
-              <div class="sticky-top-elite">
-                <v-card class="elite-checkout-card overflow-hidden">
-                  <!-- Cabecera de Recibo Premium -->
-                  <div class="checkout-header pa-8">
-                    <div class="d-flex justify-space-between align-center mb-8">
-                      <div class="checkout-title-group">
-                        <h3
-                          class="text-h5 font-weight-black text-playfair text-white mb-1"
-                        >
-                          Tu Reserva
-                        </h3>
-                        <div class="d-flex align-center">
-                          <v-icon
-                            icon="mdi-circle"
-                            color="amber"
-                            size="8"
-                            class="me-2"
-                          />
-                          <span
-                            class="text-overline text-amber-lighten-2 font-weight-black"
-                            style="font-size: 0.6rem; letter-spacing: 2px"
-                            >RESUMEN ELITE</span
-                          >
-                        </div>
-                      </div>
-                      <v-icon icon="mdi-gold" color="amber" size="36" />
-                    </div>
-
-                    <div class="d-flex flex-column ga-6">
-                      <!-- Instalación -->
-                      <div class="summary-item">
-                        <span class="summary-label">INSTALACIÓN</span>
-                        <div class="summary-value-wrapper">
-                          <span class="summary-value text-amber-accent-2">{{
-                            room?.name
-                          }}</span>
-                        </div>
-                      </div>
-
-                      <!-- Fecha con Placeholder -->
-                      <div class="summary-item">
-                        <span class="summary-label">FECHA SELECCIONADA</span>
-                        <div class="summary-value-wrapper">
-                          <span
-                            v-if="selectedDate"
-                            class="summary-value text-white"
-                            >{{ formatDate(selectedDate) }}</span
-                          >
-                          <span v-else class="summary-value-placeholder"
-                            >Pendiente de selección...</span
-                          >
-                        </div>
-                      </div>
-
-                      <!-- Horario con Placeholder -->
-                      <div class="summary-item">
-                        <span class="summary-label">TRAMO HORARIO</span>
-                        <div class="summary-value-wrapper">
-                          <span
-                            v-if="selectedSlot"
-                            class="summary-value text-white"
-                            >{{ getTimeLabel(selectedSlot) }}</span
-                          >
-                          <span v-else class="summary-value-placeholder"
-                            >Esperando horario...</span
-                          >
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="checkout-footer pa-8 bg-white">
-                    <!-- Panel de Estado de Cupo Premium -->
                     <v-expand-transition>
-                      <div
-                        v-if="
-                          userBookingsCount >=
-                          (siteSettings?.max_bookings_per_month || 2)
-                        "
-                        class="elite-usage-panel mb-8"
-                      >
-                        <div
-                          class="d-flex justify-space-between align-center mb-2"
-                        >
-                          <span class="usage-title">CUPO MENSUAL</span>
-                          <span class="usage-stat"
-                            >{{ userBookingsCount }} /
-                            {{
-                              siteSettings?.max_bookings_per_month || 2
-                            }}</span
-                          >
-                        </div>
-                        <v-progress-linear
-                          :model-value="
-                            (userBookingsCount /
-                              (siteSettings?.max_bookings_per_month || 2)) *
-                            100
-                          "
-                          color="#d97706"
-                          height="6"
-                          rounded
-                          class="usage-bar mb-3"
-                        />
-                        <div class="d-flex align-center ga-2">
-                          <v-icon
-                            icon="mdi-shield-alert-outline"
-                            size="16"
-                            color="#92400e"
-                          />
-                          <span class="usage-hint"
-                            >Límite alcanzado para este periodo</span
-                          >
-                        </div>
+                      <div v-if="userBookingsCount >= (siteSettings?.max_bookings_per_month || 2)" class="elite-usage-panel mb-10">
+                         <!-- contenido cupo -->
+                         <div class="d-flex justify-space-between align-center mb-2">
+                           <span class="usage-title">CUPO</span>
+                           <span>{{ userBookingsCount }} / {{ siteSettings?.max_bookings_per_month || 2 }}</span>
+                         </div>
+                         <v-progress-linear :model-value="100" color="#d97706" height="6" rounded class="mb-2" />
                       </div>
                     </v-expand-transition>
 
-                    <div class="d-flex justify-space-between align-end mb-10">
-                      <div>
-                        <div
-                          class="text-caption font-weight-black text-slate-400 letter-spacing-lg mb-1"
-                        >
-                          TOTAL FIANZA
-                        </div>
-                        <div class="d-flex align-center">
-                          <span
-                            class="text-h3 font-weight-black text-slate-900 me-1"
-                            >{{ room?.deposit_amount }}</span
-                          >
-                          <span class="text-h5 font-weight-bold text-slate-400"
-                            >€</span
-                          >
-                        </div>
-                      </div>
-                      <div class="text-right">
-                        <v-icon
-                          icon="mdi-shield-check"
-                          color="success"
-                          size="28"
-                          class="mb-1"
-                        />
-                        <div class="text-caption font-weight-bold text-success">
-                          Garantía Elite
-                        </div>
-                      </div>
+                    <div class="d-flex ga-4">
+                      <v-btn variant="outlined" color="slate-200" height="64" class="flex-grow-1 font-weight-black" @click="currentStep = 2">VOLVER</v-btn>
+                      <v-btn height="64" color="slate-900" class="flex-grow-2 text-white font-weight-black" :disabled="userBookingsCount >= (siteSettings?.max_bookings_per_month || 2)" @click="startPayment">PAGAR {{ room?.deposit_amount }}€</v-btn>
                     </div>
-
-                    <v-btn
-                      block
-                      height="72"
-                      color="#0f172a"
-                      rounded="xl"
-                      class="elite-action-btn shadow-elite-btn"
-                      :disabled="
-                        !isReadyToBook ||
-                        userBookingsCount >=
-                          (siteSettings?.max_bookings_per_month || 2)
-                      "
-                      @click="startPayment"
-                    >
-                      <template
-                        v-if="
-                          userBookingsCount >=
-                          (siteSettings?.max_bookings_per_month || 2)
-                        "
-                      >
-                        <span class="btn-text text-amber-darken-4"
-                          >CUPO COMPLETADO</span
-                        >
-                        <v-icon
-                          icon="mdi-lock-outline"
-                          class="ms-4 btn-icon"
-                          color="amber-darken-4"
-                        />
-                      </template>
-                      <template v-else>
-                        <span class="btn-text" v-if="isReadyToBook"
-                          >CONFIRMAR RESERVA</span
-                        >
-                        <span class="btn-text text-grey-darken-1" v-else
-                          >COMPLETA LOS DATOS</span
-                        >
-                        <v-icon icon="mdi-arrow-right" class="ms-4 btn-icon" />
-                      </template>
-                    </v-btn>
-
-                    <div
-                      class="secure-badges mt-8 d-flex justify-center ga-6 opacity-30"
-                    >
-                      <v-icon icon="mdi-stripe" size="40" />
-                      <v-icon icon="mdi-shield-lock-outline" size="20" />
-                      <v-icon icon="mdi-credit-card-outline" size="20" />
-                    </div>
-                  </div>
-                </v-card>
-
-                <!-- Panel de Compromiso Elite (Boutique Style) -->
-                <div class="elite-guarantee-panel mt-8 pa-8">
-                  <div class="guarantee-glass-overlay"></div>
-
-                  <div class="d-flex flex-column ga-8 position-relative">
-                    <!-- Protocolo de Salida -->
-                    <div class="d-flex align-start ga-5">
-                      <div class="concierge-icon-wrapper amber-glow">
-                        <v-icon
-                          icon="mdi-camera-enhance-outline"
-                          color="#d4af37"
-                          size="20"
-                        />
-                      </div>
-                      <div>
-                        <h4
-                          class="text-caption font-weight-black text-slate-900 letter-spacing-lg mb-1"
-                        >
-                          PROTOCOLO DIGITAL
-                        </h4>
-                        <p
-                          class="text-caption text-slate-500 mb-0 leading-relaxed"
-                        >
-                          Recomendamos
-                          <strong>fotografiar la estancia</strong> al finalizar.
-                          Este sencillo paso garantiza la integridad de su
-                          fianza.
-                        </p>
-                      </div>
-                    </div>
-
-                    <v-divider class="guarantee-divider" />
-
-                    <!-- Garantía de Reembolso -->
-                    <div class="d-flex align-start ga-5">
-                      <div class="concierge-icon-wrapper blue-glow">
-                        <v-icon
-                          icon="mdi-shield-refresh-outline"
-                          color="#2563eb"
-                          size="20"
-                        />
-                      </div>
-                      <div>
-                        <h4
-                          class="text-caption font-weight-black text-slate-900 letter-spacing-lg mb-1"
-                        >
-                          GARANTÍA DE REEMBOLSO
-                        </h4>
-                        <p
-                          class="text-caption text-slate-500 mb-0 leading-relaxed"
-                        >
-                          Inspección profesional y
-                          <strong>devolución automática</strong> en su cuenta en
-                          un máximo de 48h hábiles.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                  </v-card>
+                </v-window-item>
+              </v-window>
             </v-col>
           </v-row>
+
         </v-col>
       </v-row>
     </v-container>
@@ -1549,4 +1234,138 @@ export default {
   letter-spacing: 1px;
   text-transform: uppercase;
 }
+/* STEPPER INCREMENTAL PREMIUM */
+.elite-stepper-header {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.stepper-track {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.stepper-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 3;
+}
+
+.node-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  color: #94a3b8;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.node-active .node-circle {
+  border-color: #0f172a;
+  color: #0f172a;
+  transform: scale(1.1);
+  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.15);
+}
+
+.node-completed .node-circle {
+  background: #0f172a;
+  border-color: #0f172a;
+}
+
+.node-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #94a3b8;
+}
+
+.node-active .node-label {
+  color: #0f172a;
+}
+
+.stepper-line {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.stepper-line-active {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  height: 2px;
+  background: #0f172a;
+  z-index: 1;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.elite-window-container {
+  min-height: 500px;
+}
+
+.summary-row-premium {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.summary-row-premium .label {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.summary-row-premium .value {
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.summary-row-premium.total .value {
+  font-size: 1.5rem;
+}
+
+.gold-text {
+  color: #b45309;
+}
+.dot-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.bg-success {
+  background-color: #10b981 !important;
+}
+
+.bg-error {
+  background-color: #ef4444 !important;
+}
+
+.bg-warning {
+  background-color: #f59e0b !important;
+}
+
+.bg-grey-lighten-1 {
+  background-color: #bdbdbd !important;
+}
 </style>
+
+
