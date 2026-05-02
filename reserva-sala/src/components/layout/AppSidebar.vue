@@ -84,6 +84,7 @@ watch(internalDrawer, (val) => emit('update:drawer', val))
 
 const menuItems = [
   { title: 'Inicio', icon: 'mdi-home-variant-outline', to: '/', color: 'primary' },
+  { title: 'Reservar', icon: 'mdi-plus-circle-outline', to: '/reserve', color: 'success' },
   { title: 'Mis Reservas', icon: 'mdi-calendar-clock-outline', to: '/my-bookings', color: 'amber-darken-2' }
 ]
 

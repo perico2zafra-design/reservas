@@ -1,5 +1,8 @@
 <template>
-  <div class="community-dashboard dashboard-container">
+  <div v-if="$vuetify.display.mobile">
+    <MobileReserveView />
+  </div>
+  <div v-else class="community-dashboard dashboard-container">
     <v-container class="pt-4 pb-8 px-4 px-md-8">
       <!-- Resident Profile Panel -->
       <v-card
@@ -136,7 +139,7 @@
           </div>
         </div>
 
-        <v-slide-group class="pa-0 rooms-carousel-clean" show-arrows>
+        <v-slide-group v-if="rooms.length > 0" :key="rooms.length" class="pa-0 rooms-carousel-clean" show-arrows>
           <v-slide-group-item v-for="room in rooms" :key="room.id">
             <div
               class="py-4 px-3"
@@ -165,6 +168,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useBookingStore } from "@/stores/booking";
 import InitialAvatar from "@/components/common/InitialAvatar.vue";
 import RoomCard from "@/components/common/RoomCard.vue";
+import MobileReserveView from "@/components/dashboard/MobileReserveView.vue";
 
 const authStore = useAuthStore();
 const bookingStore = useBookingStore();

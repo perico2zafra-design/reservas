@@ -7,8 +7,8 @@
     base-color="white"
   >
     <v-btn to="/" value="home">
-      <v-icon>mdi-home-variant-outline</v-icon>
-      <span class="nav-text">INICIO</span>
+      <v-icon>mdi-plus-circle-outline</v-icon>
+      <span class="nav-text">RESERVAR</span>
     </v-btn>
     
     <v-btn to="/my-bookings" value="bookings">

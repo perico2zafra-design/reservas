@@ -10,6 +10,19 @@
       cover 
       class="align-end bg-slate-200 card-image-zoom"
     >
+      <template v-slot:placeholder>
+        <div class="d-flex align-center justify-center fill-height bg-slate-50">
+          <v-progress-circular indeterminate color="amber-darken-1" size="24" width="2" />
+        </div>
+      </template>
+
+      <template v-slot:error>
+        <div class="d-flex flex-column align-center justify-center fill-height bg-slate-100 text-slate-400">
+          <v-icon icon="mdi-image-off-outline" size="48" class="mb-2" />
+          <span class="text-caption font-weight-bold">Imagen no disponible</span>
+        </div>
+      </template>
+
       <div :class="[$vuetify.display.mobile ? 'pa-4' : 'pa-6', 'room-overlay']">
         <div :class="['d-flex align-center', $vuetify.display.mobile ? 'mb-2' : 'mb-3']">
           <v-chip variant="flat" size="x-small" class="fianza-chip">

@@ -138,7 +138,7 @@
           <v-window-item value="basic">
             <div class="pa-6 pa-md-8">
               <v-form @submit.prevent="modalTab = 'availability'">
-                <v-row dense>
+                <v-row density="comfortable">
                   <v-col cols="12" class="mb-4">
                     <v-text-field
                       v-model="roomForm.name"
@@ -223,7 +223,7 @@
                 <h4 class="text-subtitle-2 font-weight-black text-amber mb-4">
                   HORARIO DE OPERACIÓN
                 </h4>
-                <v-row dense class="mb-6">
+                <v-row density="comfortable" class="mb-6">
                   <v-col cols="6">
                     <v-text-field
                       v-model="roomConfig.startTime"
@@ -302,7 +302,7 @@
               <h4 class="text-subtitle-2 font-weight-black text-amber mb-4">
                 AÑADIR DÍA NO RESERVABLE
               </h4>
-              <v-row dense class="mb-6">
+              <v-row density="comfortable" class="mb-6">
                 <v-col cols="12" sm="5">
                   <v-text-field
                     v-model="newException.date"

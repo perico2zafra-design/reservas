@@ -66,7 +66,7 @@
           </div>
 
           <v-form @submit.prevent="handleRegister" v-model="valid">
-            <v-row dense>
+            <v-row density="comfortable">
               <v-col cols="6">
                 <v-text-field
                   v-model="firstName"
@@ -104,7 +104,7 @@
               required
             />
 
-            <v-row dense>
+            <v-row density="comfortable">
               <v-col cols="4">
                 <v-text-field
                   v-model="portal"
