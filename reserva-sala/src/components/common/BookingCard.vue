@@ -34,15 +34,20 @@
               </div>
             </div>
 
-            <!-- CÓDIGO DE ACCESO (SMART LOCK) -->
-            <div v-if="booking.access_code && booking.status === 'CONFIRMED'" class="access-code-badge-premium mt-4">
-              <v-icon icon="mdi-lock-open-variant-outline" size="18" class="me-3" />
-              <div class="d-flex flex-column">
-                <span class="code-label">CÓDIGO DE ACCESO</span>
-                <span class="code-value">{{ booking.access_code }}</span>
+            <!-- CÓDIGO DE ACCESO (SMART LOCK) - DISEÑO PREMIUM -->
+            <div v-if="booking.access_code && booking.status === 'CONFIRMED'" class="digital-key-wrapper mt-4">
+              <div class="key-card-elite">
+                <div class="d-flex align-center">
+                  <div class="key-icon-box">
+                    <v-icon icon="mdi-key-variant" color="#fbbf24" size="20" />
+                  </div>
+                  <div class="ms-3">
+                    <div class="key-label">LLAVE DIGITAL</div>
+                    <div class="key-code">{{ booking.access_code }}</div>
+                  </div>
+                </div>
+                <v-icon icon="mdi-nfc" class="nfc-icon" size="24" />
               </div>
-              <v-spacer />
-              <v-icon icon="mdi-keyboard-outline" opacity="0.3" size="24" />
             </div>
           </div>
         </v-col>
@@ -214,30 +219,62 @@ defineProps<{
   }
 }
 
-.access-code-badge-premium {
+.digital-key-wrapper {
+  max-width: 280px;
+}
+
+.key-card-elite {
   background: #0f172a;
-  color: white;
-  padding: 12px 20px;
-  border-radius: 16px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 14px;
+  padding: 12px 16px;
+  position: relative;
   display: flex;
   align-items: center;
-  border: 1px solid rgba(251, 191, 36, 0.2);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  justify-content: space-between;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
 }
 
-.code-label {
-  font-size: 0.6rem;
+.key-card-elite::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.05));
+}
+
+.key-icon-box {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.key-label {
+  font-size: 0.55rem;
   font-weight: 900;
   color: #94a3b8;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  margin-bottom: 2px;
 }
 
-.code-value {
-  font-size: 1.25rem;
+.key-code {
+  font-size: 1.2rem;
   font-weight: 900;
   color: #fbbf24;
   letter-spacing: 4px;
+  font-family: 'Outfit', sans-serif;
   line-height: 1;
-  margin-top: 2px;
+}
+
+.nfc-icon {
+  color: rgba(255, 255, 255, 0.1);
 }
 </style>
