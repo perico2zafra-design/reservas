@@ -19,7 +19,7 @@
             <div class="d-flex align-center justify-space-between mb-3">
               <h3 class="text-playfair room-name-v2">{{ booking.room?.name || 'SALA SOCIAL' }}</h3>
               <div :class="['status-badge-v2', booking.status?.toLowerCase()]">
-                {{ booking.status }}
+                {{ translateStatus(booking.status) }}
               </div>
             </div>
 
@@ -43,8 +43,8 @@
             <div class="price-display-v2">
               <span class="currency">€</span>
               <span class="amount text-playfair">{{ booking.deposit_amount }}</span>
-              <v-chip size="x-small" density="compact" class="ms-2 font-weight-black status-chip-v2">
-                {{ booking.deposit_status }}
+              <v-chip size="x-small" density="compact" class="ms-2 font-weight-black status-chip-v2" :color="booking.deposit_status === 'REFUNDED' ? 'success' : ''">
+                {{ translateDepositStatus(booking.deposit_status) }}
               </v-chip>
             </div>
           </div>
@@ -61,6 +61,25 @@
 <script setup lang="ts">
 import { formatDate, formatTime } from '@/utils/formatters'
 import type { Booking } from '@/types'
+
+const translateStatus = (status: string) => {
+  const map: Record<string, string> = {
+    'CONFIRMED': 'Confirmada',
+    'PENDING': 'Pendiente',
+    'CANCELLED': 'Cancelada'
+  }
+  return map[status] || status
+}
+
+const translateDepositStatus = (status: string) => {
+  const map: Record<string, string> = {
+    'PAID': 'Garantizada',
+    'REFUNDED': 'Devuelta',
+    'CAPTURED': 'Cobrada',
+    'VOIDED': 'Anulada'
+  }
+  return map[status] || status
+}
 
 defineProps<{
   booking: Booking
@@ -116,6 +135,7 @@ defineProps<{
 
 .status-badge-v2.confirmed { background: rgba(16, 185, 129, 0.1); color: #10b981; }
 .status-badge-v2.pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.status-badge-v2.cancelled { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
 
 .info-grid-v2 {
   display: flex;

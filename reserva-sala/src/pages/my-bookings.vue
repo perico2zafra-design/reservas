@@ -61,8 +61,17 @@
       <!-- Content Area -->
       <v-window v-model="activeTab" class="bg-transparent overflow-visible-elite">
         <v-window-item value="upcoming" class="overflow-visible-elite">
+          <div v-if="bookingStore.isLoading" class="d-flex justify-center py-12">
+            <v-progress-circular
+              indeterminate
+              color="#1e1b4b"
+              size="48"
+              width="3"
+            />
+          </div>
+
           <div
-            v-if="upcomingBookings.length === 0"
+            v-else-if="upcomingBookings.length === 0"
             class="empty-state-compact py-12 px-6"
           >
             <v-icon

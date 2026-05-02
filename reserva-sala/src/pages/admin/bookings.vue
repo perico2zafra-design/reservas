@@ -29,8 +29,8 @@
         </v-col>
       </v-row>
 
-      <!-- Filtros Rápidos (Estilo Premium) -->
-      <div class="tabs-container-premium mb-10 pa-1">
+      <!-- Filtros Rápidos (Escritorio: Tabs) -->
+      <div v-if="mdAndUp" class="tabs-container-premium mb-10 pa-1">
         <v-tabs
           v-model="filterTab"
           color="white"
@@ -57,8 +57,39 @@
         </v-tabs>
       </div>
 
+      <!-- Filtros Rápidos (Móvil: Grid 2x2) -->
+      <div v-if="!mdAndUp" class="mobile-filter-grid mb-8">
+        <div 
+          v-for="tab in [
+            { id: 'TO_MANAGE', label: 'Por Devolver', icon: 'mdi-alert-circle-outline' },
+            { id: 'UPCOMING', label: 'Próximas', icon: 'mdi-clock-outline' },
+            { id: 'REFUNDED', label: 'Devueltas', icon: 'mdi-cash-refund' },
+            { id: 'CAPTURED', label: 'Cobradas', icon: 'mdi-cash-check' }
+          ]" 
+          :key="tab.id"
+          class="mobile-filter-btn"
+          :class="{ 'active': filterTab === tab.id }"
+          @click="filterTab = tab.id"
+        >
+          <v-icon :icon="tab.icon" size="20" class="mb-1" />
+          <span class="text-caption font-weight-black">{{ tab.label }}</span>
+        </div>
+      </div>
+
+      <!-- Estado de Carga Localizado -->
+      <div v-if="bookingStore.isLoading" class="d-flex justify-center py-12">
+        <v-progress-circular
+          indeterminate
+          color="#d4af37"
+          size="64"
+          width="4"
+        >
+          <v-icon icon="mdi-shield-crown" color="#0f172a" size="24" />
+        </v-progress-circular>
+      </div>
+
       <!-- Lista de Reservas Admin -->
-      <div v-if="filteredBookings.length > 0">
+      <div v-else-if="filteredBookings.length > 0">
         <v-fade-transition group>
           <BookingCard
             v-for="booking in filteredBookings"
@@ -210,6 +241,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
+import { useDisplay } from "vuetify";
 import { useBookingStore } from "@/stores/booking";
 import api from "@/services/api";
 import BookingCard from "@/components/common/BookingCard.vue";
@@ -219,6 +251,7 @@ import { useAppStore } from "@/stores/app";
 
 const bookingStore = useBookingStore();
 const appStore = useAppStore();
+const { mdAndUp } = useDisplay();
 const filterTab = ref("TO_MANAGE");
 
 const refundDialog = ref(false);
@@ -358,14 +391,19 @@ onMounted(() => {
 
 @media (max-width: 600px) {
   .tabs-elite-full :deep(.v-tab) {
-    min-width: 0 !important;
-    padding: 0 8px !important;
-    font-size: 0.65rem !important;
-    letter-spacing: 0.5px !important;
+    min-width: 80px !important;
+    padding: 0 4px !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 0px !important;
   }
   .tab-icon {
-    margin-right: 4px !important;
-    font-size: 16px !important;
+    margin-right: 2px !important;
+    font-size: 14px !important;
+  }
+  .tab-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -459,5 +497,40 @@ onMounted(() => {
   .page-title-elite {
     font-size: 1.75rem;
   }
+}
+.mobile-filter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mobile-filter-btn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.mobile-filter-btn.active {
+  background: #0f172a;
+  color: white;
+  border-color: #0f172a;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);
+  transform: translateY(-2px);
+}
+
+.mobile-filter-btn .v-icon {
+  opacity: 0.7;
+}
+
+.mobile-filter-btn.active .v-icon {
+  opacity: 1;
 }
 </style>
