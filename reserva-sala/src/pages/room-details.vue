@@ -1,126 +1,144 @@
 <template>
   <div class="room-details-page-elite">
-    <!-- Hero Section con Efecto Premium -->
-    <div class="elite-hero-wrapper">
+    <!-- Desktop Hero Section -->
+    <div class="elite-hero-wrapper d-none d-md-block">
       <v-img
-        :src="
-          room?.image ||
-          'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200'
-        "
-        height="480"
+        :src="room?.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200'"
+        height="300"
         cover
         class="elite-hero-img"
       >
         <div class="elite-hero-overlay">
-          <v-container class="h-100 d-flex flex-column justify-end pb-16">
-            <v-btn
-              icon="mdi-arrow-left"
-              color="white"
-              variant="tonal"
-              class="back-btn-elite mb-6"
-              @click="$router.push('/')"
-            />
-
+          <v-container class="h-100 d-flex flex-column justify-center pt-4">
             <div class="elite-hero-content animate-fade-up">
-              <div class="d-flex align-center mb-4 ga-3">
-                <v-chip
-                  color="#fbbf24"
-                  variant="flat"
-                  size="small"
-                  class="text-slate-900 font-weight-black letter-spacing-lg"
-                >
-                  INSTALACIÓN EXCLUSIVA
-                </v-chip>
-                <v-chip
-                  v-if="room?.is_active"
-                  color="#ecfdf5"
-                  class="text-emerald-700 font-weight-black border-emerald"
-                  size="small"
-                >
-                  <v-icon
-                    icon="mdi-check-circle"
-                    start
-                    size="14"
-                    color="#059669"
-                  />
-                  DISPONIBLE
-                </v-chip>
+              <div class="d-flex align-center ga-4 flex-wrap">
+                <!-- Botón Volver con posición fija y limpia -->
+                <v-btn
+                  icon="mdi-arrow-left"
+                  color="white"
+                  variant="tonal"
+                  class="back-btn-elite-compact"
+                  size="40"
+                  @click="$router.push('/')"
+                />
+                
+                <!-- Bloque de Título y Chips alineados -->
+                <div class="d-flex align-center ga-3 flex-wrap">
+                  <h1 class="text-display-elite text-playfair text-white mb-0 lh-1">
+                    {{ room?.name }}
+                  </h1>
+                  
+                  <div class="d-flex align-center ga-2 mt-1">
+                    <v-chip color="#fbbf24" variant="flat" size="x-small" class="text-slate-900 font-weight-black">EXCLUSIVA</v-chip>
+                    <v-chip v-if="room?.is_active" color="#ecfdf5" class="text-emerald-700 font-weight-black border-emerald" size="x-small">
+                      <v-icon icon="mdi-check-circle" start size="10" color="#059669" />DISPONIBLE
+                    </v-chip>
+                  </div>
+                </div>
               </div>
 
-              <h1 class="text-display-elite text-playfair text-white mb-4">
-                {{ room?.name }}
-              </h1>
-              <p
-                class="text-h6 text-white opacity-80 font-weight-medium max-w-600 leading-relaxed"
-              >
+              <p class="text-h6 text-white opacity-70 font-weight-medium max-w-600 mt-4 d-none d-md-block">
                 {{ room?.description }}
               </p>
             </div>
+
           </v-container>
         </div>
       </v-img>
     </div>
 
+    <!-- Mobile Mini-Hero (Equilibrio Premium) -->
+    <div class="d-md-none mobile-mini-hero">
+      <v-img
+        :src="room?.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200'"
+        height="140"
+        cover
+        class="mini-hero-img"
+      >
+        <div class="mini-hero-overlay d-flex align-center px-4">
+          <v-btn icon="mdi-arrow-left" variant="tonal" color="white" size="small" class="me-4" @click="$router.push('/')" />
+          <h2 class="text-h6 font-weight-black text-white text-truncate">{{ room?.name }}</h2>
+        </div>
+      </v-img>
+    </div>
+
+
+
     <v-container v-if="room" class="elite-content-container pb-16">
       <v-row justify="center">
         <v-col cols="12" lg="11" xl="10">
-          <!-- Floating Action Card (Ultra Premium) -->
-          <v-card
-            class="elite-header-card pa-8 pa-md-10 mb-10 overflow-hidden mt-n16"
-          >
+
+          <!-- Desktop: Premium Header Card -->
+          <v-card class="d-none d-md-block elite-header-card pa-8 mb-10 overflow-hidden mt-n12">
             <div class="card-accent-line"></div>
-            <v-row align="center" justify="space-between">
-              <v-col cols="12" md="6">
-                <div class="d-flex align-center ga-6">
-                  <div class="info-item-elite">
-                    <span class="text-overline text-slate-400">CAPACIDAD</span>
-                    <div class="d-flex align-center mt-1">
-                      <v-icon
-                        icon="mdi-account-group-outline"
-                        color="slate-700"
-                        class="me-2"
-                      />
-                      <span class="text-h6 font-weight-black text-slate-800"
-                        >{{ room?.capacity }} Pers.</span
-                      >
+            <v-row align="center">
+              <v-col cols="12" md="7">
+                <div class="d-flex align-center ga-10">
+                  <!-- Capacidad -->
+                  <div class="info-group-elite">
+                    <div class="d-flex align-center ga-4">
+                      <div class="icon-circle-elite">
+                        <v-icon icon="mdi-account-group" color="slate-700" size="20" />
+                      </div>
+                      <div>
+                        <span class="text-overline-elite d-block mb-1">CAPACIDAD</span>
+                        <span class="text-h6 font-weight-black text-slate-900 leading-none">{{ room?.capacity }} PERSONAS</span>
+                      </div>
                     </div>
                   </div>
-                  <v-divider vertical class="mx-2" />
-                  <div class="info-item-elite">
-                    <span class="text-overline text-slate-400">ESTADO</span>
-                    <div class="d-flex align-center mt-1">
-                      <v-icon
-                        icon="mdi-shield-check-outline"
-                        color="success"
-                        class="me-2"
-                      />
-                      <span class="text-h6 font-weight-black text-success"
-                        >Verificado</span
-                      >
+
+                  <v-divider vertical class="mx-2 opacity-10" style="height: 40px; align-self: center;" />
+
+                  <!-- Estado -->
+                  <div class="info-group-elite">
+                    <div class="d-flex align-center ga-4">
+                      <div class="icon-circle-elite success">
+                        <v-icon icon="mdi-shield-check" color="success" size="20" />
+                      </div>
+                      <div>
+                        <span class="text-overline-elite d-block mb-1">ESTADO</span>
+                        <span class="text-h6 font-weight-black text-success leading-none">VERIFICADO</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </v-col>
-              <v-col
-                cols="12"
-                md="5"
-                class="d-flex justify-md-end pt-6 pt-md-0"
-              >
-                <div class="elite-price-box-mini pa-6 text-center">
-                  <div class="text-overline-elite mb-1">FIANZA DE GARANTÍA</div>
-                  <div class="d-flex align-center justify-center">
-                    <span class="currency-elite">€</span>
-                    <span class="amount-elite-mini">{{
-                      room?.deposit_amount
-                    }}</span>
+
+              <v-col cols="12" md="5" class="d-flex justify-md-end">
+                <div class="elite-price-badge pa-4 px-8">
+                  <span class="text-overline-elite text-white opacity-60 d-block mb-1">FIANZA DE GARANTÍA</span>
+                  <div class="d-flex align-center justify-center ga-2">
+                    <span class="price-symbol-elite">€</span>
+                    <span class="price-amount-elite">{{ room?.deposit_amount }}</span>
                   </div>
                 </div>
               </v-col>
             </v-row>
           </v-card>
 
+          <!-- MOBILE PREMIUM INFO BAR (NO CARD) -->
+
+          <div class="d-md-none mobile-info-bar-elite mb-8 mt-n8">
+            <div class="d-flex align-center justify-space-between px-6 py-4 bg-white rounded-xl shadow-sm border">
+               <div class="d-flex align-center ga-4">
+                  <div class="d-flex align-center">
+                    <v-icon icon="mdi-account-group" size="18" class="me-1 text-slate-400" />
+                    <span class="text-caption font-weight-black text-slate-700">{{ room?.capacity }}</span>
+                  </div>
+                  <v-divider vertical class="mx-0" style="height: 12px; align-self: center;" />
+                  <div class="d-flex align-center">
+                    <v-icon icon="mdi-check-decagram" size="18" class="me-1 text-success" />
+                    <span class="text-caption font-weight-black text-success">LISTO</span>
+                  </div>
+               </div>
+               <div class="mobile-price-tag-elite py-1 px-4 rounded-pill">
+                  <span class="text-caption font-weight-black text-white">€{{ room?.deposit_amount }}</span>
+               </div>
+            </div>
+          </div>
+
           <!-- PASO A PASO INCREMENTAL BOUTIQUE -->
-          <div class="elite-stepper-header mb-12">
+          <div class="elite-stepper-header mb-8 mb-md-12">
             <div class="stepper-track">
               <div
                 v-for="n in 3"
@@ -132,321 +150,54 @@
                 }"
               >
                 <div class="node-circle">
-                  <v-icon
-                    v-if="currentStep > n"
-                    icon="mdi-check"
-                    size="14"
-                    color="white"
-                  />
+                  <v-icon v-if="currentStep > n" icon="mdi-check" size="14" color="white" />
                   <span v-else>{{ n }}</span>
                 </div>
-                <div class="node-label">
-                  {{ ["Reservar", "Horario", "Resumen"][n - 1] }}
-                </div>
-
+                <div class="node-label">{{ ['Reservar', 'Horario', 'Resumen'][n-1] }}</div>
               </div>
               <div class="stepper-line"></div>
-              <div
-                class="stepper-line-active"
-                :style="{ width: ((currentStep - 1) / 2) * 100 + '%' }"
-              ></div>
+              <div class="stepper-line-active" :style="{ width: ((currentStep - 1) / 2) * 100 + '%' }"></div>
             </div>
           </div>
 
           <v-row justify="center">
             <v-col cols="12" lg="9" xl="8" class="pa-0 pa-md-4">
-              <v-window
-                v-model="currentStep"
-                class="elite-window-container overflow-visible"
-              >
-                <!-- PASO 1: LA FECHA -->
+              <v-window v-model="currentStep" class="elite-window-container overflow-visible">
+                
+                <!-- PASO 1: RESERVAR (CALENDARIO) -->
                 <v-window-item :value="1">
-                  <div class="elite-step-wrapper">
-                    <!-- Desktop: Con Tarjeta -->
-                    <v-card
-                      class="d-none d-md-block elite-step-card pa-12 mb-8"
-                    >
-                      <div class="text-center mb-10">
-                        <h2
-                          class="text-h4 font-weight-black text-slate-900 mb-2"
-                        >
-                          Reservar Sala
-                        </h2>
-                        <p class="text-body-1 text-slate-400">
-                          Elige el día de tu evento en el calendario exclusivo.
-                        </p>
-                      </div>
-                      <div class="elite-calendar-wrapper mb-10">
-                        <BoutiqueCalendar
-                          v-model="selectedDate"
-                          :bookings="roomBookings"
-                          :closed-dates="closedDates"
-                          :min-date="minDate"
-                          :max-date="maxDate"
-                          @update:model-value="currentStep = 2"
-                        />
-                      </div>
-                      <div
-                        class="d-flex justify-center ga-8 pt-4 border-t opacity-70"
-                      >
-                        <div class="d-flex align-center ga-2">
-                          <div class="dot-indicator bg-success"></div>
-                          <span class="text-caption font-weight-bold"
-                            >Libre</span
-                          >
-                        </div>
-                        <div class="d-flex align-center ga-2">
-                          <div class="dot-indicator bg-warning"></div>
-                          <span class="text-caption font-weight-bold"
-                            >Parcial</span
-                          >
-                        </div>
-                        <div class="d-flex align-center ga-2">
-                          <div class="dot-indicator bg-error"></div>
-                          <span class="text-caption font-weight-bold"
-                            >Lleno</span
-                          >
-                        </div>
-                      </div>
-                    </v-card>
-
-                    <!-- Mobile: Directo, sin Tarjeta -->
-                    <div class="d-md-none pa-4">
-                      <div class="text-center mb-6">
-                        <h2
-                          class="text-h4 font-weight-black text-slate-900 mb-1"
-                        >
-                          Reservar
-                        </h2>
-                        <p class="text-body-2 text-slate-400">
-                          Día de tu evento exclusivo
-                        </p>
-                      </div>
-                      <div class="mobile-calendar-container mb-8">
-                        <BoutiqueCalendar
-                          v-model="selectedDate"
-                          :bookings="roomBookings"
-                          :closed-dates="closedDates"
-                          :min-date="minDate"
-                          :max-date="maxDate"
-                          @update:model-value="currentStep = 2"
-                        />
-                      </div>
-                      <div class="d-flex justify-center ga-4 opacity-70 pb-10">
-                        <div class="d-flex align-center ga-1">
-                          <div class="dot-indicator bg-success"></div>
-                          <span class="text-caption">Libre</span>
-                        </div>
-                        <div class="d-flex align-center ga-1">
-                          <div class="dot-indicator bg-warning"></div>
-                          <span class="text-caption">Parcial</span>
-                        </div>
-                        <div class="d-flex align-center ga-1">
-                          <div class="dot-indicator bg-error"></div>
-                          <span class="text-caption">Lleno</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                   <BookingStepCalendar 
+                     v-model="selectedDate"
+                     :bookings="roomBookings"
+                     :closed-dates="closedDates"
+                     :min-date="minDate"
+                     :max-date="maxDate"
+                     @update:model-value="currentStep = 2"
+                   />
                 </v-window-item>
 
-                <!-- PASO 2: EL HORARIO -->
+                <!-- PASO 2: HORARIO -->
                 <v-window-item :value="2">
-                  <div class="elite-step-wrapper">
-                    <!-- Desktop -->
-                    <v-card class="d-none d-md-block elite-step-card pa-12">
-                      <div
-                        class="d-flex align-center justify-space-between mb-12"
-                      >
-                        <h2 class="text-h4 font-weight-black text-slate-900">
-                          Elige el Horario
-                        </h2>
-                        <v-btn
-                          variant="text"
-                          color="slate-400"
-                          @click="currentStep = 1"
-                          >VOLVER</v-btn
-                        >
-                      </div>
-                      <div class="elite-time-grid mb-10">
-                        <div
-                          v-for="slot in timeSlots"
-                          :key="slot.value"
-                          :class="[
-                            'elite-time-card',
-                            { active: selectedSlot === slot.value },
-                          ]"
-                          @click="
-                            () => {
-                              selectedSlot = slot.value;
-                              currentStep = 3;
-                            }
-                          "
-                        >
-                          <v-icon :icon="slot.icon" size="32" class="mb-4" />
-                          <div class="slot-name font-weight-black">
-                            {{ slot.label }}
-                          </div>
-                        </div>
-                      </div>
-                    </v-card>
-
-                    <!-- Mobile -->
-                    <div class="d-md-none pa-4">
-                      <div
-                        class="d-flex align-center justify-space-between mb-8"
-                      >
-                        <h2 class="text-h4 font-weight-black text-slate-900">
-                          Horario
-                        </h2>
-                        <v-btn
-                          icon="mdi-calendar-edit"
-                          variant="text"
-                          color="slate-400"
-                          @click="currentStep = 1"
-                        ></v-btn>
-                      </div>
-                      <div class="mobile-time-selection">
-                        <div
-                          v-for="slot in timeSlots"
-                          :key="slot.value"
-                          class="mobile-time-strip pa-5 mb-4"
-                          :class="{ active: selectedSlot === slot.value }"
-                          @click="
-                            () => {
-                              selectedSlot = slot.value;
-                              currentStep = 3;
-                            }
-                          "
-                        >
-                          <div class="d-flex align-center">
-                            <v-icon :icon="slot.icon" class="me-4" size="24" />
-                            <div class="flex-grow-1">
-                              <div class="text-subtitle-1 font-weight-black">
-                                {{ slot.label }}
-                              </div>
-                              <div class="text-caption opacity-60">
-                                {{ slot.range }}
-                              </div>
-                            </div>
-                            <v-icon icon="mdi-chevron-right" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                   <BookingStepTime 
+                     v-model="selectedSlot"
+                     :time-slots="timeSlots"
+                     @back="currentStep = 1"
+                     @update:model-value="currentStep = 3"
+                   />
                 </v-window-item>
 
-                <!-- PASO 3: RESUMEN Y PAGO -->
+                <!-- PASO 3: RESUMEN -->
                 <v-window-item :value="3">
-                  <div class="elite-step-wrapper">
-                    <!-- Desktop -->
-                    <v-card class="d-none d-md-block elite-step-card pa-12">
-                      <h2
-                        class="text-h4 font-weight-black text-slate-900 mb-10"
-                      >
-                        Resumen de Reserva
-                      </h2>
-                      <div class="elite-summary-box pa-8 mb-10">
-                        <div class="summary-row-premium">
-                          <span>Instalación</span
-                          ><span class="value font-weight-black">{{
-                            room?.name
-                          }}</span>
-                        </div>
-                        <div class="summary-row-premium">
-                          <span>Fecha</span
-                          ><span class="value font-weight-black">{{
-                            formatDate(selectedDate)
-                          }}</span>
-                        </div>
-                        <div class="summary-row-premium">
-                          <span>Horario</span
-                          ><span class="value font-weight-black">{{
-                            getTimeLabel(selectedSlot)
-                          }}</span>
-                        </div>
-                        <v-divider class="my-6 opacity-10" />
-                        <div class="summary-row-premium total">
-                          <span>Fianza</span
-                          ><span class="value gold-text"
-                            >{{ room?.deposit_amount }}€</span
-                          >
-                        </div>
-                      </div>
-                      <v-btn
-                        block
-                        height="72"
-                        color="slate-900"
-                        class="text-white font-weight-black"
-                        @click="startPayment"
-                        >PAGAR {{ room?.deposit_amount }}€</v-btn
-                      >
-                    </v-card>
-
-                    <!-- Mobile -->
-                    <div class="d-md-none pa-4">
-                      <h2
-                        class="text-h4 font-weight-black text-slate-900 mb-8 text-center"
-                      >
-                        Confirmación
-                      </h2>
-                      <div class="mobile-summary-app-card pa-6 mb-10">
-                        <div class="summary-item-mobile mb-6">
-                          <v-icon icon="mdi-map-marker-radius" class="me-4" />
-                          <div>
-                            <div class="text-overline">SALA</div>
-                            <div class="font-weight-black">
-                              {{ room?.name }}
-                            </div>
-                          </div>
-                        </div>
-                        <div class="summary-item-mobile mb-6">
-                          <v-icon icon="mdi-calendar-check" class="me-4" />
-                          <div>
-                            <div class="text-overline">CUÁNDO</div>
-                            <div class="font-weight-black">
-                              {{ formatDate(selectedDate) }}
-                            </div>
-                            <div class="text-caption">
-                              {{ getTimeLabel(selectedSlot) }}
-                            </div>
-                          </div>
-                        </div>
-                        <div class="summary-item-mobile">
-                          <v-icon icon="mdi-credit-card-outline" class="me-4" />
-                          <div>
-                            <div class="text-overline">FIANZA</div>
-                            <div class="font-weight-black text-h5">
-                              {{ room?.deposit_amount }}€
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Botón de Acción Fijo/Destacado -->
-                      <div class="mobile-final-action">
-                        <v-btn
-                          block
-                          height="72"
-                          color="slate-900"
-                          rounded="xl"
-                          class="text-white font-weight-black"
-                          @click="startPayment"
-                          >PAGAR Y RESERVAR</v-btn
-                        >
-                        <v-btn
-                          block
-                          variant="text"
-                          color="slate-400"
-                          class="mt-2"
-                          @click="currentStep = 2"
-                          >MODIFICAR</v-btn
-                        >
-                      </div>
-                    </div>
-                  </div>
+                   <BookingStepSummary 
+                     :room-name="room?.name || ''"
+                     :formatted-date="formatDate(selectedDate)"
+                     :time-label="getTimeLabel(selectedSlot)"
+                     :deposit-amount="room?.deposit_amount || 0"
+                     @confirm="startPayment"
+                     @back="currentStep = 2"
+                   />
                 </v-window-item>
+
               </v-window>
             </v-col>
           </v-row>
@@ -513,7 +264,9 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useBookingStore } from "@/stores/booking";
-import BoutiqueCalendar from "@/components/booking/BoutiqueCalendar.vue";
+import BookingStepCalendar from '@/components/booking/BookingStepCalendar.vue';
+import BookingStepTime from '@/components/booking/BookingStepTime.vue';
+import BookingStepSummary from '@/components/booking/BookingStepSummary.vue';
 import { siteService } from "@/services/site.service";
 import { formatDate } from "@/utils/formatters";
 import api from "@/services/api";
@@ -814,6 +567,12 @@ export default {
   line-height: 1;
 }
 
+.amount-elite-mini-mobile {
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
 .card-accent-line {
   position: absolute;
   top: 0;
@@ -822,6 +581,7 @@ export default {
   height: 4px;
   background: linear-gradient(to right, #d4af37, #fbbf24, #d4af37);
 }
+
 
 .text-display-elite {
   font-size: clamp(2.2rem, 5vw, 4rem);
@@ -1444,12 +1204,36 @@ export default {
   letter-spacing: 1px;
   text-transform: uppercase;
 }
+.mobile-mini-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.mini-hero-overlay {
+  height: 100%;
+  background: linear-gradient(to right, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.4));
+}
+
+.mobile-info-bar-elite {
+  position: relative;
+  z-index: 10;
+  margin-top: -30px; /* Overlap effect */
+}
+
+
+.mobile-price-tag-elite {
+  background: #0f172a;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+}
+
 /* STEPPER INCREMENTAL PREMIUM */
 .elite-stepper-header {
   max-width: 600px;
   margin: 0 auto;
   position: relative;
+  padding: 0 24px;
 }
+
 
 .stepper-track {
   display: flex;
@@ -1465,34 +1249,39 @@ export default {
   align-items: center;
   gap: 12px;
   position: relative;
+}
+
+.elite-hero-img {
+  height: 300px !important;
+}
+
+.hero-image {
+  height: 300px;
+  position: relative;
   z-index: 3;
 }
 
+@media (max-width: 600px) {
+  .hero-image {
+    height: 250px !important;
+  }
+}
+
 .node-circle {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: white;
-  border: 2px solid #e2e8f0;
+  border: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
+  font-weight: 800;
+  font-size: 0.8rem;
   color: #94a3b8;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
-
-.node-active .node-circle {
-  border-color: #0f172a;
-  color: #0f172a;
-  transform: scale(1.1);
-  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.15);
-}
-
-.node-completed .node-circle {
-  background: #0f172a;
-  border-color: #0f172a;
+  position: relative;
+  z-index: 5;
 }
 
 .node-label {
@@ -1507,51 +1296,70 @@ export default {
   color: #0f172a;
 }
 
+
+.node-completed .node-circle {
+  background: #0f172a;
+  border-color: #0f172a;
+  color: white;
+}
+
 .stepper-line {
   position: absolute;
-  top: 20px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #e2e8f0;
+  top: 16px;
+  left: 48px;
+  right: 48px;
+  height: 1px;
+  background: #f1f5f9;
   z-index: 1;
 }
 
 .stepper-line-active {
   position: absolute;
-  top: 20px;
-  left: 0;
-  height: 2px;
+  top: 16px;
+  left: 48px;
+  height: 1px;
   background: #0f172a;
   z-index: 1;
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 
 .elite-window-container {
   min-height: 500px;
 }
 
 @media (max-width: 600px) {
+  .elite-stepper-header {
+    margin-bottom: 24px !important;
+  }
+  .node-label {
+    font-size: 0.55rem !important;
+    letter-spacing: 0.5px !important;
+  }
+  .node-circle {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.8rem !important;
+  }
+  .stepper-line, .stepper-line-active {
+    top: 16px !important;
+  }
   .elite-step-card {
-    padding: 16px 0 !important; /* Zero lateral padding */
+    padding: 16px 0 !important;
     box-shadow: none !important;
     background: transparent !important;
   }
   .elite-window-container {
     min-height: 400px;
   }
-  .v-container {
+  .v-container, .v-col, .elite-content-container {
     padding-left: 0 !important;
     padding-right: 0 !important;
-  }
-  .v-col {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-  }
-  .elite-content-container {
-    padding: 0 !important;
+    padding-top: 0 !important;
   }
 }
+
+
 
 .summary-row-premium {
   display: flex;
@@ -1648,9 +1456,78 @@ export default {
 }
 
 /* Ajustes de tipografía móvil */
-.text-overline {
-  font-size: 0.65rem !important;
-  letter-spacing: 1.5px !important;
-  opacity: 0.6;
+/* ESTILOS DE PRECISIÓN PARA ALINEACIÓN HERO */
+.back-btn-elite-compact {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.text-display-elite {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1 !important;
+  font-weight: 900;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+}
+
+.lh-1 {
+  line-height: 1 !important;
+}
+
+.icon-circle-elite {
+
+  width: 44px;
+  height: 44px;
+  background: #f8fafc;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #f1f5f9;
+}
+
+.icon-circle-elite.success {
+  background: #f0fdf4;
+  border-color: #dcfce7;
+}
+
+.elite-price-badge {
+  background: #0f172a;
+  border-radius: 24px;
+  color: white;
+  text-align: center;
+  min-width: 200px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
+}
+
+.price-symbol-elite {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.price-amount-elite {
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.text-overline-elite {
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
 }
 </style>
+
+
