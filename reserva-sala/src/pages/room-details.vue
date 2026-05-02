@@ -22,7 +22,7 @@
       </v-img>
     </div>
 
-    <v-container class="elite-content-container pb-16">
+    <v-container v-if="room" class="elite-content-container pb-16">
       <v-row justify="center">
         <v-col cols="12" lg="11" xl="10">
           
@@ -83,6 +83,7 @@
                 <div class="elite-calendar-wrapper">
                   <v-date-picker
                     v-model="selectedDate"
+                    :key="`calendar-${room.id}`"
                     color="#0f172a"
                     elevation="0"
                     class="w-100 elite-picker"
@@ -239,7 +240,13 @@
     </v-container>
 
     <!-- Payment Modal (Refined) -->
-    <v-dialog v-model="showPayment" max-width="500" transition="dialog-bottom-transition">
+    <v-dialog 
+      v-if="room"
+      v-model="showPayment" 
+      max-width="500" 
+      transition="dialog-bottom-transition"
+      :key="`payment-dialog-${room.id}`"
+    >
       <v-card class="elite-modal-card pa-8 pa-md-10 overflow-hidden">
         <div class="modal-glow"></div>
         <div class="text-center mb-10">
@@ -328,10 +335,14 @@ const closedDates = [
 ]
 
 const allowedDates = (val: unknown) => {
-  const dateStr = val as string
-  const monthDay = dateStr.substring(5) // MM-DD
-  return !closedDates.includes(monthDay)
+  if (!val) return true;
+  const date = val instanceof Date ? val : new Date(val as string);
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const monthDay = `${month}-${day}`;
+  return !closedDates.includes(monthDay);
 }
+
 
 const getTimeLabel = (val: string | null) => timeSlots.value.find(s => s.value === val)?.label || 'Pendiente'
 const isReadyToBook = computed(() => selectedDate.value && selectedSlot.value)
