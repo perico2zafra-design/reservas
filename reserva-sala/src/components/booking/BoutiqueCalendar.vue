@@ -158,6 +158,15 @@ const getDayStatus = (date: any) => {
   border: 1px solid #f1f5f9;
 }
 
+@media (max-width: 600px) {
+  .boutique-calendar-wrapper {
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+  }
+}
+
+
 /* Espaciado de la cuadrícula de Vuetify */
 :deep(.v-date-picker-month__days) {
   gap: 12px 6px !important; /* Separación vertical y horizontal */
@@ -251,6 +260,81 @@ const getDayStatus = (date: any) => {
 .calendar-cell.is-selected .status-dot {
   background-color: #d4af37 !important;
 }
+/* REDISEÑO ULTRA-PREMIUM Y COMPACTO */
+.elite-calendar-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.8);
+
+  backdrop-filter: blur(10px);
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  margin: 0 auto;
+}
+
+:deep(.v-date-picker) {
+  width: 100% !important;
+  min-width: 0 !important;
+  background: transparent !important;
+}
+
+:deep(.v-date-picker-controls) {
+  padding: 4px 8px !important;
+  gap: 4px !important;
+}
+
+:deep(.v-date-picker-controls__month), 
+:deep(.v-date-picker-controls__year) {
+  padding: 0 4px !important;
+}
+
+:deep(.v-date-picker-month__days) {
+  row-gap: 16px !important; /* Aumentado a 16px por petición */
+  column-gap: 1px !important;
+  justify-content: space-between !important;
+}
+
+
+
+:deep(.v-date-picker-month__weekday) {
+  font-size: 9px !important;
+  color: #94a3b8 !important;
+  font-weight: 900 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* AJUSTES DE TAMAÑO SEGÚN PANTALLA */
+@media (max-width: 600px) {
+  :deep(.v-date-picker-month__day) {
+    --v-date-picker-month-day-size: 32px !important;
+    width: 36px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  :deep(.v-date-picker-month__day) {
+    --v-date-picker-month-day-size: 28px !important;
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  .elite-calendar-container {
+    padding: 4px;
+  }
+}
+
+@media (max-width: 340px) {
+  :deep(.v-date-picker-month__day) {
+    --v-date-picker-month-day-size: 26px !important;
+    width: 28px !important;
+  }
+}
 </style>
+
+
+
 
 
