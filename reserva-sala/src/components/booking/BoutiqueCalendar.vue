@@ -195,18 +195,16 @@ const getDayStatus = (date: any) => {
 
 
 .day-number {
-  font-weight: 800 !important;
-  font-size: 1rem !important;
-  color: #1a202c !important; /* Slate Midnight */
-  line-height: 1 !important;
-  z-index: 10 !important;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1;
 }
 
 .status-dot {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
-  margin-top: 4px;
   z-index: 10;
 }
 
@@ -309,10 +307,20 @@ const getDayStatus = (date: any) => {
 /* AJUSTES DE TAMAÑO SEGÚN PANTALLA */
 @media (max-width: 600px) {
   :deep(.v-date-picker-month__day) {
-    --v-date-picker-month-day-size: 32px !important;
-    width: 36px !important;
+    --v-date-picker-month-day-size: 35px !important;
+    width: 35px !important;
+    height: 35px !important;
+  }
+  .calendar-cell {
+    width: 35px !important;
+    height: 35px !important;
+  }
+  :deep(.v-date-picker-month__days) {
+    row-gap: 10px !important;
   }
 }
+
+
 
 @media (max-width: 380px) {
   :deep(.v-date-picker-month__day) {
