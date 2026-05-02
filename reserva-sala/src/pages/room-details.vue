@@ -35,9 +35,10 @@
                   <v-chip color="#d4af37" variant="flat" size="small" class="text-white font-weight-black letter-spacing-lg">
                     INSTALACIÓN EXCLUSIVA
                   </v-chip>
-                  <v-chip v-if="room?.is_active" color="rgba(16, 185, 129, 0.1)" class="text-success font-weight-black border-success-op" size="small">
-                    <v-icon icon="mdi-check-circle" start size="14" /> DISPONIBLE
+                  <v-chip v-if="room?.is_active" color="#ecfdf5" class="text-emerald-700 font-weight-black border-emerald" size="small">
+                    <v-icon icon="mdi-check-circle" start size="14" color="#059669" /> DISPONIBLE
                   </v-chip>
+
                 </div>
                 <h1 class="text-display-elite text-playfair mb-6">{{ room?.name }}</h1>
                 <p class="text-body-elite mb-0">{{ room?.description }}</p>
@@ -124,56 +125,97 @@
                 </div>
               </v-card>
 
-              <!-- Sección de Normas Acta 15/04/2026 -->
-              <v-card class="elite-step-card pa-8 border-amber-light">
-                <div class="d-flex align-center mb-6">
-                  <v-icon icon="mdi-gavel" color="amber-darken-3" class="me-4" />
-                  <h3 class="text-h6 font-weight-black text-slate-900">Normativa Vigente (Acta 15/04/2026)</h3>
-                </div>
-                <v-list density="compact" class="bg-transparent">
-                  <v-list-item v-for="(rule, idx) in meetingRules" :key="idx" class="px-0">
-                    <template v-slot:prepend>
-                      <v-icon icon="mdi-circle-small" color="amber" />
-                    </template>
-                    <v-list-item-title class="text-body-2 text-slate-600 text-wrap leading-relaxed">
-                      {{ rule }}
-                    </v-list-item-title>
-                  </v-list-item>
-                </v-list>
-                <div class="mt-6 pa-4 bg-error-lighten-5 rounded-lg border-error-op">
-                  <div class="d-flex align-center mb-2">
-                    <v-icon icon="mdi-alert-octagon" color="error" size="20" class="me-2" />
-                    <span class="text-caption font-weight-bold text-error">PROHIBICIÓN CRÍTICA</span>
+              <!-- Sección de Normativa Vigente (Boutique Style) -->
+              <v-card class="elite-rules-card pa-8 pa-md-10 overflow-hidden mt-8">
+                <div class="rules-accent-glow"></div>
+                
+                <div class="d-flex align-center mb-10">
+                  <div class="rules-icon-header me-5">
+                    <v-icon icon="mdi-gavel" color="#d4af37" size="28" />
                   </div>
-                  <p class="text-caption text-error-darken-2 mb-0 font-weight-bold">
-                    Queda terminantemente prohibido el acceso al GIMNASIO durante el uso del salón social. El incumplimiento conlleva sanción muy grave.
-                  </p>
+                  <div>
+                    <h3 class="text-h5 font-weight-black text-slate-900 text-playfair mb-1">Normativa Vigente</h3>
+                    <div class="d-flex align-center ga-2">
+                      <v-chip size="x-small" color="slate-900" variant="flat" class="text-white px-3">ACTA 15/04/2026</v-chip>
+                      <span class="text-caption text-slate-400 font-weight-bold letter-spacing-sm">CUMPLIMIENTO OBLIGATORIO</span>
+                    </div>
+                  </div>
+                </div>
+
+                <v-row class="ga-y-6">
+                  <v-col v-for="(rule, idx) in enrichedRules" :key="idx" cols="12" md="6">
+                    <div class="rule-premium-item">
+                      <div class="rule-icon-box me-4">
+                        <v-icon :icon="rule.icon" size="20" color="#d4af37" />
+                      </div>
+                      <div class="rule-text">
+                        <span class="text-body-2 font-weight-medium text-slate-600">{{ rule.text }}</span>
+                      </div>
+                    </div>
+                  </v-col>
+                </v-row>
+
+                <!-- Aviso Crítico (Security Grade) -->
+                <div class="mt-12 elite-security-alert pa-6">
+                  <div class="d-flex align-start ga-5">
+                    <div class="alert-pulse-icon">
+                      <v-icon icon="mdi-shield-alert" color="white" size="24" />
+                    </div>
+                    <div>
+                      <h4 class="text-subtitle-1 font-weight-black text-error-darken-4 mb-1">RESTRICCIÓN DE ACCESO CRÍTICA</h4>
+                      <p class="text-body-2 text-error-darken-2 mb-0 leading-relaxed font-weight-medium">
+                        Queda terminantemente prohibido el acceso al <strong>GIMNASIO</strong> durante el uso del salón social. 
+                        Este incumplimiento se tipifica como <strong>falta muy grave</strong> con sanción inmediata según acta.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </v-card>
+
             </v-col>
 
             <!-- Resumen y Pago (Columna Derecha) -->
             <v-col cols="12" lg="5">
               <div class="sticky-top-elite">
                 <v-card class="elite-checkout-card overflow-hidden">
-                  <div class="checkout-header pa-8 bg-slate-900 text-white">
+                  <!-- Cabecera de Recibo Premium -->
+                  <div class="checkout-header pa-8">
                     <div class="d-flex justify-space-between align-center mb-8">
-                      <h3 class="text-h5 font-weight-black text-playfair">Tu Reserva</h3>
-                      <v-icon icon="mdi-gold" color="amber" size="32" />
+                      <div class="checkout-title-group">
+                        <h3 class="text-h5 font-weight-black text-playfair text-white mb-1">Tu Reserva</h3>
+                        <div class="d-flex align-center">
+                          <v-icon icon="mdi-circle" color="amber" size="8" class="me-2" />
+                          <span class="text-overline text-amber-lighten-2 font-weight-black" style="font-size: 0.6rem; letter-spacing: 2px;">RESUMEN ELITE</span>
+                        </div>
+                      </div>
+                      <v-icon icon="mdi-gold" color="amber" size="36" />
                     </div>
                     
                     <div class="d-flex flex-column ga-6">
-                      <div class="summary-row">
+                      <!-- Instalación -->
+                      <div class="summary-item">
                         <span class="summary-label">INSTALACIÓN</span>
-                        <span class="summary-value text-amber">{{ room?.name }}</span>
+                        <div class="summary-value-wrapper">
+                          <span class="summary-value text-amber-accent-2">{{ room?.name }}</span>
+                        </div>
                       </div>
-                      <div class="summary-row">
-                        <span class="summary-label">FECHA</span>
-                        <span class="summary-value">{{ formatDate(selectedDate) }}</span>
+
+                      <!-- Fecha con Placeholder -->
+                      <div class="summary-item">
+                        <span class="summary-label">FECHA SELECCIONADA</span>
+                        <div class="summary-value-wrapper">
+                          <span v-if="selectedDate" class="summary-value text-white">{{ formatDate(selectedDate) }}</span>
+                          <span v-else class="summary-value-placeholder">Pendiente de selección...</span>
+                        </div>
                       </div>
-                      <div class="summary-row">
-                        <span class="summary-label">TRAMO</span>
-                        <span class="summary-value">{{ getTimeLabel(selectedSlot) }}</span>
+
+                      <!-- Horario con Placeholder -->
+                      <div class="summary-item">
+                        <span class="summary-label">TRAMO HORARIO</span>
+                        <div class="summary-value-wrapper">
+                          <span v-if="selectedSlot" class="summary-value text-white">{{ getTimeLabel(selectedSlot) }}</span>
+                          <span v-else class="summary-value-placeholder">Esperando horario...</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -188,7 +230,7 @@
                         </div>
                       </div>
                       <div class="text-right">
-                        <v-icon icon="mdi-shield-check" color="success" size="24" class="mb-1" />
+                        <v-icon icon="mdi-shield-check" color="success" size="28" class="mb-1" />
                         <div class="text-caption font-weight-bold text-success">Garantía Elite</div>
                       </div>
                     </div>
@@ -198,17 +240,18 @@
                       height="72"
                       color="#0f172a"
                       rounded="xl"
-                      class="elite-action-btn"
+                      class="elite-action-btn shadow-elite-btn"
                       :disabled="!isReadyToBook"
                       @click="startPayment"
                     >
-                      <span class="btn-text">CONFIRMAR RESERVA</span>
+                      <span class="btn-text" v-if="isReadyToBook">CONFIRMAR RESERVA</span>
+                      <span class="btn-text text-grey-darken-1" v-else>COMPLETA LOS DATOS</span>
                       <v-icon icon="mdi-arrow-right" class="ms-4 btn-icon" />
                     </v-btn>
                     
-                    <div class="secure-badges mt-8 d-flex justify-center ga-6 opacity-40">
+                    <div class="secure-badges mt-8 d-flex justify-center ga-6 opacity-30">
                       <v-icon icon="mdi-stripe" size="40" />
-                      <v-icon icon="mdi-lock-outline" size="20" />
+                      <v-icon icon="mdi-shield-lock-outline" size="20" />
                       <v-icon icon="mdi-credit-card-outline" size="20" />
                     </div>
                   </div>
@@ -216,22 +259,27 @@
 
                 <!-- Aviso Legal Premium -->
                 <div class="elite-notice-card mt-6 pa-6">
-                  <div class="d-flex flex-column ga-3">
-                    <div class="d-flex">
-                      <v-icon icon="mdi-camera-outline" color="amber-darken-2" class="me-3" />
-                      <p class="text-caption text-slate-500 mb-0">
-                        <strong>Recomendación Acta:</strong> Realice fotografías del estado de la sala al finalizar para garantizar su fianza.
+                  <div class="d-flex flex-column ga-4">
+                    <div class="d-flex align-start">
+                      <div class="icon-circle-amber me-4">
+                        <v-icon icon="mdi-camera-outline" color="amber-darken-3" size="18" />
+                      </div>
+                      <p class="text-caption text-slate-500 mb-0 leading-relaxed">
+                        <strong>Protocolo de Salida:</strong> Recomendamos fotografiar la sala al terminar. Garantiza la devolución íntegra de tu fianza.
                       </p>
                     </div>
-                    <v-divider class="opacity-10" />
-                    <div class="d-flex">
-                      <v-icon icon="mdi-information-outline" color="blue" class="me-3" />
+                    <v-divider class="border-opacity-25" />
+                    <div class="d-flex align-start">
+                      <div class="icon-circle-blue me-4">
+                        <v-icon icon="mdi-clock-check-outline" color="blue-darken-3" size="18" />
+                      </div>
                       <p class="text-caption text-slate-500 mb-0 leading-relaxed">
-                        Fianza reembolsable en 48h tras inspección. Límite: 2 reservas/mes por propietario.
+                        Inspección y reembolso automático en un máximo de 48h hábiles tras el evento.
                       </p>
                     </div>
                   </div>
                 </div>
+
               </div>
             </v-col>
           </v-row>
@@ -328,11 +376,25 @@ const meetingRules = computed(() => [
   "La fianza se devuelve tras comprobar el estado de limpieza y orden."
 ])
 
+const enrichedRules = computed(() => {
+  const icons = [
+    'mdi-calendar-check', 'mdi-account-star', 'mdi-trash-can-outline',
+    'mdi-volume-variant-off', 'mdi-image-off-outline', 'mdi-lightbulb-outline',
+    'mdi-broom'
+  ]
+  return meetingRules.value.map((rule, i) => ({
+    text: rule,
+    icon: icons[i] || 'mdi-information-outline'
+  }))
+})
+
+
 // Días cerrados según Acta: 24, 25, 31 Dic y 1, 5, 6 Ene
 const closedDates = [
   '12-24', '12-25', '12-31', 
   '01-01', '01-05', '01-06'
 ]
+
 
 const allowedDates = (val: unknown) => {
   if (!val) return true;
@@ -509,16 +571,107 @@ export default {
 }
 
 /* STEP CARDS */
-.elite-step-card {
+.elite-step-card, .elite-rules-card {
   border-radius: 40px !important;
   background: white !important;
   border: 1px solid #e2e8f0 !important;
   position: relative;
 }
 
+.elite-rules-card {
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05) !important;
+}
+
+.rules-accent-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, #d4af37, transparent);
+  opacity: 0.3;
+}
+
+.rules-icon-header {
+  width: 56px;
+  height: 56px;
+  background: #0f172a;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);
+}
+
+.rule-premium-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.rule-premium-item:hover {
+  background: #f8fafc;
+  transform: translateX(5px);
+}
+
+.rule-icon-box {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+
+/* SECURITY ALERT */
+.elite-security-alert {
+  background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+  border: 1px solid rgba(220, 38, 38, 0.15);
+  border-radius: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.elite-security-alert::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 6px;
+  background: #dc2626;
+}
+
+.alert-pulse-icon {
+  width: 48px !important;
+  height: 48px !important;
+  background: #dc2626;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* Evita que se estire */
+  box-shadow: 0 8px 16px rgba(220, 38, 38, 0.2);
+  animation: pulse-red 2s infinite;
+}
+
+
+@keyframes pulse-red {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
 .border-amber-light {
   border: 1px solid rgba(212, 175, 55, 0.2) !important;
 }
+
 
 .step-number {
   position: absolute;
@@ -632,6 +785,23 @@ export default {
   border-radius: 40px !important;
   box-shadow: 0 40px 80px -15px rgba(15, 23, 42, 0.2) !important;
   border: 0 !important;
+  background: white;
+}
+
+.checkout-header {
+  background: #0f172a;
+  color: white;
+  position: relative;
+}
+
+.checkout-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
 }
 
 .sticky-top-elite {
@@ -639,22 +809,31 @@ export default {
   top: 100px;
 }
 
-.summary-row {
+.summary-item {
   display: flex;
   flex-direction: column;
 }
 
 .summary-label {
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: 900;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.4);
   letter-spacing: 2px;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
 .summary-value {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 800;
+  line-height: 1.2;
+}
+
+.summary-value-placeholder {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.2);
+  font-weight: 600;
+  font-style: italic;
 }
 
 .elite-action-btn {
@@ -663,9 +842,13 @@ export default {
   transition: all 0.4s cubic-bezier(0.2, 0, 0, 1) !important;
 }
 
+.shadow-elite-btn {
+  box-shadow: 0 15px 35px -10px rgba(15, 23, 42, 0.4) !important;
+}
+
 .elite-action-btn:not(:disabled):hover {
   transform: translateY(-3px);
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.4) !important;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.5) !important;
 }
 
 .btn-icon {
@@ -678,44 +861,29 @@ export default {
 
 /* NOTICE CARD */
 .elite-notice-card {
-  background: rgba(251, 191, 36, 0.05);
-  border: 1px dashed rgba(212, 175, 55, 0.3);
-  border-radius: 24px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 32px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
 }
 
-/* MODAL & STRIPE */
-.elite-modal-card {
-  border-radius: 40px !important;
-  position: relative;
-}
-
-.modal-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 6px;
-  background: linear-gradient(to right, #d4af37, #fbbf24);
-}
-
-.modal-icon-ring {
-  width: 80px;
-  height: 80px;
-  background: #f1f5f9;
-  border-radius: 50%;
-  display: inline-flex;
+.icon-circle-amber, .icon-circle-blue {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
-.elite-stripe-box {
-  background: #f8fafc;
-  padding: 24px;
-  border-radius: 24px;
-  border: 1px solid #e2e8f0;
-}
+.icon-circle-amber { background: rgba(251, 191, 36, 0.1); }
+.icon-circle-blue { background: rgba(37, 99, 235, 0.1); }
 
 /* UTILS */
+.text-emerald-700 { color: #047857 !important; }
+.border-emerald { border: 1px solid rgba(16, 185, 129, 0.3) !important; }
+
 .letter-spacing-lg { letter-spacing: 1.5px !important; }
 .border-success-op { border: 1px solid rgba(16, 185, 129, 0.2) !important; }
 .border-error-op { border: 1px solid rgba(239, 68, 68, 0.2) !important; }
@@ -726,5 +894,6 @@ export default {
   .elite-price-box { max-width: 100%; }
 }
 </style>
+
 
 
